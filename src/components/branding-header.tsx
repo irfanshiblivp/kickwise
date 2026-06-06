@@ -34,7 +34,7 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
             height={compact ? 40 : 55} 
             className="object-contain rounded-full"
           />
-          <div className="h-8 w-[1px] bg-foreground/10 opacity-30" />
+          <div className="h-8 w-[1px] bg-foreground/20 opacity-40" />
           <Image 
             src={rightAltLogo?.imageUrl || ''} 
             alt="Right Logo" 
@@ -46,21 +46,25 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
       </div>
 
       {/* Center Branding Content */}
-      <div className={`container mx-auto px-4 text-center ${compact ? 'py-4' : 'mt-4 mb-10'}`}>
-        <div className="space-y-1">
-          <p className="text-[10px] md:text-xs font-headline font-bold uppercase tracking-[0.3em] text-foreground/70">
+      <div className={`container mx-auto px-4 text-center ${compact ? 'py-4' : 'mt-2 mb-8'}`}>
+        <div className="space-y-4">
+          <p className="text-[10px] md:text-sm font-headline font-bold uppercase tracking-[0.4em] text-foreground/80">
             College of Engineering Munnar
           </p>
           
-          <h2 className={`${compact ? 'text-2xl' : 'text-4xl md:text-6xl'} font-headline font-black text-primary tracking-widest uppercase mt-2`}>
-            Dhruva
-          </h2>
+          <div className="py-2" /> {/* Gap as requested */}
+
+          <div className="space-y-1">
+            <h2 className={`${compact ? 'text-2xl' : 'text-4xl md:text-6xl'} font-headline font-black text-primary tracking-widest uppercase`}>
+              Dhruva
+            </h2>
+            
+            <p className={`${compact ? 'text-xs' : 'text-lg md:text-xl'} font-headline font-black text-primary tracking-widest uppercase`}>
+              Department of Computer Science and Engineering
+            </p>
+          </div>
           
-          <p className="text-[10px] md:text-[12px] font-bold text-foreground/60 uppercase tracking-widest mt-1">
-            Department of Computer Science and Engineering
-          </p>
-          
-          <p className="text-[11px] font-headline font-black italic text-primary/60 mt-2 uppercase tracking-[0.2em]">
+          <p className="text-[11px] font-headline font-black italic text-primary/70 uppercase tracking-[0.3em]">
             Presents
           </p>
         </div>

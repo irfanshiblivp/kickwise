@@ -13,7 +13,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 export default function Home() {
   const router = useRouter();
   const [isAuth, setIsAuth] = useState(false);
-  const bgImage = PlaceHolderImages.find(img => img.id === 'world-cup-bg');
+  const stadiumBg = PlaceHolderImages.find(img => img.id === 'stadium-bg');
 
   useEffect(() => {
     const user = localStorage.getItem('kw_current_user');
@@ -22,16 +22,16 @@ export default function Home() {
 
   return (
     <div className="min-h-screen relative flex flex-col items-center bg-background selection:bg-primary selection:text-white overflow-x-hidden">
-      {/* Professional Background with watermark effect */}
-      <div className="fixed inset-0 z-0">
+      {/* Stadium Background with Grass and Blur */}
+      <div className="fixed inset-0 z-0 overflow-hidden">
         <Image 
-          src={bgImage?.imageUrl || ''} 
-          alt="Branding Background" 
+          src={stadiumBg?.imageUrl || ''} 
+          alt="Stadium Background" 
           fill 
-          className="object-contain opacity-5 grayscale scale-110"
+          className="object-cover opacity-20 blur-[6px] scale-105"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/80 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/80 to-background" />
       </div>
 
       <BrandingHeader />
