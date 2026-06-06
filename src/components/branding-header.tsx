@@ -8,77 +8,77 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
   const leftLogo = PlaceHolderImages.find(img => img.id === 'left-logo');
   const cemLogo = PlaceHolderImages.find(img => img.id === 'cem-logo');
   const rightAltLogo = PlaceHolderImages.find(img => img.id === 'right-alt-logo');
-  const extraLogo = PlaceHolderImages.find(img => img.id === 'extra-logo');
+  const kickwiseLogo = PlaceHolderImages.find(img => img.id === 'kickwise-logo');
 
   return (
     <header className={`w-full relative z-20 ${compact ? 'bg-card/80 border-b border-border' : ''}`}>
       {/* Topmost Logo Bar */}
-      <div className="container mx-auto px-4 py-2 flex justify-between items-center">
+      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         {/* Left Logo */}
         <div className="flex-shrink-0">
           <Image 
             src={leftLogo?.imageUrl || ''} 
             alt="Association Logo" 
-            width={compact ? 40 : 50} 
-            height={compact ? 40 : 50} 
+            width={compact ? 45 : 60} 
+            height={compact ? 45 : 60} 
             className="object-contain"
           />
         </div>
 
         {/* Right Logos with Thin Divider */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <Image 
             src={cemLogo?.imageUrl || ''} 
             alt="CEM Logo" 
-            width={compact ? 35 : 45} 
-            height={compact ? 35 : 45} 
+            width={compact ? 40 : 55} 
+            height={compact ? 40 : 55} 
             className="object-contain rounded-full"
           />
-          <div className="h-6 w-[0.5px] bg-foreground/10" />
+          <div className="h-8 w-[1px] bg-foreground/10 opacity-30" />
           <Image 
             src={rightAltLogo?.imageUrl || ''} 
             alt="Right Logo" 
-            width={compact ? 35 : 45} 
-            height={compact ? 35 : 45} 
+            width={compact ? 40 : 55} 
+            height={compact ? 40 : 55} 
             className="object-contain"
           />
         </div>
       </div>
 
       {/* Center Branding Content */}
-      <div className={`container mx-auto px-4 text-center ${compact ? 'py-4' : 'mt-2 mb-8'}`}>
-        <div className="space-y-0.5">
-          <p className="text-[10px] md:text-xs font-headline font-bold uppercase tracking-[0.2em] text-foreground/70">
+      <div className={`container mx-auto px-4 text-center ${compact ? 'py-4' : 'mt-4 mb-10'}`}>
+        <div className="space-y-1">
+          <p className="text-[10px] md:text-xs font-headline font-bold uppercase tracking-[0.3em] text-foreground/70">
             College of Engineering Munnar
           </p>
-          {!compact && <div className="py-2" />}
-          <h2 className={`${compact ? 'text-xl' : 'text-3xl md:text-5xl'} font-headline font-black text-primary tracking-widest uppercase`}>
+          
+          <h2 className={`${compact ? 'text-2xl' : 'text-4xl md:text-6xl'} font-headline font-black text-primary tracking-widest uppercase mt-2`}>
             Dhruva
           </h2>
-          <p className="text-[9px] md:text-[10px] font-bold text-foreground/60 uppercase tracking-widest">
+          
+          <p className="text-[10px] md:text-[12px] font-bold text-foreground/60 uppercase tracking-widest mt-1">
             Department of Computer Science and Engineering
           </p>
-          <p className="text-[10px] italic font-light text-foreground/40 mt-1 lowercase">
+          
+          <p className="text-[11px] font-headline font-black italic text-primary/60 mt-2 uppercase tracking-[0.2em]">
             Presents
           </p>
         </div>
 
         {!compact && (
-          <div className="mt-6 flex justify-center items-center gap-4">
+          <div className="mt-8 flex flex-col items-center gap-6">
              <Image 
-              src={extraLogo?.imageUrl || ''} 
-              alt="Extra Logo" 
-              width={60} 
-              height={60} 
-              className="object-contain animate-pulse"
+              src={kickwiseLogo?.imageUrl || ''} 
+              alt="Kickwise Logo" 
+              width={140} 
+              height={140} 
+              className="object-contain animate-pop"
             />
+            <div className="w-48 h-[1px] bg-primary/20" />
+            <p className="text-xs md:text-sm font-headline font-black text-foreground tracking-[0.5em] uppercase">
+              2026 PREDICTION ARENA
+            </p>
           </div>
-        )}
-        
-        {!compact && (
-          <p className="text-xs md:text-sm font-headline font-bold text-foreground mt-4 tracking-[0.4em] uppercase border-t border-primary/20 pt-4 inline-block">
-            2026 PREDICTION ARENA
-          </p>
         )}
       </div>
     </header>
