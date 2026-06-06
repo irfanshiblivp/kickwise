@@ -34,7 +34,7 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
             height={compact ? 40 : 55} 
             className="object-contain rounded-full"
           />
-          <div className="h-8 w-[1px] bg-foreground/20 opacity-40" />
+          <div className="h-8 w-[1px] bg-foreground/20 opacity-20" />
           <Image 
             src={rightAltLogo?.imageUrl || ''} 
             alt="Right Logo" 
@@ -54,8 +54,8 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
           
           <div className="py-2" /> {/* Requested Gap */}
 
-          <div className="space-y-1">
-            <h2 className={`${compact ? 'text-2xl' : 'text-4xl md:text-5xl'} font-headline font-black text-primary tracking-widest uppercase`}>
+          <div className="space-y-2">
+            <h2 className={`${compact ? 'text-2xl' : 'text-3xl md:text-4xl'} font-headline font-black text-primary tracking-widest uppercase`}>
               Dhruva
             </h2>
             
@@ -64,7 +64,7 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
             </p>
           </div>
           
-          <p className="text-[11px] font-headline font-black italic text-primary/70 uppercase tracking-[0.3em]">
+          <p className="text-[11px] font-headline font-black italic text-primary/70 uppercase tracking-[0.3em] mt-4">
             Presents
           </p>
         </div>

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState, useMemo } from 'react';
@@ -11,6 +12,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { LogOut, Trophy, MessageSquare, LayoutDashboard, ListOrdered } from 'lucide-react';
 import { Toaster } from '@/components/ui/toaster';
+import Image from 'next/image';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -19,6 +22,7 @@ export default function DashboardPage() {
   const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
   const [leaderboard, setLeaderboard] = useState<User[]>([]);
   const [activeRound, setActiveRound] = useState('1');
+  const stadiumBg = PlaceHolderImages.find(img => img.id === 'stadium-bg');
 
   useEffect(() => {
     const savedUser = localStorage.getItem('kw_current_user');
@@ -56,7 +60,19 @@ export default function DashboardPage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen relative flex flex-col bg-background">
+      {/* Stadium Background */}
+      <div className="fixed inset-0 z-0 overflow-hidden">
+        <Image 
+          src={stadiumBg?.imageUrl || ''} 
+          alt="Stadium Background" 
+          fill 
+          className="object-cover opacity-10 blur-[4px]"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/50 to-background" />
+      </div>
+
       <BrandingHeader compact />
 
       <nav className="border-b border-border bg-card/50 backdrop-blur-md sticky top-0 z-40">
@@ -85,7 +101,7 @@ export default function DashboardPage() {
         </div>
       </nav>
 
-      <main className="container mx-auto px-4 py-8 space-y-8 flex-1">
+      <main className="container mx-auto px-4 py-8 space-y-8 flex-1 z-10">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           
           {/* Main Tournament View */}
