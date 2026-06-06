@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Toaster } from '@/components/ui/toaster';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   ShieldCheck, 
   Plus, 
@@ -30,8 +31,9 @@ import {
   Edit2,
   RefreshCcw,
   ListOrdered,
-  Eye,
-  EyeOff
+  LayoutGrid,
+  Trophy,
+  History
 } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -197,15 +199,32 @@ export default function AdminPage() {
         </div>
       </nav>
 
-      <main className="container mx-auto p-4 md:p-8 space-y-8 z-10 flex-1">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          <div className="lg:col-span-2 space-y-8">
+      <main className="container mx-auto p-4 md:p-8 space-y-8 z-10 flex-1 max-w-6xl">
+        <Tabs defaultValue="manage" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto bg-muted/50 border border-border p-1 rounded-none mb-8">
+            <TabsTrigger value="create" className="rounded-none py-3 text-[10px] font-black uppercase tracking-widest gap-2">
+              <Plus className="h-3 w-3" /> New Match
+            </TabsTrigger>
+            <TabsTrigger value="manage" className="rounded-none py-3 text-[10px] font-black uppercase tracking-widest gap-2">
+              <History className="h-3 w-3" /> Fixtures & Scores
+            </TabsTrigger>
+            <TabsTrigger value="leadership" className="rounded-none py-3 text-[10px] font-black uppercase tracking-widest gap-2">
+              <Trophy className="h-3 w-3" /> Leadership
+            </TabsTrigger>
+            <TabsTrigger value="rounds" className="rounded-none py-3 text-[10px] font-black uppercase tracking-widest gap-2">
+              <Lock className="h-3 w-3" /> Rounds
+            </TabsTrigger>
+            <TabsTrigger value="system" className="rounded-none py-3 text-[10px] font-black uppercase tracking-widest gap-2">
+              <ShieldCheck className="h-3 w-3" /> System
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="create">
             <Card className="glass-morphism rounded-none classic-border">
               <CardHeader className="bg-primary/5 border-b border-border">
                 <CardTitle className="font-headline font-black uppercase tracking-tighter text-sm flex items-center gap-2">
                   <Plus className="h-4 w-4 text-primary" />
-                  Enter New Match
+                  Enter New Official Fixture
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
@@ -264,10 +283,12 @@ export default function AdminPage() {
                 </form>
               </CardContent>
             </Card>
+          </TabsContent>
 
+          <TabsContent value="manage">
             <Card className="glass-morphism rounded-none classic-border">
               <CardHeader className="flex flex-row items-center justify-between border-b border-border bg-primary/5">
-                <CardTitle className="font-headline font-black uppercase tracking-tighter text-sm">Manage Fixtures & Scores</CardTitle>
+                <CardTitle className="font-headline font-black uppercase tracking-tighter text-sm">Update Scores & Manage Fixtures</CardTitle>
                 <Badge variant="outline" className="text-primary border-primary/30 rounded-none text-[9px] font-black">{matches.length} MATCHES</Badge>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
@@ -348,16 +369,18 @@ export default function AdminPage() {
                 ))}
               </CardContent>
             </Card>
+          </TabsContent>
 
+          <TabsContent value="leadership">
             <Card className="glass-morphism rounded-none classic-border">
               <CardHeader className="bg-primary/5 border-b border-border">
                 <CardTitle className="font-headline font-black uppercase text-sm flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <ListOrdered className="h-4 w-4 text-primary" />
-                    Leadership Table (User View Control)
+                    Leadership Table Control
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-black text-muted-foreground uppercase">{settings.leaderboardVisible ? "Visible to Users" : "Hidden from Users"}</span>
+                    <span className="text-[10px] font-black text-muted-foreground uppercase">{settings.leaderboardVisible ? "Visible to Students" : "Hidden from Students"}</span>
                     <Switch checked={settings.leaderboardVisible} onCheckedChange={toggleLeaderboardVisibility} />
                   </div>
                 </CardTitle>
@@ -379,14 +402,14 @@ export default function AdminPage() {
                 </div>
               </CardContent>
             </Card>
-          </div>
+          </TabsContent>
 
-          <div className="space-y-6">
+          <TabsContent value="rounds">
             <Card className="glass-morphism rounded-none classic-border overflow-hidden">
               <CardHeader className="bg-primary/5 border-b border-border">
                 <CardTitle className="font-headline font-black uppercase text-sm flex items-center gap-2">
                   <Lock className="h-4 w-4 text-primary" />
-                  Round Controls
+                  Global Round Control (Bulk Unlock/Lock)
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
@@ -396,83 +419,96 @@ export default function AdminPage() {
                   { label: "ROUND 3", val: 3 },
                   { label: "KNOCKOUTS", val: 4 }
                 ].map(r => (
-                  <div key={r.val} className="flex items-center justify-between p-3 border border-border bg-card/30">
-                    <span className="text-[10px] font-black uppercase">{r.label}</span>
+                  <div key={r.val} className="flex items-center justify-between p-4 border border-border bg-card/30">
+                    <div>
+                      <span className="text-xs font-black uppercase block">{r.label}</span>
+                      <span className="text-[9px] text-muted-foreground uppercase font-bold">Manage entry access for all matches in this round</span>
+                    </div>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline" className="h-8 text-[9px] font-black px-3" onClick={() => handleLockRound(r.val, false)}>
-                        <Unlock className="h-3 w-3 mr-1" /> UNLOCK
+                      <Button size="sm" variant="outline" className="h-10 text-[10px] font-black px-6" onClick={() => handleLockRound(r.val, false)}>
+                        <Unlock className="h-3 w-3 mr-2" /> UNLOCK ENTIRE ROUND
                       </Button>
-                      <Button size="sm" variant="default" className="h-8 text-[9px] font-black px-3 bg-primary" onClick={() => handleLockRound(r.val, true)}>
-                        <Lock className="h-3 w-3 mr-1" /> LOCK
+                      <Button size="sm" variant="default" className="h-10 text-[10px] font-black px-6 bg-primary" onClick={() => handleLockRound(r.val, true)}>
+                        <Lock className="h-3 w-3 mr-2" /> LOCK ENTIRE ROUND
                       </Button>
                     </div>
                   </div>
                 ))}
               </CardContent>
             </Card>
+          </TabsContent>
 
-            <Card className="glass-morphism rounded-none classic-border overflow-hidden">
-              <CardHeader className="bg-primary/5 border-b border-border">
-                <CardTitle className="font-headline font-black uppercase text-sm flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-primary" />
-                  System Management
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6 space-y-4">
-                <Button 
-                  variant="destructive" 
-                  className="w-full rounded-none font-black text-[10px] uppercase h-11"
-                  onClick={handleResetSystem}
-                >
-                  <RefreshCcw className="h-3 w-3 mr-2" />
-                  Nuclear System Reset
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="glass-morphism rounded-none classic-border">
-              <CardHeader className="bg-primary/5 border-b border-border">
-                <CardTitle className="font-headline font-black uppercase text-sm flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-primary" />
-                  User Inbox
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <ScrollArea className="h-[250px]">
-                  <div className="space-y-3">
-                    {messages.length > 0 ? messages.map(msg => (
-                      <div key={msg.id} className="p-3 border border-border bg-card/30 relative group">
-                        <div className="flex justify-between items-start mb-2">
-                          <span className="text-[10px] font-black uppercase text-primary">{msg.username}</span>
-                          <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => { db.inbox.delete(msg.id); refresh(); }}>
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
-                        <p className="text-[11px] font-medium leading-relaxed">{msg.message}</p>
-                        <span className="text-[8px] text-muted-foreground uppercase block mt-2">{new Date(msg.timestamp).toLocaleString()}</span>
+          <TabsContent value="system">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-8">
+                <Card className="glass-morphism rounded-none classic-border">
+                  <CardHeader className="bg-primary/5 border-b border-border">
+                    <CardTitle className="font-headline font-black uppercase text-sm flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-primary" />
+                      Student Inbox
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-6">
+                    <ScrollArea className="h-[400px]">
+                      <div className="space-y-3">
+                        {messages.length > 0 ? messages.map(msg => (
+                          <div key={msg.id} className="p-3 border border-border bg-card/30 relative group">
+                            <div className="flex justify-between items-start mb-2">
+                              <span className="text-[10px] font-black uppercase text-primary">{msg.username}</span>
+                              <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => { db.inbox.delete(msg.id); refresh(); }}>
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            </div>
+                            <p className="text-[11px] font-medium leading-relaxed">{msg.message}</p>
+                            <span className="text-[8px] text-muted-foreground uppercase block mt-2">{new Date(msg.timestamp).toLocaleString()}</span>
+                          </div>
+                        )) : (
+                          <p className="text-[10px] text-center text-muted-foreground font-black uppercase py-20 italic">No student messages found.</p>
+                        )}
                       </div>
-                    )) : (
-                      <p className="text-[10px] text-center text-muted-foreground font-black uppercase py-10 italic">Inbox is empty.</p>
-                    )}
-                  </div>
-                </ScrollArea>
-              </CardContent>
-            </Card>
+                    </ScrollArea>
+                  </CardContent>
+                </Card>
+              </div>
 
-            <Card className="glass-morphism rounded-none classic-border">
-              <CardHeader className="bg-primary/5 border-b border-border">
-                <CardTitle className="font-headline font-black uppercase text-sm flex items-center gap-2">
-                  <MessageSquare className="h-4 w-4 text-primary" />
-                  Broadcaster
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6 space-y-4">
-                <Input placeholder="Announce updates..." value={broadcast} onChange={e => setBroadcast(e.target.value)} className="bg-card/50 text-[11px] font-bold rounded-none h-10 border-border" />
-                <Button onClick={sendBroadcast} className="w-full bg-primary text-[10px] font-black uppercase tracking-widest rounded-none h-10 shadow-lg">SEND BULLETIN</Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+              <div className="space-y-8">
+                <Card className="glass-morphism rounded-none classic-border">
+                  <CardHeader className="bg-primary/5 border-b border-border">
+                    <CardTitle className="font-headline font-black uppercase text-sm flex items-center gap-2">
+                      <MessageSquare className="h-4 w-4 text-primary" />
+                      Global Broadcaster
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-6 space-y-4">
+                    <Input placeholder="Send announcement to all students..." value={broadcast} onChange={e => setBroadcast(e.target.value)} className="bg-card/50 text-[11px] font-bold rounded-none h-11 border-border" />
+                    <Button onClick={sendBroadcast} className="w-full bg-primary text-[10px] font-black uppercase tracking-widest rounded-none h-11 shadow-lg">SEND BULLETIN</Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="glass-morphism rounded-none classic-border border-destructive/20 overflow-hidden">
+                  <CardHeader className="bg-destructive/5 border-b border-border">
+                    <CardTitle className="font-headline font-black uppercase text-sm text-destructive flex items-center gap-2">
+                      <RefreshCcw className="h-4 w-4" />
+                      System Reset
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-6 space-y-4">
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase leading-relaxed">
+                      Danger: This will clear all tournament data, student accounts, and results. Use with extreme caution.
+                    </p>
+                    <Button 
+                      variant="destructive" 
+                      className="w-full rounded-none font-black text-[10px] uppercase h-11"
+                      onClick={handleResetSystem}
+                    >
+                      NUCLEAR SYSTEM RESET
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
       </main>
       <Toaster />
     </div>
