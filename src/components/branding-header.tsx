@@ -48,12 +48,14 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
       {/* Center Branding Content */}
       <div className={`container mx-auto px-4 text-center ${compact ? 'py-4' : 'mt-2 mb-8'}`}>
         <div className="space-y-4">
+          {/* Top Level: College Name */}
           <p className="text-[10px] md:text-sm font-headline font-bold uppercase tracking-[0.4em] text-foreground/80">
             College of Engineering Munnar
           </p>
           
           <div className="py-2" /> {/* Requested Gap */}
 
+          {/* Middle Level: Dhruva and Dept (Same manner) */}
           <div className="space-y-2">
             <h2 className={`${compact ? 'text-2xl' : 'text-3xl md:text-4xl'} font-headline font-black text-primary tracking-widest uppercase`}>
               Dhruva
@@ -64,6 +66,7 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
             </p>
           </div>
           
+          {/* Bottom Level: Presents */}
           <p className="text-[11px] font-headline font-black italic text-primary/70 uppercase tracking-[0.3em] mt-4">
             Presents
           </p>
