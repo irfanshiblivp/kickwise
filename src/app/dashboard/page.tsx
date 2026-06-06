@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { LogOut, Trophy, MessageSquare, LayoutDashboard, ListOrdered } from 'lucide-react';
 import { Toaster } from '@/components/ui/toaster';
 import Image from 'next/image';
@@ -55,7 +56,10 @@ export default function DashboardPage() {
 
   const filteredMatches = useMemo(() => {
     if (activeTab === 'upcoming') {
-      return matches.filter(m => !m.isFinished).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      return matches.filter(m => !m.isFinished).sort((a, b) => {
+        if (a.isLocked !== b.isLocked) return a.isLocked ? 1 : -1;
+        return new Date(a.date).getTime() - new Date(b.date).getTime();
+      });
     }
     return matches.filter(m => m.isFinished).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [matches, activeTab]);
@@ -70,10 +74,10 @@ export default function DashboardPage() {
           src={stadiumBg?.imageUrl || ''} 
           alt="Stadium Background" 
           fill 
-          className="object-cover opacity-10 blur-[4px]"
+          className="object-cover opacity-10 dark:opacity-5 blur-[4px]"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/50 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/50 to-background dark:via-background/90" />
       </div>
 
       <BrandingHeader compact />
@@ -89,7 +93,8 @@ export default function DashboardPage() {
               <Button size="sm" variant="outline" onClick={() => router.push('/admin')} className="text-[9px] font-black uppercase h-7 border-primary/20">Admin Panel</Button>
             )}
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
             <div className="hidden sm:flex flex-col items-end mr-2">
               <span className="text-xs font-black uppercase">{user.username}</span>
               <span className="text-[9px] text-muted-foreground font-bold">{user.year} {user.department}</span>
@@ -98,7 +103,7 @@ export default function DashboardPage() {
               variant="outline" 
               size="sm" 
               onClick={logout} 
-              className="h-9 px-4 hover:bg-destructive/10 hover:text-destructive text-xs font-bold uppercase tracking-wider transition-colors border-primary/10"
+              className="h-9 px-4 hover:bg-destructive/10 hover:text-destructive text-xs font-bold uppercase tracking-wider border-primary/10"
             >
               <LogOut className="h-4 w-4 mr-2" />
               Logout
@@ -110,7 +115,6 @@ export default function DashboardPage() {
       <main className="container mx-auto px-4 py-8 space-y-8 flex-1 z-10">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           
-          {/* Main Tournament View */}
           <div className="lg:col-span-3 space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <h2 className="text-2xl font-headline font-black flex items-center gap-2 tracking-tighter uppercase">
@@ -139,15 +143,14 @@ export default function DashboardPage() {
                 ))
               ) : (
                 <div className="col-span-full py-20 text-center glass-morphism rounded-none border border-dashed border-muted">
-                  <p className="text-muted-foreground font-bold uppercase text-xs tracking-widest">No matches in this category.</p>
+                  <p className="text-muted-foreground font-bold uppercase text-xs tracking-widest">No matches available.</p>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Sidebar: Leaderboard & Broadcasts */}
           <div className="space-y-6">
-            <Card className="glass-morphism border-primary/10 rounded-none overflow-hidden">
+            <Card className="glass-morphism classic-border rounded-none overflow-hidden">
               <CardHeader className="pb-3 border-b border-border bg-primary/5">
                 <CardTitle className="text-sm font-headline font-black uppercase flex items-center gap-2">
                   <ListOrdered className="h-4 w-4 text-primary" />
@@ -170,16 +173,11 @@ export default function DashboardPage() {
                       <span className="font-headline font-black text-xs text-primary">{u.points}</span>
                     </div>
                   ))}
-                  {leaderboard.filter(u => !u.isAdmin).length === 0 && (
-                    <div className="p-10 text-center">
-                      <p className="text-[10px] font-black text-muted-foreground uppercase italic">No contestants yet.</p>
-                    </div>
-                  )}
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="glass-morphism border-primary/10 rounded-none overflow-hidden">
+            <Card className="glass-morphism classic-border rounded-none overflow-hidden">
               <CardHeader className="pb-3 border-b border-border bg-primary/5">
                 <CardTitle className="text-sm font-headline font-black uppercase flex items-center gap-2">
                   <MessageSquare className="h-4 w-4 text-primary" />
@@ -191,7 +189,7 @@ export default function DashboardPage() {
                   <div className="space-y-4">
                     {broadcasts.length > 0 ? (
                       broadcasts.map(msg => (
-                        <div key={msg.id} className="bg-muted/30 p-3 rounded-none border-l-2 border-primary">
+                        <div key={msg.id} className="bg-card/40 p-3 rounded-none border-l-2 border-primary shadow-sm">
                           <p className="text-[11px] leading-relaxed mb-2 font-medium">{msg.message}</p>
                           <div className="flex justify-between items-center text-[8px] text-muted-foreground font-black uppercase tracking-widest">
                             <span className="text-primary">{msg.author}</span>

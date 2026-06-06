@@ -3,13 +3,15 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { db, Match, User } from '@/lib/db';
+import { db, Match, User, UserMessage } from '@/lib/db';
 import { BrandingHeader } from '@/components/branding-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { useToast } from '@/hooks/use-toast';
 import { Toaster } from '@/components/ui/toaster';
 import { 
@@ -22,7 +24,8 @@ import {
   Users,
   LogOut,
   ArrowLeft,
-  Trophy
+  Trash2,
+  Mail
 } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -32,6 +35,7 @@ export default function AdminPage() {
   const { toast } = useToast();
   const [matches, setMatches] = useState<Match[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [messages, setMessages] = useState<UserMessage[]>([]);
   const [broadcast, setBroadcast] = useState('');
   const [newMatch, setNewMatch] = useState({
     teamA: '', teamB: '', flagA: '', flagB: '', group: 'Group A', round: 1, date: '', time: '', venue: ''
@@ -55,6 +59,7 @@ export default function AdminPage() {
   const refresh = () => {
     setMatches(db.matches.all());
     setUsers(db.users.all());
+    setMessages(db.inbox.all());
   };
 
   const handleCreateMatch = (e: React.FormEvent) => {
@@ -75,15 +80,18 @@ export default function AdminPage() {
     toast({ title: `Match ${!currentStatus ? 'Locked' : 'Unlocked'}` });
   };
 
+  const deleteMsg = (id: string) => {
+    db.inbox.delete(id);
+    refresh();
+    toast({ title: "Message Deleted" });
+  };
+
   const logout = () => {
     localStorage.removeItem('kw_current_user');
     router.push('/');
   };
 
   const handleUpdateScore = (matchId: string, scoreA: number, scoreB: number) => {
-    const match = matches.find(m => m.id === matchId);
-    if (!match) return;
-
     db.matches.update(matchId, { scoreA, scoreB, isFinished: true, isLocked: true });
 
     const predictions = db.predictions.forMatch(matchId);
@@ -103,10 +111,7 @@ export default function AdminPage() {
       }
     });
 
-    toast({ 
-      title: "Score Updated!", 
-      description: `Results applied and points distributed.` 
-    });
+    toast({ title: "Score Updated!", description: `Results applied and points distributed.` });
     refresh();
   };
 
@@ -114,21 +119,20 @@ export default function AdminPage() {
     if (!broadcast) return;
     db.broadcasts.add(broadcast, 'ADMIN');
     setBroadcast('');
-    toast({ title: "Broadcast Sent", description: "All users can now see your message." });
+    toast({ title: "Broadcast Sent" });
   };
 
   return (
     <div className="min-h-screen bg-background relative flex flex-col">
-      {/* Background Image */}
       <div className="fixed inset-0 z-0 overflow-hidden">
         <Image 
           src={stadiumBg?.imageUrl || ''} 
           alt="Stadium Background" 
           fill 
-          className="object-cover opacity-10 blur-[4px]"
+          className="object-cover opacity-10 dark:opacity-5 blur-[4px]"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/50 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/50 to-background dark:via-background/90" />
       </div>
 
       <BrandingHeader compact />
@@ -140,6 +144,7 @@ export default function AdminPage() {
             <h1 className="font-headline font-black text-sm uppercase tracking-widest text-primary">ADMIN CONTROL</h1>
           </div>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <Button variant="ghost" size="sm" onClick={() => router.push('/dashboard')} className="font-bold uppercase text-[10px]">
               <ArrowLeft className="h-3 w-3 mr-2" /> View Dashboard
             </Button>
@@ -159,17 +164,17 @@ export default function AdminPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           <div className="lg:col-span-2 space-y-6">
-            <Card className="glass-morphism rounded-none border-primary/10">
+            <Card className="glass-morphism rounded-none classic-border">
               <CardHeader className="flex flex-row items-center justify-between border-b border-border bg-primary/5">
                 <CardTitle className="font-headline font-black uppercase tracking-tighter text-sm">Active Fixtures</CardTitle>
                 <Badge variant="outline" className="text-primary border-primary/30 rounded-none text-[9px] font-black">{matches.length} MATCHES</Badge>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
                 {matches.map(m => (
-                  <div key={m.id} className="p-4 rounded-none border border-border bg-white/40 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div key={m.id} className="p-4 rounded-none border border-border bg-card/40 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all">
                     <div className="flex items-center gap-4">
                       <div className="text-center w-12 border-r border-border pr-4">
-                        <Badge className="bg-primary/10 text-primary mb-1 uppercase font-bold text-[9px] rounded-none">{m.group || 'WC'}</Badge>
+                        <Badge className="bg-primary/10 text-primary mb-1 uppercase font-bold text-[9px] rounded-none">R{m.round}</Badge>
                       </div>
                       <div>
                         <p className="font-bold text-sm uppercase tracking-tighter">
@@ -215,56 +220,44 @@ export default function AdminPage() {
                 ))}
               </CardContent>
             </Card>
-
-            <Card className="glass-morphism rounded-none border-primary/10">
-              <CardHeader className="bg-primary/5 border-b border-border">
-                <CardTitle className="font-headline font-black uppercase text-sm flex items-center gap-2">
-                  <Plus className="h-4 w-4 text-primary" />
-                  Create New Fixture
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <form onSubmit={handleCreateMatch} className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="space-y-2 col-span-2 md:col-span-1">
-                    <Label className="text-[10px] uppercase font-black opacity-60">Team A</Label>
-                    <Input className="rounded-none bg-white/50 h-9" placeholder="e.g. Mexico" value={newMatch.teamA} onChange={e => setNewMatch({...newMatch, teamA: e.target.value})} />
-                  </div>
-                  <div className="space-y-2 col-span-2 md:col-span-1">
-                    <Label className="text-[10px] uppercase font-black opacity-60">Logo/Flag A (URL/Emoji)</Label>
-                    <Input className="rounded-none bg-white/50 h-9" placeholder="e.g. 🇲🇽" value={newMatch.flagA} onChange={e => setNewMatch({...newMatch, flagA: e.target.value})} />
-                  </div>
-                  <div className="space-y-2 col-span-2 md:col-span-1">
-                    <Label className="text-[10px] uppercase font-black opacity-60">Team B</Label>
-                    <Input className="rounded-none bg-white/50 h-9" placeholder="e.g. USA" value={newMatch.teamB} onChange={e => setNewMatch({...newMatch, teamB: e.target.value})} />
-                  </div>
-                  <div className="space-y-2 col-span-2 md:col-span-1">
-                    <Label className="text-[10px] uppercase font-black opacity-60">Logo/Flag B (URL/Emoji)</Label>
-                    <Input className="rounded-none bg-white/50 h-9" placeholder="e.g. 🇺🇸" value={newMatch.flagB} onChange={e => setNewMatch({...newMatch, flagB: e.target.value})} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-[10px] uppercase font-black opacity-60">Group</Label>
-                    <Input className="rounded-none bg-white/50 h-9" placeholder="e.g. Group A" value={newMatch.group} onChange={e => setNewMatch({...newMatch, group: e.target.value})} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-[10px] uppercase font-black opacity-60">Date</Label>
-                    <Input className="rounded-none bg-white/50 h-9" type="date" value={newMatch.date} onChange={e => setNewMatch({...newMatch, date: e.target.value})} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-[10px] uppercase font-black opacity-60">Time</Label>
-                    <Input className="rounded-none bg-white/50 h-9" type="time" value={newMatch.time} onChange={e => setNewMatch({...newMatch, time: e.target.value})} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-[10px] uppercase font-black opacity-60">Venue</Label>
-                    <Input className="rounded-none bg-white/50 h-9" placeholder="Stadium" value={newMatch.venue} onChange={e => setNewMatch({...newMatch, venue: e.target.value})} />
-                  </div>
-                  <Button type="submit" className="col-span-full bg-primary hover:bg-primary/90 mt-2 font-headline font-black uppercase tracking-widest rounded-none h-11">PUBLISH TO ARENA</Button>
-                </form>
-              </CardContent>
-            </Card>
           </div>
 
           <div className="space-y-6">
-            <Card className="glass-morphism rounded-none border-primary/10">
+            <Card className="glass-morphism rounded-none classic-border">
+              <CardHeader className="bg-primary/5 border-b border-border">
+                <CardTitle className="font-headline font-black uppercase text-sm flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-primary" />
+                  User Inbox
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <ScrollArea className="h-[400px]">
+                  <div className="space-y-3">
+                    {messages.length > 0 ? messages.map(msg => (
+                      <div key={msg.id} className="p-3 border border-border bg-card/30 relative group">
+                        <div className="flex justify-between items-start mb-2">
+                          <span className="text-[10px] font-black uppercase text-primary">{msg.username}</span>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-6 w-6 text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => deleteMsg(msg.id)}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                        <p className="text-[11px] font-medium leading-relaxed">{msg.message}</p>
+                        <span className="text-[8px] text-muted-foreground uppercase block mt-2">{new Date(msg.timestamp).toLocaleString()}</span>
+                      </div>
+                    )) : (
+                      <p className="text-[10px] text-center text-muted-foreground font-black uppercase py-10 italic">Inbox is empty.</p>
+                    )}
+                  </div>
+                </ScrollArea>
+              </CardContent>
+            </Card>
+
+            <Card className="glass-morphism rounded-none classic-border">
               <CardHeader className="bg-primary/5 border-b border-border">
                 <CardTitle className="font-headline font-black uppercase text-sm flex items-center gap-2">
                   <MessageSquare className="h-4 w-4 text-primary" />
@@ -276,34 +269,9 @@ export default function AdminPage() {
                   placeholder="Announce tournament updates..." 
                   value={broadcast} 
                   onChange={e => setBroadcast(e.target.value)}
-                  className="bg-white/50 text-[11px] font-bold rounded-none h-10"
+                  className="bg-card/50 text-[11px] font-bold rounded-none h-10 border-border"
                 />
-                <Button onClick={sendBroadcast} className="w-full bg-primary hover:bg-primary/90 text-[10px] font-black uppercase tracking-widest rounded-none h-10">SEND BULLETIN</Button>
-              </CardContent>
-            </Card>
-
-            <Card className="glass-morphism rounded-none border-primary/10">
-              <CardHeader className="bg-primary/5 border-b border-border">
-                <CardTitle className="font-headline font-black uppercase text-sm flex items-center gap-2">
-                  <Users className="h-4 w-4 text-primary" />
-                  Top Players
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <div className="space-y-2">
-                  {users.filter(u => !u.isAdmin).slice(0, 10).map(u => (
-                    <div key={u.id} className="flex justify-between items-center p-3 rounded-none bg-white/30 border border-border/50">
-                      <div className="flex flex-col">
-                        <span className="font-bold text-[10px] uppercase">{u.username}</span>
-                        <span className="text-[8px] text-muted-foreground uppercase font-black">{u.department}</span>
-                      </div>
-                      <Badge variant="outline" className="text-[9px] font-black border-primary/20 text-primary rounded-none">{u.points} XP</Badge>
-                    </div>
-                  ))}
-                  {users.filter(u => !u.isAdmin).length === 0 && (
-                    <p className="text-[10px] text-center text-muted-foreground font-black uppercase italic">Arena is empty.</p>
-                  )}
-                </div>
+                <Button onClick={sendBroadcast} className="w-full bg-primary hover:bg-primary/90 text-[10px] font-black uppercase tracking-widest rounded-none h-10 shadow-lg">SEND BULLETIN</Button>
               </CardContent>
             </Card>
           </div>
