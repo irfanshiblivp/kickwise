@@ -31,10 +31,11 @@ import {
   Edit2,
   RefreshCcw,
   ListOrdered,
-  LayoutGrid,
   Trophy,
   History,
-  FilePlus2
+  FilePlus2,
+  Radio,
+  Settings2
 } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -122,7 +123,7 @@ export default function AdminPage() {
   };
 
   const handleResetSystem = () => {
-    if (confirm("NUCLEAR OPTION: This will permanently delete all users, predictions, messages, and restore default matches. Are you sure?")) {
+    if (confirm("CRITICAL: This will permanently delete all data. Continue?")) {
       db.system.resetAll();
     }
   };
@@ -140,7 +141,7 @@ export default function AdminPage() {
   };
 
   const deleteMatch = (matchId: string) => {
-    if (confirm("Are you sure you want to delete this match?")) {
+    if (confirm("Delete match?")) {
       db.matches.delete(matchId);
       refresh();
       toast({ title: "Match Deleted" });
@@ -170,13 +171,13 @@ export default function AdminPage() {
   const handleUpdateScore = (matchId: string, scoreA: number, scoreB: number) => {
     db.matches.update(matchId, { scoreA, scoreB, isFinished: true, isLocked: true });
     recalculatePoints();
-    toast({ title: "Score Updated!", description: `Results applied and points recalculated.` });
+    toast({ title: "Score Applied", description: `Points updated.` });
   };
 
   const saveEdit = (matchId: string, updates: any) => {
     db.matches.update(matchId, updates);
     setEditingMatch(null);
-    toast({ title: "Match Updated" });
+    toast({ title: "Updated" });
     refresh();
   };
 
@@ -184,7 +185,7 @@ export default function AdminPage() {
     if (!broadcast) return;
     db.broadcasts.add(broadcast, 'ADMIN');
     setBroadcast('');
-    toast({ title: "Broadcast Sent" });
+    toast({ title: "Broadcast Transmitted" });
   };
 
   const logout = () => {
@@ -202,7 +203,7 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-background relative flex flex-col">
-      <div className="fixed inset-0 z-0 overflow-hidden">
+      <div className="fixed inset-0 z-0">
         <Image 
           src={stadiumBg?.imageUrl || ''} 
           alt="Stadium Background" 
@@ -210,48 +211,47 @@ export default function AdminPage() {
           className="object-cover opacity-10 dark:opacity-5 blur-[4px]"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/50 to-background dark:via-background/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/90 to-background" />
       </div>
 
       <BrandingHeader compact />
 
-      <nav className="border-b border-border bg-card/50 backdrop-blur-md sticky top-0 z-40">
-        <div className="container mx-auto px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="text-primary h-5 w-5" />
-            <h1 className="font-headline font-black text-sm uppercase tracking-widest text-primary">ADMIN CONTROL</h1>
-          </div>
+      <nav className="border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-40">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
+            <div className="bg-primary p-2 rounded-none">
+              <ShieldCheck className="text-white h-5 w-5" />
+            </div>
+            <h1 className="font-headline font-black text-xs uppercase tracking-[0.3em] text-primary">Command Center</h1>
+          </div>
+          <div className="flex items-center gap-4">
             <ThemeToggle />
-            <Button variant="ghost" size="sm" onClick={() => router.push('/dashboard')} className="font-bold uppercase text-[10px]">
-              <ArrowLeft className="h-3 w-3 mr-2" /> View Dashboard
+            <Button variant="outline" size="sm" onClick={() => router.push('/dashboard')} className="font-black uppercase text-[9px] tracking-widest rounded-none border-primary/20">
+              <ArrowLeft className="h-3 w-3 mr-2" /> User View
             </Button>
-            <Button variant="outline" size="sm" onClick={logout} className="text-destructive border-destructive/20 font-bold uppercase text-[10px]">
-              <LogOut className="h-3 w-3 mr-2" /> Logout
+            <Button variant="ghost" size="sm" onClick={logout} className="text-destructive font-black uppercase text-[9px] tracking-widest hover:bg-destructive/5 rounded-none">
+              <LogOut className="h-3 w-3 mr-2" /> Sign Out
             </Button>
           </div>
         </div>
       </nav>
 
-      <main className="container mx-auto p-4 md:p-8 space-y-8 z-10 flex-1 max-w-6xl">
+      <main className="container mx-auto p-4 md:p-8 space-y-8 z-10 flex-1 max-w-7xl">
         <Tabs defaultValue="entry" className="w-full">
-          <div className="overflow-x-auto pb-2 scrollbar-hide">
-            <TabsList className="flex w-full min-w-max md:grid md:grid-cols-5 h-auto bg-muted/50 border border-border p-1 rounded-none mb-6">
-              <TabsTrigger value="entry" className="rounded-none py-4 px-6 text-[10px] font-black uppercase tracking-widest gap-2 flex-1 data-[state=active]:bg-primary data-[state=active]:text-white">
-                <Plus className="h-4 w-4" /> ENTRY SECTION
-              </TabsTrigger>
-              <TabsTrigger value="manage" className="rounded-none py-4 px-6 text-[10px] font-black uppercase tracking-widest gap-2 flex-1 data-[state=active]:bg-primary data-[state=active]:text-white">
-                <History className="h-4 w-4" /> SCORES & EDIT
-              </TabsTrigger>
-              <TabsTrigger value="leadership" className="rounded-none py-4 px-6 text-[10px] font-black uppercase tracking-widest gap-2 flex-1 data-[state=active]:bg-primary data-[state=active]:text-white">
-                <Trophy className="h-4 w-4" /> LEADERSHIP
-              </TabsTrigger>
-              <TabsTrigger value="rounds" className="rounded-none py-4 px-6 text-[10px] font-black uppercase tracking-widest gap-2 flex-1 data-[state=active]:bg-primary data-[state=active]:text-white">
-                <Lock className="h-4 w-4" /> ROUNDS
-              </TabsTrigger>
-              <TabsTrigger value="system" className="rounded-none py-4 px-6 text-[10px] font-black uppercase tracking-widest gap-2 flex-1 data-[state=active]:bg-primary data-[state=active]:text-white">
-                <ShieldCheck className="h-4 w-4" /> SYSTEM
-              </TabsTrigger>
+          <div className="overflow-x-auto pb-4 scrollbar-hide">
+            <TabsList className="flex w-full min-w-max h-auto bg-muted/30 border border-border p-1 rounded-none mb-8">
+              {[
+                { val: "entry", icon: FilePlus2, label: "Entry Section" },
+                { val: "manage", icon: History, label: "Fixture Hub" },
+                { val: "leadership", icon: Trophy, label: "Leadership" },
+                { val: "rounds", icon: Lock, label: "Round Toggles" },
+                { val: "broadcast", icon: Radio, label: "Live Broadcast" },
+                { val: "system", icon: Settings2, label: "System Core" }
+              ].map(t => (
+                <TabsTrigger key={t.val} value={t.val} className="rounded-none py-4 px-8 text-[10px] font-black uppercase tracking-[0.2em] gap-3 flex-1 data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
+                  <t.icon className="h-4 w-4" /> {t.label}
+                </TabsTrigger>
+              ))}
             </TabsList>
           </div>
 
@@ -259,36 +259,36 @@ export default function AdminPage() {
             <Card className="glass-morphism rounded-none classic-border overflow-hidden shadow-2xl">
               <CardHeader className="bg-primary/5 border-b border-border py-6">
                 <CardTitle className="font-headline font-black uppercase tracking-widest text-sm flex items-center gap-3">
-                  <FilePlus2 className="h-5 w-5 text-primary" />
-                  New Tournament Fixture Entry
+                  <Plus className="h-5 w-5 text-primary" />
+                  New Fixture Registration
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-8 px-6 md:px-10 pb-10">
-                <form onSubmit={handleCreateMatch} className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-4">
+              <CardContent className="pt-10 px-6 md:px-12 pb-12">
+                <form onSubmit={handleCreateMatch} className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                  <div className="space-y-6">
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Team A & Emoji/Flag</Label>
-                      <div className="flex gap-3">
-                        <Input placeholder="e.g. Mexico" value={newMatch.teamA} onChange={e => setNewMatch({...newMatch, teamA: e.target.value})} className="rounded-none bg-card/50 border-border text-xs h-12 focus:ring-primary/30" />
-                        <Input placeholder="🇲🇽" value={newMatch.flagA} onChange={e => setNewMatch({...newMatch, flagA: e.target.value})} className="w-24 rounded-none bg-card/50 border-border text-center text-xl h-12 focus:ring-primary/30" />
+                      <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Home Team Identity</Label>
+                      <div className="flex gap-4">
+                        <Input placeholder="e.g. Mexico" value={newMatch.teamA} onChange={e => setNewMatch({...newMatch, teamA: e.target.value})} className="rounded-none bg-background/50 border-border h-12 font-bold" />
+                        <Input placeholder="🇲🇽" value={newMatch.flagA} onChange={e => setNewMatch({...newMatch, flagA: e.target.value})} className="w-24 rounded-none bg-background/50 border-border text-center text-2xl h-12" />
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Team B & Emoji/Flag</Label>
-                      <div className="flex gap-3">
-                        <Input placeholder="e.g. South Africa" value={newMatch.teamB} onChange={e => setNewMatch({...newMatch, teamB: e.target.value})} className="rounded-none bg-card/50 border-border text-xs h-12 focus:ring-primary/30" />
-                        <Input placeholder="🇿🇦" value={newMatch.flagB} onChange={e => setNewMatch({...newMatch, flagB: e.target.value})} className="w-24 rounded-none bg-card/50 border-border text-center text-xl h-12 focus:ring-primary/30" />
+                      <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Away Team Identity</Label>
+                      <div className="flex gap-4">
+                        <Input placeholder="e.g. South Africa" value={newMatch.teamB} onChange={e => setNewMatch({...newMatch, teamB: e.target.value})} className="rounded-none bg-background/50 border-border h-12 font-bold" />
+                        <Input placeholder="🇿🇦" value={newMatch.flagB} onChange={e => setNewMatch({...newMatch, flagB: e.target.value})} className="w-24 rounded-none bg-background/50 border-border text-center text-2xl h-12" />
                       </div>
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-2 gap-8">
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Tournament Stage</Label>
+                      <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Tournament Round</Label>
                       <Select value={newMatch.round.toString()} onValueChange={v => setNewMatch({...newMatch, round: parseInt(v)})}>
-                        <SelectTrigger className="rounded-none bg-card/50 border-border text-xs h-12">
+                        <SelectTrigger className="rounded-none bg-background/50 border-border h-12 font-bold uppercase text-[10px]">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -300,47 +300,41 @@ export default function AdminPage() {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Group</Label>
-                      <Input placeholder="Group A" value={newMatch.group} onChange={e => setNewMatch({...newMatch, group: e.target.value})} className="rounded-none bg-card/50 border-border text-xs h-12 focus:ring-primary/30" />
+                      <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Group / Pool</Label>
+                      <Input placeholder="Group A" value={newMatch.group} onChange={e => setNewMatch({...newMatch, group: e.target.value})} className="rounded-none bg-background/50 border-border h-12 font-bold" />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-2 gap-8">
                     <div className="space-y-2">
                       <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Match Date</Label>
-                      <Input type="date" value={newMatch.date} onChange={e => setNewMatch({...newMatch, date: e.target.value})} className="rounded-none bg-card/50 border-border text-xs h-12 focus:ring-primary/30" />
+                      <Input type="date" value={newMatch.date} onChange={e => setNewMatch({...newMatch, date: e.target.value})} className="rounded-none bg-background/50 border-border h-12 font-bold" />
                     </div>
                     <div className="space-y-2">
                       <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Kickoff Time (24h)</Label>
-                      <Input type="time" value={newMatch.time} onChange={e => setNewMatch({...newMatch, time: e.target.value})} className="rounded-none bg-card/50 border-border text-xs h-12 focus:ring-primary/30" />
+                      <Input type="time" value={newMatch.time} onChange={e => setNewMatch({...newMatch, time: e.target.value})} className="rounded-none bg-background/50 border-border h-12 font-bold" />
                     </div>
                   </div>
 
                   <div className="md:col-span-2 space-y-2">
                     <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Official Venue</Label>
                     <Select value={newMatch.venue} onValueChange={v => setNewMatch({...newMatch, venue: v})}>
-                      <SelectTrigger className="rounded-none bg-card/50 border-border text-xs h-12">
-                        <SelectValue placeholder="Select FIFA World Cup 2026 Stadium" />
+                      <SelectTrigger className="rounded-none bg-background/50 border-border h-12 font-bold">
+                        <SelectValue placeholder="Select Tournament Stadium" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel className="text-primary font-black uppercase text-[10px] tracking-[0.2em] py-2 border-b border-border mb-1">USA STADIUMS</SelectLabel>
-                          {STADIUMS.USA.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                        </SelectGroup>
-                        <SelectGroup>
-                          <SelectLabel className="text-primary font-black uppercase text-[10px] tracking-[0.2em] py-2 border-b border-border mb-1 mt-2">MEXICO STADIUMS</SelectLabel>
-                          {STADIUMS.Mexico.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                        </SelectGroup>
-                        <SelectGroup>
-                          <SelectLabel className="text-primary font-black uppercase text-[10px] tracking-[0.2em] py-2 border-b border-border mb-1 mt-2">CANADA STADIUMS</SelectLabel>
-                          {STADIUMS.Canada.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                        </SelectGroup>
+                        {Object.entries(STADIUMS).map(([country, venues]) => (
+                          <SelectGroup key={country}>
+                            <SelectLabel className="text-primary font-black uppercase text-[10px] tracking-[0.2em] py-3 border-b border-border/50 mb-1">{country} HOSTS</SelectLabel>
+                            {venues.map(s => <SelectItem key={s} value={s} className="text-[11px] font-bold">{s}</SelectItem>)}
+                          </SelectGroup>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
 
-                  <Button type="submit" className="md:col-span-2 w-full bg-primary hover:bg-primary/90 text-white rounded-none font-black uppercase text-xs h-14 shadow-xl transition-all hover:scale-[1.01] active:scale-100 tracking-[0.2em]">
-                    ADD TO TOURNAMENT SCHEDULE
+                  <Button type="submit" className="md:col-span-2 w-full bg-primary hover:bg-primary/90 text-white rounded-none font-black uppercase tracking-[0.4em] h-16 shadow-2xl transition-all hover:scale-[1.01] mt-4">
+                    Commit to Tournament Schedule
                   </Button>
                 </form>
               </CardContent>
@@ -350,21 +344,21 @@ export default function AdminPage() {
           <TabsContent value="manage" className="animate-fade-in-up">
             <Card className="glass-morphism rounded-none classic-border shadow-2xl">
               <CardHeader className="flex flex-row items-center justify-between border-b border-border bg-primary/5 py-6">
-                <CardTitle className="font-headline font-black uppercase tracking-widest text-sm">Official Match Day Registry</CardTitle>
-                <Badge variant="outline" className="text-primary border-primary/30 rounded-none text-[9px] font-black tracking-widest px-3">{matches.length} FIXTURES</Badge>
+                <CardTitle className="font-headline font-black uppercase tracking-widest text-sm">Active Fixture Management</CardTitle>
+                <Badge variant="outline" className="text-primary border-primary/30 rounded-none text-[9px] font-black tracking-widest px-4 py-1">{matches.length} REGISTERED</Badge>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
                 {matches.length > 0 ? matches.sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()).map(m => (
-                  <div key={m.id} className="p-5 rounded-none border border-border bg-card/40 flex flex-col gap-4 transition-all hover:border-primary/20">
+                  <div key={m.id} className="p-6 rounded-none border border-border bg-background/40 hover:bg-primary/5 transition-all">
                     {editingMatch === m.id ? (
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <Input className="text-xs h-10 rounded-none" defaultValue={m.teamA} id={`editTeamA-${m.id}`} />
-                        <Input className="text-xs h-10 rounded-none" defaultValue={m.teamB} id={`editTeamB-${m.id}`} />
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <Input className="rounded-none font-bold" defaultValue={m.teamA} id={`editTeamA-${m.id}`} />
+                        <Input className="rounded-none font-bold" defaultValue={m.teamB} id={`editTeamB-${m.id}`} />
                         <Select defaultValue={m.venue} onValueChange={v => {
                           const input = document.getElementById(`editVenue-${m.id}`) as HTMLInputElement;
                           if (input) input.value = v;
                         }}>
-                          <SelectTrigger className="rounded-none border-border text-xs h-10">
+                          <SelectTrigger className="rounded-none font-bold">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -372,78 +366,73 @@ export default function AdminPage() {
                           </SelectContent>
                         </Select>
                         <input type="hidden" id={`editVenue-${m.id}`} defaultValue={m.venue} />
-                        <Input type="date" className="text-xs h-10 rounded-none" defaultValue={m.date} id={`editDate-${m.id}`} />
-                        <Input type="time" className="text-xs h-10 rounded-none" defaultValue={m.time} id={`editTime-${m.id}`} />
-                        <div className="flex gap-2">
-                          <Button size="sm" className="flex-1 text-[10px] font-black uppercase rounded-none" onClick={() => {
+                        <div className="flex gap-4 md:col-span-3">
+                          <Button size="sm" className="flex-1 font-black uppercase tracking-widest rounded-none" onClick={() => {
                             const updates = {
                               teamA: (document.getElementById(`editTeamA-${m.id}`) as HTMLInputElement).value,
                               teamB: (document.getElementById(`editTeamB-${m.id}`) as HTMLInputElement).value,
                               venue: (document.getElementById(`editVenue-${m.id}`) as HTMLInputElement).value,
-                              date: (document.getElementById(`editDate-${m.id}`) as HTMLInputElement).value,
-                              time: (document.getElementById(`editTime-${m.id}`) as HTMLInputElement).value,
                             };
                             saveEdit(m.id, updates);
-                          }}>Save</Button>
-                          <Button size="sm" variant="outline" className="flex-1 text-[10px] font-black uppercase rounded-none" onClick={() => setEditingMatch(null)}>Cancel</Button>
+                          }}>Save Updates</Button>
+                          <Button size="sm" variant="outline" className="flex-1 font-black uppercase tracking-widest rounded-none" onClick={() => setEditingMatch(null)}>Cancel</Button>
                         </div>
                       </div>
                     ) : (
-                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                         <div className="flex items-center gap-6">
-                          <div className="text-center w-16 border-r border-border pr-6">
-                            <Badge className="bg-primary/10 text-primary mb-1 uppercase font-black text-[9px] rounded-none px-2 tracking-tighter">RD {m.round}</Badge>
+                          <div className="text-center w-20 border-r border-border/50 pr-6">
+                            <Badge className="bg-primary text-white mb-2 uppercase font-black text-[9px] rounded-none px-2 tracking-tighter">RD {m.round}</Badge>
                             <p className="text-[9px] font-black text-muted-foreground uppercase">{m.group}</p>
                           </div>
                           <div>
-                            <p className="font-headline font-black text-sm uppercase tracking-tighter mb-1">
-                              {m.flagA} {m.teamA} <span className="text-muted-foreground mx-2 text-xs">VS</span> {m.teamB} {m.flagB}
+                            <p className="font-headline font-black text-base uppercase tracking-tight mb-1">
+                              {m.flagA} {m.teamA} <span className="text-primary mx-3 text-xs italic">VS</span> {m.teamB} {m.flagB}
                             </p>
-                            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em]">{m.date} | {format12h(m.time)} | {m.venue}</p>
+                            <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.2em]">{m.date} | {format12h(m.time)} | {m.venue}</p>
                           </div>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-3">
-                          <Button size="icon" variant="ghost" onClick={() => setEditingMatch(m.id)} className="h-9 w-9 text-primary hover:bg-primary/10">
-                            <Edit2 className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button size="icon" variant="ghost" onClick={() => deleteMatch(m.id)} className="h-9 w-9 text-destructive hover:bg-destructive/10">
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                          
-                          <Button 
-                            size="sm" 
-                            variant={m.isLocked ? "outline" : "secondary"}
-                            onClick={() => toggleLock(m.id, m.isLocked)}
-                            className={m.isLocked ? "text-[10px] font-black uppercase h-9 rounded-none w-28 tracking-widest" : "bg-green-600/10 text-green-600 border-green-600/20 text-[10px] font-black uppercase h-9 rounded-none w-28 tracking-widest"}
-                          >
-                            {m.isLocked ? <Lock className="h-3.5 w-3.5 mr-2" /> : <Unlock className="h-3.5 w-3.5 mr-2" />}
-                            {m.isLocked ? "Locked" : "Unlocked"}
-                          </Button>
-
-                          <div className="flex items-center gap-2 bg-background/50 p-1 rounded-none border border-border shadow-inner">
-                            <Input className="w-11 h-9 p-1 text-center bg-transparent border-none text-sm font-black focus-visible:ring-0" defaultValue={m.scoreA} id={`scoreA-${m.id}`} placeholder="A" />
-                            <span className="font-black text-xs text-muted-foreground">-</span>
-                            <Input className="w-11 h-9 p-1 text-center bg-transparent border-none text-sm font-black focus-visible:ring-0" defaultValue={m.scoreB} id={`scoreB-${m.id}`} placeholder="B" />
+                        <div className="flex flex-wrap items-center gap-4">
+                          <div className="flex items-center gap-3 bg-muted/50 p-1.5 rounded-none border border-border">
+                            <Input className="w-12 h-10 p-0 text-center bg-transparent border-none text-base font-black focus-visible:ring-0" defaultValue={m.scoreA} id={`scoreA-${m.id}`} placeholder="A" />
+                            <span className="font-black text-xs text-muted-foreground">:</span>
+                            <Input className="w-12 h-10 p-0 text-center bg-transparent border-none text-base font-black focus-visible:ring-0" defaultValue={m.scoreB} id={`scoreB-${m.id}`} placeholder="B" />
                             <Button 
                               size="icon" 
-                              className="h-9 w-9 bg-primary rounded-none shadow-lg"
+                              className="h-10 w-10 bg-primary hover:bg-primary/90 rounded-none shadow-lg"
                               onClick={() => {
                                 const sA = (document.getElementById(`scoreA-${m.id}`) as HTMLInputElement).value;
                                 const sB = (document.getElementById(`scoreB-${m.id}`) as HTMLInputElement).value;
                                 if (sA !== '' && sB !== '') handleUpdateScore(m.id, parseInt(sA), parseInt(sB));
                               }}
                             >
-                              <CheckCircle className="h-4 w-4 text-white" />
+                              <CheckCircle className="h-5 w-5 text-white" />
                             </Button>
                           </div>
+                          
+                          <Button 
+                            variant="outline" 
+                            size="icon" 
+                            onClick={() => toggleLock(m.id, m.isLocked)}
+                            className={`h-10 w-10 rounded-none border-border transition-colors ${m.isLocked ? 'bg-destructive/10 text-destructive' : 'bg-green-600/10 text-green-600'}`}
+                          >
+                            {m.isLocked ? <Lock className="h-4 w-4" /> : <Unlock className="h-4 w-4" />}
+                          </Button>
+
+                          <Button size="icon" variant="ghost" onClick={() => setEditingMatch(m.id)} className="h-10 w-10 rounded-none text-primary hover:bg-primary/10">
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <Button size="icon" variant="ghost" onClick={() => deleteMatch(m.id)} className="h-10 w-10 rounded-none text-destructive hover:bg-destructive/10">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       </div>
                     )}
                   </div>
                 )) : (
-                  <div className="py-20 text-center italic text-muted-foreground uppercase text-xs font-black tracking-widest border border-dashed border-border">
-                    No fixtures currently registered in system.
+                  <div className="py-24 text-center glass-morphism border-2 border-dashed border-border">
+                    <p className="text-muted-foreground font-black uppercase text-[10px] tracking-widest">No fixtures registered.</p>
                   </div>
                 )}
               </CardContent>
@@ -456,35 +445,31 @@ export default function AdminPage() {
                 <CardTitle className="font-headline font-black uppercase tracking-widest text-sm flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <ListOrdered className="h-5 w-5 text-primary" />
-                    Global Standings Table Control
+                    Student Standing Table
                   </div>
-                  <div className="flex items-center gap-4 bg-background/50 px-4 py-2 border border-border">
-                    <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{settings.leaderboardVisible ? "LIVE STATUS" : "HIDDEN STATUS"}</span>
+                  <div className="flex items-center gap-4 bg-background/50 px-6 py-2 border border-border">
+                    <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{settings.leaderboardVisible ? "LIVE TO USERS" : "HIDDEN FROM USERS"}</span>
                     <Switch checked={settings.leaderboardVisible} onCheckedChange={toggleLeaderboardVisibility} />
                   </div>
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="divide-y divide-border">
-                  {users.filter(u => !u.isAdmin).length > 0 ? users.filter(u => !u.isAdmin).map((u, idx) => (
-                    <div key={u.id} className="flex items-center justify-between px-8 py-5 hover:bg-primary/5 transition-colors group">
-                      <div className="flex items-center gap-6">
-                        <span className={`w-8 text-xs font-black ${idx < 3 ? 'text-primary' : 'text-muted-foreground'}`}>#{idx + 1}</span>
+                  {users.filter(u => !u.isAdmin).map((u, idx) => (
+                    <div key={u.id} className="flex items-center justify-between px-10 py-6 hover:bg-primary/5 transition-all group">
+                      <div className="flex items-center gap-8">
+                        <span className={`w-10 text-sm font-black ${idx < 3 ? 'text-primary' : 'text-muted-foreground'}`}>#{idx + 1}</span>
                         <div>
-                          <p className="font-headline font-black uppercase text-sm group-hover:text-primary transition-colors">{u.username}</p>
-                          <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">{u.year} | {u.department}</p>
+                          <p className="font-headline font-black uppercase text-base group-hover:text-primary transition-colors">{u.username}</p>
+                          <p className="text-[10px] text-muted-foreground uppercase font-black tracking-[0.2em]">{u.year} | {u.department}</p>
                         </div>
                       </div>
-                      <div className="flex flex-col items-end">
-                        <span className="font-headline font-black text-primary text-lg">{u.points}</span>
-                        <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">EXPERIENCE POINTS</span>
+                      <div className="text-right">
+                        <span className="font-headline font-black text-primary text-2xl">{u.points}</span>
+                        <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground block">ACCUMULATED XP</span>
                       </div>
                     </div>
-                  )) : (
-                    <div className="py-20 text-center italic text-muted-foreground uppercase text-xs font-black tracking-widest">
-                      No student profiles registered.
-                    </div>
-                  )}
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -498,24 +483,24 @@ export default function AdminPage() {
                   Global Round Switchboard
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-8 space-y-6 px-6 md:px-10 pb-10">
+              <CardContent className="pt-10 px-6 md:px-12 pb-12 space-y-6">
                 {[
-                  { label: "GROUP STAGE ROUND 1", val: 1, desc: "First set of 24 fixtures" },
-                  { label: "GROUP STAGE ROUND 2", val: 2, desc: "Second set of 24 fixtures" },
-                  { label: "GROUP STAGE ROUND 3", val: 3, desc: "Final group stage matches" },
+                  { label: "GROUP STAGE ROUND 1", val: 1, desc: "Opening set of 24 fixtures" },
+                  { label: "GROUP STAGE ROUND 2", val: 2, desc: "Mid-group tournament matches" },
+                  { label: "GROUP STAGE ROUND 3", val: 3, desc: "Final group stage qualifiers" },
                   { label: "KNOCKOUT PHASE", val: 4, desc: "Round of 32 through Final" }
                 ].map(r => (
-                  <div key={r.val} className="flex flex-col md:flex-row md:items-center justify-between p-6 border border-border bg-card/40 transition-all hover:bg-primary/5 gap-6">
+                  <div key={r.val} className="flex flex-col md:flex-row md:items-center justify-between p-8 border border-border bg-background/40 hover:border-primary/30 transition-all gap-8">
                     <div className="space-y-1">
-                      <span className="text-xs font-black uppercase tracking-widest block">{r.label}</span>
-                      <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">{r.desc}</span>
+                      <span className="text-[11px] font-black uppercase tracking-[0.2em] block">{r.label}</span>
+                      <span className="text-[9px] text-muted-foreground uppercase font-black tracking-widest">{r.desc}</span>
                     </div>
-                    <div className="grid grid-cols-2 gap-3 w-full md:w-auto">
-                      <Button size="sm" variant="outline" className="h-12 text-[10px] font-black px-6 flex items-center justify-center gap-3 rounded-none tracking-widest border-primary/20 hover:bg-primary hover:text-white transition-all" onClick={() => handleLockRound(r.val, false)}>
-                        <Unlock className="h-4 w-4" /> UNLOCK
+                    <div className="grid grid-cols-2 gap-4 w-full md:w-auto">
+                      <Button size="lg" variant="outline" className="h-14 text-[10px] font-black px-8 rounded-none tracking-[0.2em] border-primary/20 hover:bg-green-600 hover:text-white transition-all uppercase" onClick={() => handleLockRound(r.val, false)}>
+                        <Unlock className="h-4 w-4 mr-3" /> OPEN
                       </Button>
-                      <Button size="sm" variant="default" className="h-12 text-[10px] font-black px-6 bg-primary flex items-center justify-center gap-3 rounded-none tracking-widest shadow-lg hover:bg-primary/90 transition-all" onClick={() => handleLockRound(r.val, true)}>
-                        <Lock className="h-4 w-4" /> LOCK
+                      <Button size="lg" className="h-14 text-[10px] font-black px-8 bg-primary rounded-none tracking-[0.2em] shadow-xl hover:bg-destructive transition-all uppercase" onClick={() => handleLockRound(r.val, true)}>
+                        <Lock className="h-4 w-4 mr-3" /> LOCK
                       </Button>
                     </div>
                   </div>
@@ -524,32 +509,71 @@ export default function AdminPage() {
             </Card>
           </TabsContent>
 
+          <TabsContent value="broadcast" className="animate-fade-in-up">
+            <Card className="glass-morphism rounded-none classic-border shadow-2xl h-fit overflow-hidden">
+              <CardHeader className="bg-primary/5 border-b border-border py-6">
+                <CardTitle className="font-headline font-black uppercase tracking-widest text-sm flex items-center gap-3">
+                  <Radio className="h-5 w-5 text-primary" />
+                  Live Announcement Broadcast
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-10 px-6 md:px-12 pb-12 space-y-8">
+                <div className="space-y-4">
+                  <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Message Payload</Label>
+                  <Input 
+                    placeholder="Enter urgent broadcast message for all players..." 
+                    value={broadcast} 
+                    onChange={e => setBroadcast(e.target.value)} 
+                    className="bg-background/50 font-bold rounded-none h-20 border-border px-6 focus:ring-primary/30 text-base" 
+                  />
+                </div>
+                <Button onClick={sendBroadcast} className="w-full bg-primary text-[11px] font-black uppercase tracking-[0.4em] rounded-none h-16 shadow-2xl hover:bg-primary/90 transition-all">
+                  TRANSMIT TO ALL ARENAS
+                </Button>
+
+                <div className="pt-10 space-y-4">
+                  <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border pb-2">Recent Transmissions</h3>
+                  <ScrollArea className="h-[300px] border border-border bg-background/20 p-4">
+                    <div className="space-y-4">
+                      {db.broadcasts.all().map(b => (
+                        <div key={b.id} className="p-4 bg-muted/30 border-l-2 border-primary">
+                          <p className="text-[11px] font-bold mb-2">{b.message}</p>
+                          <p className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">{new Date(b.timestamp).toLocaleString()}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="system" className="animate-fade-in-up">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
               <Card className="glass-morphism rounded-none classic-border shadow-2xl h-fit">
                 <CardHeader className="bg-primary/5 border-b border-border py-6">
                   <CardTitle className="font-headline font-black uppercase tracking-widest text-sm flex items-center gap-3">
                     <Mail className="h-5 w-5 text-primary" />
-                    Student Feedback Registry
+                    Incoming Transmissions (Inbox)
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-6">
-                  <ScrollArea className="h-[450px]">
+                  <ScrollArea className="h-[500px]">
                     <div className="space-y-4 pr-4">
                       {messages.length > 0 ? messages.map(msg => (
-                        <div key={msg.id} className="p-4 border border-border bg-card/30 relative group hover:border-primary/30 transition-all">
-                          <div className="flex justify-between items-start mb-3">
+                        <div key={msg.id} className="p-6 border border-border bg-background/30 relative group hover:border-primary/30 transition-all">
+                          <div className="flex justify-between items-start mb-4">
                             <span className="text-[10px] font-black uppercase text-primary tracking-widest">{msg.username}</span>
-                            <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10" onClick={() => { db.inbox.delete(msg.id); refresh(); }}>
-                              <Trash2 className="h-3.5 w-3.5" />
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => { db.inbox.delete(msg.id); refresh(); }}>
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
-                          <p className="text-[11px] font-medium leading-relaxed mb-3">{msg.message}</p>
-                          <span className="text-[8px] text-muted-foreground uppercase font-bold tracking-widest border-t border-border/30 pt-2 block">{new Date(msg.timestamp).toLocaleString()}</span>
+                          <p className="text-[11px] font-bold leading-relaxed mb-4">{msg.message}</p>
+                          <span className="text-[8px] text-muted-foreground uppercase font-black tracking-[0.2em] border-t border-border/30 pt-3 block">{new Date(msg.timestamp).toLocaleString()}</span>
                         </div>
                       )) : (
-                        <div className="py-20 text-center italic text-muted-foreground uppercase text-xs font-black tracking-widest border border-dashed border-border">
-                          No incoming transmissions.
+                        <div className="py-24 text-center glass-morphism border-2 border-dashed border-border">
+                          <p className="text-muted-foreground font-black uppercase text-[9px] tracking-[0.3em]">Inbox Empty</p>
                         </div>
                       )}
                     </div>
@@ -557,40 +581,33 @@ export default function AdminPage() {
                 </CardContent>
               </Card>
 
-              <div className="space-y-8">
-                <Card className="glass-morphism rounded-none classic-border shadow-2xl">
-                  <CardHeader className="bg-primary/5 border-b border-border py-6">
-                    <CardTitle className="font-headline font-black uppercase tracking-widest text-sm flex items-center gap-3">
-                      <MessageSquare className="h-5 w-5 text-primary" />
-                      Global Broadcast Bulletin
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-8 space-y-4">
-                    <Input placeholder="Compose announcement for all arenas..." value={broadcast} onChange={e => setBroadcast(e.target.value)} className="bg-card/50 text-[11px] font-bold rounded-none h-14 border-border px-4 focus:ring-primary/30" />
-                    <Button onClick={sendBroadcast} className="w-full bg-primary text-[10px] font-black uppercase tracking-[0.3em] rounded-none h-14 shadow-xl hover:bg-primary/90">TRANSMIT TO ALL PLAYERS</Button>
-                  </CardContent>
-                </Card>
-
+              <div className="space-y-10">
                 <Card className="glass-morphism rounded-none classic-border border-destructive/30 overflow-hidden shadow-2xl">
-                  <CardHeader className="bg-destructive/5 border-b border-border py-6">
-                    <CardTitle className="font-headline font-black uppercase tracking-widest text-sm text-destructive flex items-center gap-3">
+                  <CardHeader className="bg-destructive/10 border-b border-border py-6 text-center">
+                    <CardTitle className="font-headline font-black uppercase tracking-widest text-sm text-destructive flex items-center justify-center gap-3">
                       <RefreshCcw className="h-5 w-5 animate-spin-slow" />
-                      System Maintenance
+                      Critical System Maintenance
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-8 space-y-4 px-10 pb-10">
-                    <p className="text-[11px] font-bold text-muted-foreground uppercase leading-relaxed text-center">
-                      CRITICAL: This action will permanently erase all tournament data, student profiles, and historical records.
-                    </p>
+                  <CardContent className="pt-10 space-y-6 px-10 pb-12">
+                    <div className="bg-destructive/5 p-6 border border-destructive/10">
+                      <p className="text-[10px] font-black text-destructive uppercase leading-relaxed text-center tracking-widest">
+                        WARNING: EXECUTION OF THE NUCLEAR OPTION WILL PERMANENTLY ERASE ALL TOURNAMENT DATA, PLAYER PROFILES, AND RECORDS.
+                      </p>
+                    </div>
                     <Button 
                       variant="destructive" 
-                      className="w-full rounded-none font-black text-[10px] uppercase h-14 tracking-[0.3em] shadow-2xl"
+                      className="w-full rounded-none font-black text-[11px] uppercase h-16 tracking-[0.4em] shadow-2xl transition-all active:scale-95"
                       onClick={handleResetSystem}
                     >
                       EXECUTE NUCLEAR RESET
                     </Button>
                   </CardContent>
                 </Card>
+
+                <div className="p-10 text-center glass-morphism classic-border">
+                   <p className="text-[10px] font-black uppercase tracking-[0.5em] text-muted-foreground opacity-50">Dhruva 2026 Prediction Arena Core</p>
+                </div>
               </div>
             </div>
           </TabsContent>

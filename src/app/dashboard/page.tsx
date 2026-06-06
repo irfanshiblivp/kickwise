@@ -20,7 +20,9 @@ import {
   CalendarCheck, 
   History,
   TrendingUp,
-  EyeOff
+  EyeOff,
+  ShieldCheck,
+  ChevronRight
 } from 'lucide-react';
 import { Toaster } from '@/components/ui/toaster';
 import Image from 'next/image';
@@ -110,35 +112,37 @@ export default function DashboardPage() {
               <span className="text-xs font-black text-primary uppercase">{user.points} XP</span>
             </div>
             {user.isAdmin && (
-              <Button size="sm" variant="outline" onClick={() => router.push('/admin')} className="text-[9px] font-black uppercase h-7 border-primary/20">Admin Panel</Button>
+              <Button size="sm" variant="outline" onClick={() => router.push('/admin')} className="text-[9px] font-black uppercase h-7 border-primary/20 rounded-none bg-primary/5 hover:bg-primary hover:text-white transition-all">
+                <ShieldCheck className="h-3 w-3 mr-1" /> Command Center
+              </Button>
             )}
           </div>
           <div className="flex items-center gap-3">
             <ThemeToggle />
             <div className="hidden sm:flex flex-col items-end mr-2">
-              <span className="text-xs font-black uppercase">{user.username}</span>
-              <span className="text-[9px] text-muted-foreground font-bold">{user.year} {user.department}</span>
+              <span className="text-[10px] font-black uppercase text-primary tracking-widest">{user.username}</span>
+              <span className="text-[9px] text-muted-foreground font-bold uppercase">{user.year} {user.department}</span>
             </div>
             <Button 
               variant="outline" 
               size="sm" 
               onClick={logout} 
-              className="h-9 px-4 hover:bg-destructive/10 hover:text-destructive text-xs font-bold uppercase tracking-wider border-primary/10"
+              className="h-8 px-4 hover:bg-destructive/10 hover:text-destructive text-[10px] font-black uppercase tracking-wider border-border rounded-none"
             >
-              <LogOut className="h-4 w-4 mr-2" />
-              Logout
+              <LogOut className="h-3 w-3 mr-2" />
+              Sign Out
             </Button>
           </div>
         </div>
       </nav>
 
-      <main className="container mx-auto px-4 py-8 space-y-8 flex-1 z-10">
+      <main className="container mx-auto px-4 py-8 space-y-8 flex-1 z-10 max-w-7xl">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           
           <div className="lg:col-span-3 space-y-6">
             <div className="flex flex-col gap-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-headline font-black flex items-center gap-2 tracking-tighter uppercase">
+                <h2 className="text-2xl font-headline font-black flex items-center gap-3 tracking-tighter uppercase">
                   <LayoutDashboard className="h-6 w-6 text-primary" />
                   Predictor Arena
                 </h2>
@@ -147,35 +151,35 @@ export default function DashboardPage() {
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                   <TabsList className="bg-muted/50 border border-border rounded-none h-11 p-1">
-                    <TabsTrigger value="upcoming" className="flex-1 rounded-none px-6 text-[10px] font-bold uppercase flex items-center gap-2">
-                      <CalendarCheck className="h-3 w-3" />
-                      Active Fixtures
+                    <TabsTrigger value="upcoming" className="flex-1 rounded-none px-6 text-[10px] font-black uppercase flex items-center gap-2 tracking-widest data-[state=active]:bg-primary data-[state=active]:text-white">
+                      <CalendarCheck className="h-3.5 w-3.5" />
+                      Live Fixtures
                     </TabsTrigger>
-                    <TabsTrigger value="finished" className="flex-1 rounded-none px-6 text-[10px] font-bold uppercase flex items-center gap-2">
-                      <History className="h-3 w-3" />
-                      Past Results
+                    <TabsTrigger value="finished" className="flex-1 rounded-none px-6 text-[10px] font-black uppercase flex items-center gap-2 tracking-widest data-[state=active]:bg-primary data-[state=active]:text-white">
+                      <History className="h-3.5 w-3.5" />
+                      Archived Results
                     </TabsTrigger>
                     {settings.leaderboardVisible && (
-                      <TabsTrigger value="leaderboard" className="lg:hidden flex-1 rounded-none px-6 text-[10px] font-bold uppercase flex items-center gap-2">
-                        <ListOrdered className="h-3 w-3" />
-                        Leaderboard
+                      <TabsTrigger value="leaderboard" className="lg:hidden flex-1 rounded-none px-6 text-[10px] font-black uppercase flex items-center gap-2 tracking-widest data-[state=active]:bg-primary data-[state=active]:text-white">
+                        <ListOrdered className="h-3.5 w-3.5" />
+                        Standings
                       </TabsTrigger>
                     )}
                   </TabsList>
 
                   {(activeTab === 'upcoming' || activeTab === 'finished') && (
-                    <div className="flex bg-muted/50 border border-border p-1 rounded-none overflow-x-auto">
+                    <div className="flex bg-muted/50 border border-border p-1 rounded-none overflow-x-auto scrollbar-hide">
                       {[
-                        { id: 'all', label: 'ALL' },
-                        { id: '1', label: 'R1' },
-                        { id: '2', label: 'R2' },
-                        { id: '3', label: 'R3' },
-                        { id: '4', label: 'KO' }
+                        { id: 'all', label: 'ALL ROUNDS' },
+                        { id: '1', label: 'ROUND 1' },
+                        { id: '2', label: 'ROUND 2' },
+                        { id: '3', label: 'ROUND 3' },
+                        { id: '4', label: 'KNOCKOUTS' }
                       ].map(round => (
                         <button
                           key={round.id}
                           onClick={() => setSelectedRound(round.id)}
-                          className={`px-4 py-1.5 text-[9px] font-black uppercase transition-all min-w-[50px] ${selectedRound === round.id ? 'bg-primary text-white shadow-lg' : 'text-muted-foreground hover:text-primary'}`}
+                          className={`px-4 py-2 text-[9px] font-black uppercase transition-all min-w-[90px] tracking-widest border border-transparent ${selectedRound === round.id ? 'bg-primary text-white shadow-lg border-primary/20' : 'text-muted-foreground hover:text-primary'}`}
                         >
                           {round.label}
                         </button>
@@ -184,7 +188,7 @@ export default function DashboardPage() {
                   )}
                 </div>
 
-                <TabsContent value="upcoming" className="m-0">
+                <TabsContent value="upcoming" className="m-0 animate-fade-in-up">
                   <div className="bento-grid">
                     {filteredMatches.length > 0 ? (
                       filteredMatches.map(match => (
@@ -197,14 +201,14 @@ export default function DashboardPage() {
                         />
                       ))
                     ) : (
-                      <div className="col-span-full py-20 text-center glass-morphism rounded-none border border-dashed border-muted">
-                        <p className="text-muted-foreground font-bold uppercase text-xs tracking-widest">No active fixtures found.</p>
+                      <div className="col-span-full py-24 text-center glass-morphism rounded-none border-2 border-dashed border-primary/10">
+                        <p className="text-muted-foreground font-black uppercase text-[10px] tracking-[0.3em]">System clear: No active matches in the arena.</p>
                       </div>
                     )}
                   </div>
                 </TabsContent>
 
-                <TabsContent value="finished" className="m-0">
+                <TabsContent value="finished" className="m-0 animate-fade-in-up">
                    <div className="bento-grid">
                     {filteredMatches.length > 0 ? (
                       filteredMatches.map(match => (
@@ -217,27 +221,35 @@ export default function DashboardPage() {
                         />
                       ))
                     ) : (
-                      <div className="col-span-full py-20 text-center glass-morphism rounded-none border border-dashed border-muted">
-                        <p className="text-muted-foreground font-bold uppercase text-xs tracking-widest">No past results found.</p>
+                      <div className="col-span-full py-24 text-center glass-morphism rounded-none border-2 border-dashed border-primary/10">
+                        <p className="text-muted-foreground font-black uppercase text-[10px] tracking-[0.3em]">Archive clear: No historical results logged.</p>
                       </div>
                     )}
                   </div>
                 </TabsContent>
 
-                <TabsContent value="leaderboard" className="m-0 lg:hidden">
-                  <Card className="glass-morphism rounded-none classic-border overflow-hidden">
+                <TabsContent value="leaderboard" className="m-0 lg:hidden animate-fade-in-up">
+                  <Card className="glass-morphism rounded-none classic-border overflow-hidden shadow-2xl">
+                    <CardHeader className="bg-primary/5 border-b border-border py-4">
+                      <CardTitle className="text-xs font-headline font-black uppercase flex items-center gap-2">
+                        <Trophy className="h-4 w-4 text-primary" />
+                        Global Standings
+                      </CardTitle>
+                    </CardHeader>
                     <CardContent className="p-0">
                       <div className="divide-y divide-border">
                         {leaderboard.filter(u => !u.isAdmin).map((u, idx) => (
-                          <div key={u.id} className={`flex items-center justify-between px-6 py-4 ${u.id === user.id ? 'bg-primary/5' : ''}`}>
+                          <div key={u.id} className={`flex items-center justify-between px-6 py-5 transition-colors ${u.id === user.id ? 'bg-primary/5 border-l-2 border-primary' : ''}`}>
                             <div className="flex items-center gap-4">
-                              <span className={`w-6 text-xs font-black ${idx < 3 ? 'text-primary' : 'text-muted-foreground'}`}>#{idx + 1}</span>
+                              <span className={`w-8 text-[10px] font-black ${idx < 3 ? 'text-primary' : 'text-muted-foreground'}`}>#{idx + 1}</span>
                               <div>
-                                <p className="font-bold uppercase text-sm">{u.username}</p>
-                                <p className="text-[10px] text-muted-foreground uppercase">{u.year} | {u.department}</p>
+                                <p className="font-black uppercase text-xs">{u.username}</p>
+                                <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">{u.year} | {u.department}</p>
                               </div>
                             </div>
-                            <span className="font-headline font-black text-primary">{u.points} XP</span>
+                            <div className="text-right">
+                              <span className="font-headline font-black text-primary block">{u.points} XP</span>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -248,26 +260,26 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="space-y-6 hidden lg:block">
+          <div className="space-y-8 hidden lg:block">
             {settings.leaderboardVisible ? (
-              <Card className="glass-morphism classic-border rounded-none overflow-hidden">
-                <CardHeader className="pb-3 border-b border-border bg-primary/5">
-                  <CardTitle className="text-sm font-headline font-black uppercase flex items-center gap-2">
+              <Card className="glass-morphism classic-border rounded-none overflow-hidden shadow-2xl">
+                <CardHeader className="pb-4 border-b border-border bg-primary/5">
+                  <CardTitle className="text-[10px] font-headline font-black uppercase flex items-center gap-2 tracking-[0.2em]">
                     <ListOrdered className="h-4 w-4 text-primary" />
-                    Elite Leaderboard
+                    Elite Standings
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-4 p-0">
+                <CardContent className="pt-4 p-0 max-h-[500px] overflow-y-auto scrollbar-hide">
                   <div className="divide-y divide-border">
-                    {leaderboard.filter(u => !u.isAdmin).slice(0, 15).map((u, idx) => (
-                      <div key={u.id} className={`flex items-center justify-between px-4 py-3 transition-colors ${u.id === user.id ? 'bg-primary/5' : 'hover:bg-muted/30'}`}>
-                        <div className="flex items-center gap-3">
-                          <span className={`w-5 text-[10px] font-black ${idx === 0 ? 'text-yellow-600' : idx === 1 ? 'text-slate-400' : idx === 2 ? 'text-amber-700' : 'text-muted-foreground'}`}>
+                    {leaderboard.filter(u => !u.isAdmin).map((u, idx) => (
+                      <div key={u.id} className={`flex items-center justify-between px-5 py-4 transition-all duration-300 ${u.id === user.id ? 'bg-primary/10 border-l-2 border-primary' : 'hover:bg-primary/5'}`}>
+                        <div className="flex items-center gap-4">
+                          <span className={`w-6 text-[10px] font-black ${idx === 0 ? 'text-yellow-500' : idx === 1 ? 'text-slate-400' : idx === 2 ? 'text-amber-600' : 'text-muted-foreground'}`}>
                             #{idx + 1}
                           </span>
                           <div>
-                            <p className={`text-xs font-bold uppercase ${u.id === user.id ? 'text-primary' : ''}`}>{u.username}</p>
-                            <p className="text-[9px] text-muted-foreground uppercase font-medium">{u.year} | {u.department}</p>
+                            <p className={`text-[11px] font-black uppercase tracking-tight ${u.id === user.id ? 'text-primary' : ''}`}>{u.username}</p>
+                            <p className="text-[8px] text-muted-foreground uppercase font-black tracking-widest">{u.year} | {u.department}</p>
                           </div>
                         </div>
                         <span className="font-headline font-black text-xs text-primary">{u.points}</span>
@@ -275,48 +287,63 @@ export default function DashboardPage() {
                     ))}
                   </div>
                 </CardContent>
+                <div className="bg-primary/5 border-t border-border p-3 text-center">
+                  <p className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">TOP 50 PLAYERS SHOWN</p>
+                </div>
               </Card>
             ) : (
-              <Card className="glass-morphism border-dashed border-primary/20 rounded-none overflow-hidden">
-                <CardContent className="py-12 flex flex-col items-center justify-center text-center px-6">
-                  <EyeOff className="h-8 w-8 text-muted-foreground/40 mb-3" />
-                  <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest leading-relaxed">
-                    Leaderboard is currently<br />hidden by Admin
+              <Card className="glass-morphism border-dashed border-primary/20 rounded-none overflow-hidden shadow-xl">
+                <CardContent className="py-16 flex flex-col items-center justify-center text-center px-8">
+                  <div className="bg-primary/10 p-4 mb-4 rounded-none">
+                    <EyeOff className="h-8 w-8 text-primary/40" />
+                  </div>
+                  <p className="text-[10px] font-black uppercase text-muted-foreground tracking-[0.3em] leading-relaxed">
+                    Leaderboard access<br />restricted by admin
                   </p>
                 </CardContent>
               </Card>
             )}
 
-            <Card className="glass-morphism classic-border rounded-none overflow-hidden">
-              <CardHeader className="pb-3 border-b border-border bg-primary/5">
-                <CardTitle className="text-sm font-headline font-black uppercase flex items-center gap-2">
+            <Card className="glass-morphism classic-border rounded-none overflow-hidden shadow-2xl">
+              <CardHeader className="pb-4 border-b border-border bg-primary/5">
+                <CardTitle className="text-[10px] font-headline font-black uppercase flex items-center gap-2 tracking-[0.2em]">
                   <MessageSquare className="h-4 w-4 text-primary" />
-                  Bulletins
+                  Live Bulletins
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-4 px-0">
-                <ScrollArea className="h-[250px] px-4">
-                  <div className="space-y-4">
+              <CardContent className="pt-6 px-0">
+                <ScrollArea className="h-[350px] px-6">
+                  <div className="space-y-6">
                     {broadcasts.length > 0 ? (
                       broadcasts.map(msg => (
-                        <div key={msg.id} className="bg-card/40 p-3 rounded-none border-l-2 border-primary shadow-sm">
-                          <p className="text-[11px] leading-relaxed mb-2 font-medium">{msg.message}</p>
+                        <div key={msg.id} className="relative pl-4 border-l-2 border-primary animate-fade-in-up">
+                          <p className="text-[11px] font-bold leading-relaxed mb-3 text-foreground/90">{msg.message}</p>
                           <div className="flex justify-between items-center text-[8px] text-muted-foreground font-black uppercase tracking-widest">
-                            <span className="text-primary">{msg.author}</span>
-                            <span>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                            <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-none">{msg.author}</span>
+                            <span>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</span>
                           </div>
                         </div>
                       ))
                     ) : (
-                      <p className="text-center text-muted-foreground text-[10px] py-10 uppercase font-black tracking-tighter">No updates.</p>
+                      <div className="text-center py-20">
+                        <p className="text-muted-foreground text-[9px] uppercase font-black tracking-widest opacity-50">No incoming transmissions</p>
+                      </div>
                     )}
                   </div>
                 </ScrollArea>
               </CardContent>
             </Card>
+
+            <Button onClick={() => router.push('/')} variant="ghost" className="w-full text-[9px] font-black uppercase tracking-[0.4em] py-8 rounded-none border border-border/50 hover:bg-primary/5 transition-all">
+              Return to Main Entrance
+            </Button>
           </div>
         </div>
       </main>
+      
+      <footer className="w-full py-8 text-foreground/30 text-[8px] uppercase font-black tracking-[0.6em] text-center border-t border-border/20 z-10 bg-background/50 backdrop-blur-sm">
+        Dhruva 2026 • Prediction Arena • CSE Association Munnar
+      </footer>
       <Toaster />
     </div>
   );
