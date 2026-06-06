@@ -98,7 +98,7 @@ let userMessages: UserMessage[] = [];
 let settings: AppSettings = { leaderboardVisible: true };
 
 if (typeof window !== 'undefined') {
-  const CURRENT_DB_VERSION = 'kw_arena_v7';
+  const CURRENT_DB_VERSION = 'kw_arena_v8'; // Bumped version
   const savedUsers = localStorage.getItem('kw_users');
   const savedMatches = localStorage.getItem('kw_matches');
   const savedPredictions = localStorage.getItem('kw_predictions');

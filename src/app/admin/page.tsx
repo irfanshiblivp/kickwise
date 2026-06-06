@@ -34,7 +34,9 @@ import {
   History,
   FilePlus2,
   Radio,
-  Settings2
+  Settings2,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -114,11 +116,13 @@ export default function AdminPage() {
     setNewMatch({ teamA: '', teamB: '', flagA: '', flagB: '', group: 'Group A', round: 1, date: '', time: '', venue: '' });
   };
 
-  const toggleLeaderboardVisibility = () => {
-    const newVal = !settings.leaderboardVisible;
-    db.settings.update({ leaderboardVisible: newVal });
+  const toggleLeaderboardVisibility = (checked: boolean) => {
+    db.settings.update({ leaderboardVisible: checked });
     refresh();
-    toast({ title: newVal ? "Leaderboard Visible" : "Leaderboard Hidden" });
+    toast({ 
+      title: checked ? "Leaderboard Live" : "Leaderboard Hidden", 
+      description: checked ? "Standings are now visible to all players." : "Standings access has been restricted."
+    });
   };
 
   const handleResetSystem = () => {
@@ -142,7 +146,7 @@ export default function AdminPage() {
   const deleteMatch = (matchId: string) => {
     if (confirm("Are you sure you want to delete this match? This action cannot be undone.")) {
       db.matches.delete(matchId);
-      refresh();
+      setMatches(prev => prev.filter(m => m.id !== matchId));
       toast({ title: "Match Deleted", description: "The fixture has been removed from the tournament." });
     }
   };
@@ -442,19 +446,22 @@ export default function AdminPage() {
           <TabsContent value="leadership" className="animate-fade-in-up">
             <Card className="glass-morphism rounded-none classic-border shadow-2xl overflow-hidden">
               <CardHeader className="bg-primary/5 border-b border-border py-6">
-                <CardTitle className="font-headline font-black uppercase tracking-widest text-sm flex items-center justify-between">
+                <CardTitle className="font-headline font-black uppercase tracking-widest text-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
                   <div className="flex items-center gap-3">
                     <ListOrdered className="h-5 w-5 text-primary" />
                     Student Standing Table
                   </div>
-                  <div className="flex items-center gap-4">
-                    <Button variant="outline" size="sm" onClick={recalculatePoints} className="rounded-none border-primary/30 text-[9px] font-black uppercase h-8 px-4 bg-primary/5 hover:bg-primary hover:text-white transition-all">
-                      <RefreshCcw className="h-3 w-3 mr-2" /> Recalculate Points
-                    </Button>
-                    <div className="flex items-center gap-4 bg-background/50 px-6 py-2 border border-border">
-                      <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{settings.leaderboardVisible ? "LIVE TO USERS" : "HIDDEN FROM USERS"}</span>
+                  <div className="flex flex-wrap items-center gap-4">
+                    <div className="flex items-center gap-4 bg-background/80 px-4 py-2 border-2 border-primary/20 shadow-lg">
+                      {settings.leaderboardVisible ? <Eye className="h-4 w-4 text-green-500" /> : <EyeOff className="h-4 w-4 text-destructive" />}
+                      <span className="text-[9px] font-black text-foreground uppercase tracking-widest min-w-[120px]">
+                        {settings.leaderboardVisible ? "LEADERBOARD: LIVE" : "LEADERBOARD: HIDDEN"}
+                      </span>
                       <Switch checked={settings.leaderboardVisible} onCheckedChange={toggleLeaderboardVisibility} />
                     </div>
+                    <Button variant="outline" size="sm" onClick={recalculatePoints} className="rounded-none border-primary/30 text-[9px] font-black uppercase h-10 px-6 bg-primary/5 hover:bg-primary hover:text-white transition-all shadow-md">
+                      <RefreshCcw className="h-3 w-3 mr-2" /> Recalculate Points
+                    </Button>
                   </div>
                 </CardTitle>
               </CardHeader>
