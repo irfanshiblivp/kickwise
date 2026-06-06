@@ -100,7 +100,7 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
             )}
           </div>
         </div>
-      </Header>
+      </CardHeader>
 
       <CardContent className="space-y-4 pt-2">
         <div className="flex flex-col gap-1.5 text-[10px] font-bold uppercase text-foreground/50 bg-muted/30 p-3">
