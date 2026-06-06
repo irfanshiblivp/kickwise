@@ -21,7 +21,7 @@ export default function DashboardPage() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
   const [leaderboard, setLeaderboard] = useState<User[]>([]);
-  const [activeRound, setActiveRound] = useState('1');
+  const [activeTab, setActiveTab] = useState('upcoming');
   const stadiumBg = PlaceHolderImages.find(img => img.id === 'stadium-bg');
 
   useEffect(() => {
@@ -54,8 +54,11 @@ export default function DashboardPage() {
   };
 
   const filteredMatches = useMemo(() => {
-    return matches.filter(m => m.round.toString() === activeRound);
-  }, [matches, activeRound]);
+    if (activeTab === 'upcoming') {
+      return matches.filter(m => !m.isFinished).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    }
+    return matches.filter(m => m.isFinished).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [matches, activeTab]);
 
   if (!user) return null;
 
@@ -82,6 +85,9 @@ export default function DashboardPage() {
               <Trophy className="h-3 w-3 text-primary" />
               <span className="text-xs font-black text-primary uppercase">{user.points} XP</span>
             </div>
+            {user.isAdmin && (
+              <Button size="sm" variant="outline" onClick={() => router.push('/admin')} className="text-[9px] font-black uppercase h-7 border-primary/20">Admin Panel</Button>
+            )}
           </div>
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex flex-col items-end mr-2">
@@ -112,12 +118,10 @@ export default function DashboardPage() {
                 Live Matches
               </h2>
               
-              <Tabs value={activeRound} onValueChange={setActiveRound} className="w-full md:w-auto">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto">
                 <TabsList className="bg-muted/50 border border-border w-full rounded-none">
-                  <TabsTrigger value="1" className="flex-1 rounded-none text-[10px] font-bold uppercase">R1</TabsTrigger>
-                  <TabsTrigger value="2" className="flex-1 rounded-none text-[10px] font-bold uppercase">R2</TabsTrigger>
-                  <TabsTrigger value="3" className="flex-1 rounded-none text-[10px] font-bold uppercase">R3</TabsTrigger>
-                  <TabsTrigger value="4" className="flex-1 rounded-none text-[10px] font-bold uppercase">Playoffs</TabsTrigger>
+                  <TabsTrigger value="upcoming" className="flex-1 rounded-none text-[10px] font-bold uppercase">Active Fixtures</TabsTrigger>
+                  <TabsTrigger value="finished" className="flex-1 rounded-none text-[10px] font-bold uppercase">Past Results</TabsTrigger>
                 </TabsList>
               </Tabs>
             </div>
@@ -135,7 +139,7 @@ export default function DashboardPage() {
                 ))
               ) : (
                 <div className="col-span-full py-20 text-center glass-morphism rounded-none border border-dashed border-muted">
-                  <p className="text-muted-foreground font-bold uppercase text-xs tracking-widest">No fixtures confirmed for this round.</p>
+                  <p className="text-muted-foreground font-bold uppercase text-xs tracking-widest">No matches in this category.</p>
                 </div>
               )}
             </div>
@@ -152,7 +156,7 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent className="pt-4 p-0">
                 <div className="divide-y divide-border">
-                  {leaderboard.slice(0, 10).map((u, idx) => (
+                  {leaderboard.filter(u => !u.isAdmin).slice(0, 10).map((u, idx) => (
                     <div key={u.id} className={`flex items-center justify-between px-4 py-3 transition-colors ${u.id === user.id ? 'bg-primary/5' : 'hover:bg-muted/30'}`}>
                       <div className="flex items-center gap-3">
                         <span className={`w-5 text-[10px] font-black ${idx === 0 ? 'text-yellow-600' : idx === 1 ? 'text-slate-400' : idx === 2 ? 'text-amber-700' : 'text-muted-foreground'}`}>
@@ -166,6 +170,11 @@ export default function DashboardPage() {
                       <span className="font-headline font-black text-xs text-primary">{u.points}</span>
                     </div>
                   ))}
+                  {leaderboard.filter(u => !u.isAdmin).length === 0 && (
+                    <div className="p-10 text-center">
+                      <p className="text-[10px] font-black text-muted-foreground uppercase italic">No contestants yet.</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

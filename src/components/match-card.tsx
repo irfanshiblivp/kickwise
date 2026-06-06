@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -8,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, MapPin, Lock, Trophy, Timer } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import Image from 'next/image';
 
 interface MatchCardProps {
   match: Match;
@@ -43,19 +45,21 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
     onPredictionSubmit();
   };
 
+  const isUrl = (str: string) => str.startsWith('http') || str.startsWith('https') || str.startsWith('/');
+
   return (
-    <Card className={`glass-morphism rounded-none border-primary/10 relative overflow-hidden transition-all duration-300 ${match.isLocked ? 'opacity-80' : 'hover:border-primary/30 hover:shadow-xl'}`}>
+    <Card className={`glass-morphism rounded-none border-primary/10 relative overflow-hidden transition-all duration-300 ${match.isLocked && !match.isFinished ? 'opacity-80' : 'hover:border-primary/30 hover:shadow-xl'}`}>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center mb-4">
           <Badge variant="secondary" className="bg-primary/10 text-primary border-none text-[9px] font-black uppercase rounded-none px-2 py-0.5">
-            {match.round === 4 ? 'Playoffs' : `R${match.round}`} Fixture
+            {match.group || 'Tournament'} Fixture
           </Badge>
-          {match.isLocked ? (
+          {match.isFinished ? (
+            <Badge variant="default" className="bg-green-600 text-white rounded-none text-[8px] font-bold uppercase">Result Final</Badge>
+          ) : match.isLocked ? (
             <Badge variant="outline" className="text-muted-foreground border-muted-foreground/30 rounded-none text-[8px] font-bold uppercase">
               <Lock className="h-2.5 w-2.5 mr-1" /> Entries Closed
             </Badge>
-          ) : match.isFinished ? (
-            <Badge variant="default" className="bg-green-600 text-white rounded-none text-[8px] font-bold uppercase">Result Final</Badge>
           ) : (
             <Badge variant="outline" className="text-amber-600 border-amber-600/30 rounded-none text-[8px] font-black uppercase animate-pulse">
               <Timer className="h-2.5 w-2.5 mr-1" /> Open for Entries
@@ -65,7 +69,13 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
         
         <div className="flex items-center justify-between text-center gap-1">
           <div className="flex-1 flex flex-col items-center">
-            <span className="text-3xl mb-1">{match.flagA}</span>
+            {isUrl(match.flagA) ? (
+              <div className="relative h-12 w-12 mb-2">
+                <Image src={match.flagA} alt={match.teamA} fill className="object-contain" />
+              </div>
+            ) : (
+              <span className="text-4xl mb-1">{match.flagA || '🏳️'}</span>
+            )}
             <span className="font-headline font-black text-sm uppercase tracking-tighter truncate w-full">{match.teamA}</span>
             {match.isFinished && (
               <span className="text-xl font-black text-primary mt-1">{match.scoreA}</span>
@@ -77,7 +87,13 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
           </div>
 
           <div className="flex-1 flex flex-col items-center">
-            <span className="text-3xl mb-1">{match.flagB}</span>
+             {isUrl(match.flagB) ? (
+              <div className="relative h-12 w-12 mb-2">
+                <Image src={match.flagB} alt={match.teamB} fill className="object-contain" />
+              </div>
+            ) : (
+              <span className="text-4xl mb-1">{match.flagB || '🏳️'}</span>
+            )}
             <span className="font-headline font-black text-sm uppercase tracking-tighter truncate w-full">{match.teamB}</span>
             {match.isFinished && (
               <span className="text-xl font-black text-primary mt-1">{match.scoreB}</span>
@@ -112,7 +128,6 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
                 {existingPrediction.scoreA === match.scoreA && existingPrediction.scoreB === match.scoreB ? (
                   <p className="text-[8px] text-green-600 font-black mt-1">+10 POINTS EARNED</p>
                 ) : (
-                  // Simple check for outcome (ignoring draw complexity for this brief display)
                   ((existingPrediction.scoreA > existingPrediction.scoreB && match.scoreA! > match.scoreB!) ||
                    (existingPrediction.scoreA < existingPrediction.scoreB && match.scoreA! < match.scoreB!) ||
                    (existingPrediction.scoreA === existingPrediction.scoreB && match.scoreA! === match.scoreB!)) &&

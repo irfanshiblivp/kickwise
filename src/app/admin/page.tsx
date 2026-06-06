@@ -21,7 +21,8 @@ import {
   MessageSquare,
   Users,
   LogOut,
-  ArrowLeft
+  ArrowLeft,
+  Trophy
 } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -33,7 +34,7 @@ export default function AdminPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [broadcast, setBroadcast] = useState('');
   const [newMatch, setNewMatch] = useState({
-    teamA: '', teamB: '', flagA: '🏳️', flagB: '🏳️', round: 1, date: '', time: '', venue: ''
+    teamA: '', teamB: '', flagA: '', flagB: '', group: 'Group A', round: 1, date: '', time: '', venue: ''
   });
   const stadiumBg = PlaceHolderImages.find(img => img.id === 'stadium-bg');
 
@@ -65,7 +66,7 @@ export default function AdminPage() {
     });
     toast({ title: "Match Added", description: `${newMatch.teamA} vs ${newMatch.teamB} scheduled.` });
     refresh();
-    setNewMatch({ teamA: '', teamB: '', flagA: '🏳️', flagB: '🏳️', round: 1, date: '', time: '', venue: '' });
+    setNewMatch({ teamA: '', teamB: '', flagA: '', flagB: '', group: 'Group A', round: 1, date: '', time: '', venue: '' });
   };
 
   const toggleLock = (matchId: string, currentStatus: boolean) => {
@@ -168,10 +169,12 @@ export default function AdminPage() {
                   <div key={m.id} className="p-4 rounded-none border border-border bg-white/40 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                       <div className="text-center w-12 border-r border-border pr-4">
-                        <Badge className="bg-primary/10 text-primary mb-1 uppercase font-bold text-[9px] rounded-none">R{m.round}</Badge>
+                        <Badge className="bg-primary/10 text-primary mb-1 uppercase font-bold text-[9px] rounded-none">{m.group || 'WC'}</Badge>
                       </div>
                       <div>
-                        <p className="font-bold text-sm uppercase tracking-tighter">{m.flagA} {m.teamA} vs {m.teamB} {m.flagB}</p>
+                        <p className="font-bold text-sm uppercase tracking-tighter">
+                          {m.flagA} {m.teamA} vs {m.teamB} {m.flagB}
+                        </p>
                         <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{m.date} | {m.venue}</p>
                       </div>
                     </div>
@@ -222,25 +225,25 @@ export default function AdminPage() {
               </CardHeader>
               <CardContent className="pt-6">
                 <form onSubmit={handleCreateMatch} className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="space-y-2">
+                  <div className="space-y-2 col-span-2 md:col-span-1">
                     <Label className="text-[10px] uppercase font-black opacity-60">Team A</Label>
-                    <Input className="rounded-none bg-white/50 h-9" placeholder="Nation A" value={newMatch.teamA} onChange={e => setNewMatch({...newMatch, teamA: e.target.value})} />
+                    <Input className="rounded-none bg-white/50 h-9" placeholder="e.g. Mexico" value={newMatch.teamA} onChange={e => setNewMatch({...newMatch, teamA: e.target.value})} />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-[10px] uppercase font-black opacity-60">Flag A</Label>
-                    <Input className="rounded-none bg-white/50 h-9" placeholder="Emoji" value={newMatch.flagA} onChange={e => setNewMatch({...newMatch, flagA: e.target.value})} />
+                  <div className="space-y-2 col-span-2 md:col-span-1">
+                    <Label className="text-[10px] uppercase font-black opacity-60">Logo/Flag A (URL/Emoji)</Label>
+                    <Input className="rounded-none bg-white/50 h-9" placeholder="e.g. 🇲🇽" value={newMatch.flagA} onChange={e => setNewMatch({...newMatch, flagA: e.target.value})} />
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-2 col-span-2 md:col-span-1">
                     <Label className="text-[10px] uppercase font-black opacity-60">Team B</Label>
-                    <Input className="rounded-none bg-white/50 h-9" placeholder="Nation B" value={newMatch.teamB} onChange={e => setNewMatch({...newMatch, teamB: e.target.value})} />
+                    <Input className="rounded-none bg-white/50 h-9" placeholder="e.g. USA" value={newMatch.teamB} onChange={e => setNewMatch({...newMatch, teamB: e.target.value})} />
+                  </div>
+                  <div className="space-y-2 col-span-2 md:col-span-1">
+                    <Label className="text-[10px] uppercase font-black opacity-60">Logo/Flag B (URL/Emoji)</Label>
+                    <Input className="rounded-none bg-white/50 h-9" placeholder="e.g. 🇺🇸" value={newMatch.flagB} onChange={e => setNewMatch({...newMatch, flagB: e.target.value})} />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[10px] uppercase font-black opacity-60">Flag B</Label>
-                    <Input className="rounded-none bg-white/50 h-9" placeholder="Emoji" value={newMatch.flagB} onChange={e => setNewMatch({...newMatch, flagB: e.target.value})} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-[10px] uppercase font-black opacity-60">Round</Label>
-                    <Input className="rounded-none bg-white/50 h-9" type="number" value={newMatch.round} onChange={e => setNewMatch({...newMatch, round: parseInt(e.target.value)})} />
+                    <Label className="text-[10px] uppercase font-black opacity-60">Group</Label>
+                    <Input className="rounded-none bg-white/50 h-9" placeholder="e.g. Group A" value={newMatch.group} onChange={e => setNewMatch({...newMatch, group: e.target.value})} />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] uppercase font-black opacity-60">Date</Label>
@@ -283,12 +286,12 @@ export default function AdminPage() {
               <CardHeader className="bg-primary/5 border-b border-border">
                 <CardTitle className="font-headline font-black uppercase text-sm flex items-center gap-2">
                   <Users className="h-4 w-4 text-primary" />
-                  Leaderboard Data
+                  Top Players
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
                 <div className="space-y-2">
-                  {users.slice(0, 10).map(u => (
+                  {users.filter(u => !u.isAdmin).slice(0, 10).map(u => (
                     <div key={u.id} className="flex justify-between items-center p-3 rounded-none bg-white/30 border border-border/50">
                       <div className="flex flex-col">
                         <span className="font-bold text-[10px] uppercase">{u.username}</span>
@@ -297,6 +300,9 @@ export default function AdminPage() {
                       <Badge variant="outline" className="text-[9px] font-black border-primary/20 text-primary rounded-none">{u.points} XP</Badge>
                     </div>
                   ))}
+                  {users.filter(u => !u.isAdmin).length === 0 && (
+                    <p className="text-[10px] text-center text-muted-foreground font-black uppercase italic">Arena is empty.</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
