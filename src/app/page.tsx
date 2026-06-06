@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -6,11 +5,14 @@ import { useRouter } from 'next/navigation';
 import { BrandingHeader } from '@/components/branding-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Trophy, ChevronRight, UserPlus, LogIn } from 'lucide-react';
+import { Trophy, ChevronRight, UserPlus, LogIn, ShieldCheck, Zap } from 'lucide-react';
+import Image from 'next/image';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function Home() {
   const router = useRouter();
   const [isAuth, setIsAuth] = useState(false);
+  const bgImage = PlaceHolderImages.find(img => img.id === 'world-cup-bg');
 
   useEffect(() => {
     const user = localStorage.getItem('kw_current_user');
@@ -18,89 +20,97 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen relative overflow-hidden flex flex-col items-center">
-      {/* Background decoration */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-accent/20 rounded-full blur-[120px] pointer-events-none" />
+    <div className="min-h-screen relative flex flex-col items-center bg-background">
+      {/* Hero Background with Overlay */}
+      <div className="absolute inset-0 z-0">
+        <Image 
+          src={bgImage?.imageUrl || ''} 
+          alt="World Cup Stadium" 
+          fill 
+          className="object-cover opacity-40"
+          priority
+        />
+        <div className="absolute inset-0 hero-overlay" />
+      </div>
 
       <BrandingHeader />
 
-      <main className="container mx-auto px-4 z-10 flex flex-col items-center">
-        <div className="max-w-2xl text-center space-y-6 mb-12">
-          <p className="text-lg text-muted-foreground leading-relaxed">
-            The ultimate prediction platform for the FIFA World Cup 2026. 
-            Join your fellow students from CEM Munnar, climb the leaderboard, and prove your football IQ.
+      <main className="container mx-auto px-4 z-10 flex flex-col items-center flex-grow">
+        <div className="max-w-3xl text-center space-y-8 mb-16 mt-8">
+          <p className="text-xl text-white/80 leading-relaxed font-light italic">
+            "Experience the thrill of the World Cup like never before."
           </p>
           
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-6">
             {!isAuth ? (
               <>
                 <Button 
                   onClick={() => router.push('/register')}
                   size="lg" 
-                  className="bg-primary hover:bg-primary/90 text-white font-headline font-bold px-8 h-14 rounded-full transition-all hover:scale-105 active:scale-95"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-headline font-bold px-10 h-14 rounded-sm transition-all hover:scale-105 shadow-xl classic-border"
                 >
                   <UserPlus className="mr-2 h-5 w-5" />
-                  JOIN THE ARENA
+                  CREATE PROFILE
                 </Button>
                 <Button 
                   onClick={() => router.push('/login')}
                   variant="outline" 
                   size="lg" 
-                  className="border-primary text-primary hover:bg-primary/10 font-headline font-bold px-8 h-14 rounded-full"
+                  className="border-white/20 text-white hover:bg-white/10 font-headline font-bold px-10 h-14 rounded-sm"
                 >
                   <LogIn className="mr-2 h-5 w-5" />
-                  LOGIN
+                  PLAYER LOGIN
                 </Button>
               </>
             ) : (
               <Button 
                 onClick={() => router.push('/dashboard')}
                 size="lg" 
-                className="bg-accent hover:bg-accent/90 text-white font-headline font-bold px-8 h-14 rounded-full transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(132,125,255,0.4)]"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-headline font-bold px-12 h-16 rounded-sm transition-all hover:scale-105 shadow-[0_0_30px_rgba(218,165,32,0.3)]"
               >
-                GO TO DASHBOARD
+                ACCESS ARENA
                 <ChevronRight className="ml-2 h-5 w-5" />
               </Button>
             )}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl mt-8">
-          <Card className="glass-morphism border-primary/20 smooth-sweep hover:border-primary/50">
-            <CardContent className="pt-6 flex flex-col items-center text-center">
-              <div className="bg-primary/20 p-4 rounded-2xl mb-4">
-                <Trophy className="h-8 w-8 text-primary" />
+        {/* Feature Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl mb-12">
+          <Card className="glass-morphism border-white/10 smooth-sweep hover:border-primary/40 group">
+            <CardContent className="pt-8 flex flex-col items-center text-center">
+              <div className="bg-white/5 p-4 rounded-full mb-6 group-hover:bg-primary/20 transition-colors">
+                <Trophy className="h-10 w-10 text-primary" />
               </div>
-              <h3 className="font-headline font-bold text-xl mb-2">Predict & Win</h3>
-              <p className="text-muted-foreground text-sm">Submit your scores before kick-off. Earn 10 points for exact match, 5 for outcome.</p>
+              <h3 className="font-headline font-bold text-xl mb-3 tracking-wide">ELITE COMPETITION</h3>
+              <p className="text-white/60 text-sm leading-relaxed">Submit precision scores before kick-off. Earn maximum points for exact results.</p>
             </CardContent>
           </Card>
 
-          <Card className="glass-morphism border-accent/20 smooth-sweep hover:border-accent/50">
-            <CardContent className="pt-6 flex flex-col items-center text-center">
-              <div className="bg-accent/20 p-4 rounded-2xl mb-4">
-                <Trophy className="h-8 w-8 text-accent" />
+          <Card className="glass-morphism border-white/10 smooth-sweep hover:border-primary/40 group">
+            <CardContent className="pt-8 flex flex-col items-center text-center">
+              <div className="bg-white/5 p-4 rounded-full mb-6 group-hover:bg-primary/20 transition-colors">
+                <ShieldCheck className="h-10 w-10 text-primary" />
               </div>
-              <h3 className="font-headline font-bold text-xl mb-2">Live Standings</h3>
-              <p className="text-muted-foreground text-sm">Watch the leaderboard evolve in real-time as match results are confirmed by admins.</p>
+              <h3 className="font-headline font-bold text-xl mb-3 tracking-wide">SECURE ANALYTICS</h3>
+              <p className="text-white/60 text-sm leading-relaxed">Real-time leaderboard updates verified by campus administrators for total transparency.</p>
             </CardContent>
           </Card>
 
-          <Card className="glass-morphism border-primary/20 smooth-sweep hover:border-primary/50">
-            <CardContent className="pt-6 flex flex-col items-center text-center">
-              <div className="bg-primary/20 p-4 rounded-2xl mb-4">
-                <Trophy className="h-8 w-8 text-primary" />
+          <Card className="glass-morphism border-white/10 smooth-sweep hover:border-primary/40 group">
+            <CardContent className="pt-8 flex flex-col items-center text-center">
+              <div className="bg-white/5 p-4 rounded-full mb-6 group-hover:bg-primary/20 transition-colors">
+                <Zap className="h-10 w-10 text-primary" />
               </div>
-              <h3 className="font-headline font-bold text-xl mb-2">AI Insights</h3>
-              <p className="text-muted-foreground text-sm">Leverage our custom AI engine to analyze past stats and player form before you predict.</p>
+              <h3 className="font-headline font-bold text-xl mb-3 tracking-wide">AI STRATEGY</h3>
+              <p className="text-white/60 text-sm leading-relaxed">Leverage the Kickwise AI engine for historical data analysis and form-based insights.</p>
             </CardContent>
           </Card>
         </div>
       </main>
 
-      <footer className="mt-auto py-8 text-muted-foreground/60 text-xs">
-        © 2026 College of Engineering Munnar. Developed for Dhruva.
+      <footer className="w-full py-8 text-white/30 text-[10px] uppercase tracking-[0.4em] text-center border-t border-white/5 z-10">
+        College of Engineering Munnar • Dhruva 2026 • CSE Association
       </footer>
     </div>
   );

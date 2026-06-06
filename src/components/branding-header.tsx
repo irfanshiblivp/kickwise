@@ -1,55 +1,80 @@
-
 "use client";
 
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export function BrandingHeader() {
-  const collegeLogo = PlaceHolderImages.find(img => img.id === 'college-logo');
-  const unionLogo = PlaceHolderImages.find(img => img.id === 'union-logo');
-  const clubLogo = PlaceHolderImages.find(img => img.id === 'club-logo');
+  const leftLogo = PlaceHolderImages.find(img => img.id === 'left-logo');
+  const cemLogo = PlaceHolderImages.find(img => img.id === 'cem-logo');
+  const rightAltLogo = PlaceHolderImages.find(img => img.id === 'right-alt-logo');
+  const kickwiseLogo = PlaceHolderImages.find(img => img.id === 'kickwise-logo');
 
   return (
-    <header className="w-full pt-8 pb-12">
-      <div className="container mx-auto px-4 flex flex-col items-center text-center">
-        <div className="flex items-center gap-6 mb-8">
+    <header className="w-full relative z-20">
+      {/* Top Bar with Logos */}
+      <div className="container mx-auto px-4 py-4 flex justify-between items-start">
+        {/* Left Logo */}
+        <div className="flex-shrink-0">
           <Image 
-            src={collegeLogo?.imageUrl || ''} 
-            alt="College Logo" 
-            width={80} 
-            height={80} 
-            className="rounded-full border-2 border-primary/20 p-1 bg-card shadow-lg"
-          />
-          <Image 
-            src={unionLogo?.imageUrl || ''} 
-            alt="Union Logo" 
-            width={70} 
-            height={70} 
-            className="rounded-full border-2 border-primary/20 p-1 bg-card shadow-lg"
-          />
-          <Image 
-            src={clubLogo?.imageUrl || ''} 
-            alt="Club Logo" 
-            width={80} 
-            height={80} 
-            className="rounded-full border-2 border-primary/20 p-1 bg-card shadow-lg"
+            src={leftLogo?.imageUrl || ''} 
+            alt="Association Logo" 
+            width={60} 
+            height={60} 
+            className="object-contain"
           />
         </div>
 
-        <div className="space-y-2 mb-6">
-          <p className="text-sm font-medium tracking-[0.2em] text-accent uppercase">Dhruva 2026 Presents</p>
-          <h2 className="text-xl md:text-2xl font-headline font-bold text-muted-foreground">
+        {/* Right Logos with Divider */}
+        <div className="flex items-center gap-4">
+          <Image 
+            src={cemLogo?.imageUrl || ''} 
+            alt="CEM Logo" 
+            width={55} 
+            height={55} 
+            className="object-contain rounded-full"
+          />
+          <div className="h-10 w-[1px] bg-white/20" />
+          <Image 
+            src={rightAltLogo?.imageUrl || ''} 
+            alt="Alt Logo" 
+            width={55} 
+            height={55} 
+            className="object-contain"
+          />
+        </div>
+      </div>
+
+      {/* Center Branding Content */}
+      <div className="container mx-auto px-4 text-center mt-4 mb-8">
+        <div className="space-y-1">
+          <p className="text-sm md:text-base font-headline font-semibold tracking-wider text-white/90">
             College of Engineering Munnar
+          </p>
+          <div className="py-4" /> {/* Gap */}
+          <h2 className="text-3xl md:text-5xl font-headline font-bold text-accent tracking-widest uppercase">
+            Dhruva
           </h2>
-          <p className="text-sm md:text-md text-muted-foreground/80 font-medium">
+          <p className="text-xs md:text-sm font-medium text-white/70 uppercase tracking-widest mt-2">
             Department of Computer Science and Engineering
+          </p>
+          <p className="text-sm italic font-light text-white/60 mt-4 lowercase">
+            Presents
           </p>
         </div>
 
-        <h1 className="text-6xl md:text-9xl font-headline font-black tracking-tighter text-primary drop-shadow-[0_0_30px_rgba(61,139,255,0.4)]">
-          KICKWISE
-        </h1>
-        <p className="text-xl md:text-2xl font-headline font-bold text-foreground mt-2">
+        <div className="mt-8 flex justify-center">
+          <div className="relative w-full max-w-[320px] md:max-w-[480px] aspect-[4/1]">
+            <Image 
+              src={kickwiseLogo?.imageUrl || ''} 
+              alt="Kickwise 2026" 
+              fill
+              className="object-contain gold-glow"
+              priority
+            />
+          </div>
+        </div>
+        
+        <p className="text-lg md:text-xl font-headline font-bold text-foreground mt-4 tracking-[0.3em] uppercase">
           2026 PREDICTION ARENA
         </p>
       </div>
