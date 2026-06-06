@@ -14,7 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { useToast } from '@/hooks/use-toast';
 import { Toaster } from '@/components/ui/toaster';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
@@ -37,6 +37,31 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+
+const STADIUMS = {
+  USA: [
+    "Mercedes-Benz Stadium (Atlanta)",
+    "Gillette Stadium (Boston)",
+    "AT&T Stadium (Dallas)",
+    "NRG Stadium (Houston)",
+    "Arrowhead Stadium (Kansas City)",
+    "SoFi Stadium (Los Angeles)",
+    "Hard Rock Stadium (Miami)",
+    "MetLife Stadium (New York/New Jersey)",
+    "Lincoln Financial Field (Philadelphia)",
+    "Levi's Stadium (San Francisco Bay Area)",
+    "Lumen Field (Seattle)"
+  ],
+  Mexico: [
+    "Estadio Akron (Guadalajara)",
+    "Estadio Azteca (Mexico City)",
+    "Estadio BBVA (Monterrey)"
+  ],
+  Canada: [
+    "BMO Field (Toronto)",
+    "BC Place (Vancouver)"
+  ]
+};
 
 export default function AdminPage() {
   const router = useRouter();
@@ -75,8 +100,8 @@ export default function AdminPage() {
 
   const handleCreateMatch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMatch.teamA || !newMatch.teamB) {
-      toast({ title: "Validation Error", description: "Teams names are required.", variant: "destructive" });
+    if (!newMatch.teamA || !newMatch.teamB || !newMatch.venue) {
+      toast({ title: "Validation Error", description: "Teams and Venue are required.", variant: "destructive" });
       return;
     }
     db.matches.add({
@@ -166,7 +191,6 @@ export default function AdminPage() {
     router.push('/');
   };
 
-  // Helper to format internal 24h time to 12h display
   const format12h = (time24: string) => {
     if (!time24) return '';
     const [hours, minutes] = time24.split(':').map(Number);
@@ -211,7 +235,7 @@ export default function AdminPage() {
       <main className="container mx-auto p-4 md:p-8 space-y-8 z-10 flex-1 max-w-6xl">
         <Tabs defaultValue="manage" className="w-full">
           <div className="overflow-x-auto pb-2 scrollbar-hide">
-            <TabsList className="flex w-full min-w-max md:grid md:grid-cols-5 h-auto bg-muted/50 border border-border p-1 rounded-none mb-4">
+            <TabsList className="flex w-full min-max md:grid md:grid-cols-5 h-auto bg-muted/50 border border-border p-1 rounded-none mb-4">
               <TabsTrigger value="create" className="rounded-none py-3 text-[10px] font-black uppercase tracking-widest gap-2 flex-1">
                 <Plus className="h-3 w-3" /> New Match
               </TabsTrigger>
@@ -286,7 +310,25 @@ export default function AdminPage() {
                   </div>
                   <div className="md:col-span-2 space-y-2">
                     <Label className="text-[10px] font-black uppercase text-muted-foreground">Venue</Label>
-                    <Input placeholder="Stadium Name" value={newMatch.venue} onChange={e => setNewMatch({...newMatch, venue: e.target.value})} className="rounded-none bg-card/50 border-border text-xs h-10" />
+                    <Select value={newMatch.venue} onValueChange={v => setNewMatch({...newMatch, venue: v})}>
+                      <SelectTrigger className="rounded-none bg-card/50 border-border text-xs h-10">
+                        <SelectValue placeholder="Select Tournament Stadium" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel className="text-primary font-black uppercase text-[10px] tracking-widest">USA Venues</SelectLabel>
+                          {STADIUMS.USA.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                        </SelectGroup>
+                        <SelectGroup>
+                          <SelectLabel className="text-primary font-black uppercase text-[10px] tracking-widest">Mexico Venues</SelectLabel>
+                          {STADIUMS.Mexico.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                        </SelectGroup>
+                        <SelectGroup>
+                          <SelectLabel className="text-primary font-black uppercase text-[10px] tracking-widest">Canada Venues</SelectLabel>
+                          {STADIUMS.Canada.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <Button type="submit" className="md:col-span-2 w-full bg-primary hover:bg-primary/90 rounded-none font-black uppercase text-xs h-11 shadow-lg">
                     CREATE OFFICIAL FIXTURE
@@ -309,7 +351,18 @@ export default function AdminPage() {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <Input className="text-xs h-8" defaultValue={m.teamA} id={`editTeamA-${m.id}`} />
                         <Input className="text-xs h-8" defaultValue={m.teamB} id={`editTeamB-${m.id}`} />
-                        <Input className="text-xs h-8" defaultValue={m.venue} id={`editVenue-${m.id}`} />
+                        <Select defaultValue={m.venue} onValueChange={v => {
+                          const input = document.getElementById(`editVenue-${m.id}`) as HTMLInputElement;
+                          if (input) input.value = v;
+                        }}>
+                          <SelectTrigger className="rounded-none border-border text-xs h-8">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Object.values(STADIUMS).flat().map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                        <input type="hidden" id={`editVenue-${m.id}`} defaultValue={m.venue} />
                         <Input type="date" className="text-xs h-8" defaultValue={m.date} id={`editDate-${m.id}`} />
                         <Input type="time" className="text-xs h-8" defaultValue={m.time} id={`editTime-${m.id}`} />
                         <div className="flex gap-2">
