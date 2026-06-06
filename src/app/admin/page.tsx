@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { db, Match, UserMessage, AppSettings } from '@/lib/db';
+import { db, Match, UserMessage, AppSettings, User } from '@/lib/db';
 import { BrandingHeader } from '@/components/branding-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -28,7 +28,10 @@ import {
   Trash2,
   Mail,
   Edit2,
-  RefreshCcw
+  RefreshCcw,
+  ListOrdered,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -38,6 +41,7 @@ export default function AdminPage() {
   const { toast } = useToast();
   const [matches, setMatches] = useState<Match[]>([]);
   const [messages, setMessages] = useState<UserMessage[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [settings, setSettings] = useState<AppSettings>({ leaderboardVisible: true });
   const [broadcast, setBroadcast] = useState('');
   const [editingMatch, setEditingMatch] = useState<string | null>(null);
@@ -63,6 +67,7 @@ export default function AdminPage() {
   const refresh = () => {
     setMatches(db.matches.all());
     setMessages(db.inbox.all());
+    setUsers(db.users.all());
     setSettings(db.settings.get());
   };
 
@@ -81,14 +86,15 @@ export default function AdminPage() {
     setNewMatch({ teamA: '', teamB: '', flagA: '', flagB: '', group: 'Group A', round: 1, date: '', time: '', venue: '' });
   };
 
-  const toggleLeaderboard = (visible: boolean) => {
-    db.settings.update({ leaderboardVisible: visible });
+  const toggleLeaderboardVisibility = () => {
+    const newVal = !settings.leaderboardVisible;
+    db.settings.update({ leaderboardVisible: newVal });
     refresh();
-    toast({ title: visible ? "Leaderboard Visible" : "Leaderboard Hidden" });
+    toast({ title: newVal ? "Leaderboard Visible" : "Leaderboard Hidden" });
   };
 
   const handleResetSystem = () => {
-    if (confirm("NUCLEAR OPTION: This will permanently delete all users, predictions, messages, and restore default matches. The app will reload and you will need to log in again. Are you absolutely sure?")) {
+    if (confirm("NUCLEAR OPTION: This will permanently delete all users, predictions, messages, and restore default matches. Are you sure?")) {
       db.system.resetAll();
     }
   };
@@ -97,6 +103,12 @@ export default function AdminPage() {
     db.matches.update(matchId, { isLocked: !currentStatus });
     refresh();
     toast({ title: `Match ${!currentStatus ? 'Locked' : 'Unlocked'}` });
+  };
+
+  const handleLockRound = (round: number, lock: boolean) => {
+    db.matches.lockRound(round, lock);
+    refresh();
+    toast({ title: `Round ${round} ${lock ? 'Locked' : 'Unlocked'}` });
   };
 
   const deleteMatch = (matchId: string) => {
@@ -124,13 +136,13 @@ export default function AdminPage() {
         if (pointsAwarded > 0) db.users.addPoints(pred.userId, pointsAwarded);
       });
     });
+    refresh();
   };
 
   const handleUpdateScore = (matchId: string, scoreA: number, scoreB: number) => {
     db.matches.update(matchId, { scoreA, scoreB, isFinished: true, isLocked: true });
     recalculatePoints();
     toast({ title: "Score Updated!", description: `Results applied and points recalculated.` });
-    refresh();
   };
 
   const saveEdit = (matchId: string, updates: any) => {
@@ -255,7 +267,7 @@ export default function AdminPage() {
 
             <Card className="glass-morphism rounded-none classic-border">
               <CardHeader className="flex flex-row items-center justify-between border-b border-border bg-primary/5">
-                <CardTitle className="font-headline font-black uppercase tracking-tighter text-sm">Manage Fixtures</CardTitle>
+                <CardTitle className="font-headline font-black uppercase tracking-tighter text-sm">Manage Fixtures & Scores</CardTitle>
                 <Badge variant="outline" className="text-primary border-primary/30 rounded-none text-[9px] font-black">{matches.length} MATCHES</Badge>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
@@ -323,7 +335,7 @@ export default function AdminPage() {
                               onClick={() => {
                                 const sA = (document.getElementById(`scoreA-${m.id}`) as HTMLInputElement).value;
                                 const sB = (document.getElementById(`scoreB-${m.id}`) as HTMLInputElement).value;
-                                if (sA && sB) handleUpdateScore(m.id, parseInt(sA), parseInt(sB));
+                                if (sA !== '' && sB !== '') handleUpdateScore(m.id, parseInt(sA), parseInt(sB));
                               }}
                             >
                               <CheckCircle className="h-4 w-4" />
@@ -336,38 +348,85 @@ export default function AdminPage() {
                 ))}
               </CardContent>
             </Card>
+
+            <Card className="glass-morphism rounded-none classic-border">
+              <CardHeader className="bg-primary/5 border-b border-border">
+                <CardTitle className="font-headline font-black uppercase text-sm flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <ListOrdered className="h-4 w-4 text-primary" />
+                    Leadership Table (User View Control)
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black text-muted-foreground uppercase">{settings.leaderboardVisible ? "Visible to Users" : "Hidden from Users"}</span>
+                    <Switch checked={settings.leaderboardVisible} onCheckedChange={toggleLeaderboardVisibility} />
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6 p-0">
+                <div className="divide-y divide-border">
+                  {users.filter(u => !u.isAdmin).map((u, idx) => (
+                    <div key={u.id} className="flex items-center justify-between px-6 py-4 hover:bg-muted/30 transition-colors">
+                      <div className="flex items-center gap-4">
+                        <span className={`w-6 text-xs font-black ${idx < 3 ? 'text-primary' : 'text-muted-foreground'}`}>#{idx + 1}</span>
+                        <div>
+                          <p className="font-bold uppercase text-sm">{u.username}</p>
+                          <p className="text-[10px] text-muted-foreground uppercase">{u.year} | {u.department}</p>
+                        </div>
+                      </div>
+                      <span className="font-headline font-black text-primary">{u.points} XP</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           <div className="space-y-6">
             <Card className="glass-morphism rounded-none classic-border overflow-hidden">
               <CardHeader className="bg-primary/5 border-b border-border">
                 <CardTitle className="font-headline font-black uppercase text-sm flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-primary" />
-                  System Controls
+                  <Lock className="h-4 w-4 text-primary" />
+                  Round Controls
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-6 space-y-6">
-                <div className="flex items-center justify-between p-3 bg-background/40 border border-border">
-                  <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-black uppercase">Leaderboard Visibility</span>
-                    <span className="text-[8px] text-muted-foreground uppercase">Hide or show the Hall of Fame</span>
+              <CardContent className="pt-6 space-y-4">
+                {[
+                  { label: "ROUND 1", val: 1 },
+                  { label: "ROUND 2", val: 2 },
+                  { label: "ROUND 3", val: 3 },
+                  { label: "KNOCKOUTS", val: 4 }
+                ].map(r => (
+                  <div key={r.val} className="flex items-center justify-between p-3 border border-border bg-card/30">
+                    <span className="text-[10px] font-black uppercase">{r.label}</span>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" className="h-8 text-[9px] font-black px-3" onClick={() => handleLockRound(r.val, false)}>
+                        <Unlock className="h-3 w-3 mr-1" /> UNLOCK
+                      </Button>
+                      <Button size="sm" variant="default" className="h-8 text-[9px] font-black px-3 bg-primary" onClick={() => handleLockRound(r.val, true)}>
+                        <Lock className="h-3 w-3 mr-1" /> LOCK
+                      </Button>
+                    </div>
                   </div>
-                  <Switch 
-                    checked={settings.leaderboardVisible} 
-                    onCheckedChange={toggleLeaderboard} 
-                  />
-                </div>
+                ))}
+              </CardContent>
+            </Card>
 
-                <div className="pt-4 border-t border-border">
-                  <Button 
-                    variant="destructive" 
-                    className="w-full rounded-none font-black text-[10px] uppercase h-11"
-                    onClick={handleResetSystem}
-                  >
-                    <RefreshCcw className="h-3 w-3 mr-2" />
-                    Nuclear Reset (All Data)
-                  </Button>
-                </div>
+            <Card className="glass-morphism rounded-none classic-border overflow-hidden">
+              <CardHeader className="bg-primary/5 border-b border-border">
+                <CardTitle className="font-headline font-black uppercase text-sm flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-primary" />
+                  System Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6 space-y-4">
+                <Button 
+                  variant="destructive" 
+                  className="w-full rounded-none font-black text-[10px] uppercase h-11"
+                  onClick={handleResetSystem}
+                >
+                  <RefreshCcw className="h-3 w-3 mr-2" />
+                  Nuclear System Reset
+                </Button>
               </CardContent>
             </Card>
 
@@ -379,7 +438,7 @@ export default function AdminPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
-                <ScrollArea className="h-[300px]">
+                <ScrollArea className="h-[250px]">
                   <div className="space-y-3">
                     {messages.length > 0 ? messages.map(msg => (
                       <div key={msg.id} className="p-3 border border-border bg-card/30 relative group">
@@ -408,7 +467,7 @@ export default function AdminPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
-                <Input placeholder="Announce tournament updates..." value={broadcast} onChange={e => setBroadcast(e.target.value)} className="bg-card/50 text-[11px] font-bold rounded-none h-10 border-border" />
+                <Input placeholder="Announce updates..." value={broadcast} onChange={e => setBroadcast(e.target.value)} className="bg-card/50 text-[11px] font-bold rounded-none h-10 border-border" />
                 <Button onClick={sendBroadcast} className="w-full bg-primary text-[10px] font-black uppercase tracking-widest rounded-none h-10 shadow-lg">SEND BULLETIN</Button>
               </CardContent>
             </Card>

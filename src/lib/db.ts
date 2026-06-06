@@ -152,6 +152,10 @@ export const db = {
         save();
       }
     },
+    lockRound: (round: number, isLocked: boolean) => {
+      matches = matches.map(m => m.round === round ? { ...m, isLocked } : m);
+      save();
+    },
     add: (match: Omit<Match, 'id' | 'isFinished'>) => {
       const newMatch = { ...match, id: Math.random().toString(36), isFinished: false };
       matches.push(newMatch);
