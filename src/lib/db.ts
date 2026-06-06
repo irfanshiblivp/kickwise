@@ -64,7 +64,7 @@ const INITIAL_MATCHES: Match[] = [
 ];
 
 let users: User[] = [
-  { id: 'admin-1', username: 'admin12', password: 'admdhr12', year: '4th', department: 'CSE', points: 0, isAdmin: true }
+  { id: 'admin-seed', username: 'admin12', password: 'admdhr12', year: '4th', department: 'CSE', points: 0, isAdmin: true }
 ];
 let matches: Match[] = [...INITIAL_MATCHES];
 let predictions: Prediction[] = [];
@@ -95,6 +95,11 @@ if (typeof window !== 'undefined') {
     if (savedBroadcasts) broadcasts = JSON.parse(savedBroadcasts);
     if (savedInbox) userMessages = JSON.parse(savedInbox);
     if (savedSettings) settings = JSON.parse(savedSettings);
+
+    // Ensure admin user is always present even after resets if logic changes
+    if (!users.some(u => u.username === 'admin12')) {
+      users.push({ id: 'admin-seed', username: 'admin12', password: 'admdhr12', year: '4th', department: 'CSE', points: 0, isAdmin: true });
+    }
   }
 }
 
@@ -196,6 +201,10 @@ export const db = {
       broadcasts = [];
       userMessages = [];
       users = users.map(u => ({ ...u, points: 0 }));
+      // Keep admin
+      if (!users.some(u => u.username === 'admin12')) {
+        users.push({ id: 'admin-seed', username: 'admin12', password: 'admdhr12', year: '4th', department: 'CSE', points: 0, isAdmin: true });
+      }
       settings = { leaderboardVisible: true };
       save();
     }
