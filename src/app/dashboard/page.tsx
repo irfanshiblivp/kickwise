@@ -3,7 +3,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { db, User, Match, Broadcast } from '@/lib/db';
+import { db, User, Match, Broadcast, AppSettings } from '@/lib/db';
 import { BrandingHeader } from '@/components/branding-header';
 import { MatchCard } from '@/components/match-card';
 import { Button } from '@/components/ui/button';
@@ -20,7 +20,7 @@ import {
   CalendarCheck, 
   History,
   TrendingUp,
-  Filter
+  EyeOff
 } from 'lucide-react';
 import { Toaster } from '@/components/ui/toaster';
 import Image from 'next/image';
@@ -32,6 +32,7 @@ export default function DashboardPage() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
   const [leaderboard, setLeaderboard] = useState<User[]>([]);
+  const [settings, setSettings] = useState<AppSettings>({ leaderboardVisible: true });
   const [activeTab, setActiveTab] = useState('upcoming');
   const [selectedRound, setSelectedRound] = useState<string>('all');
   const stadiumBg = PlaceHolderImages.find(img => img.id === 'stadium-bg');
@@ -52,6 +53,7 @@ export default function DashboardPage() {
     setMatches(db.matches.all());
     setBroadcasts(db.broadcasts.all());
     setLeaderboard(db.users.all());
+    setSettings(db.settings.get());
     const savedUser = localStorage.getItem('kw_current_user');
     if (savedUser) {
       const parsed = JSON.parse(savedUser);
@@ -153,13 +155,15 @@ export default function DashboardPage() {
                       <History className="h-3 w-3" />
                       Past Results
                     </TabsTrigger>
-                    <TabsTrigger value="leaderboard" className="lg:hidden flex-1 rounded-none px-6 text-[10px] font-bold uppercase flex items-center gap-2">
-                      <ListOrdered className="h-3 w-3" />
-                      Leaderboard
-                    </TabsTrigger>
+                    {settings.leaderboardVisible && (
+                      <TabsTrigger value="leaderboard" className="lg:hidden flex-1 rounded-none px-6 text-[10px] font-bold uppercase flex items-center gap-2">
+                        <ListOrdered className="h-3 w-3" />
+                        Leaderboard
+                      </TabsTrigger>
+                    )}
                   </TabsList>
 
-                  {activeTab !== 'leaderboard' && (
+                  {(activeTab === 'upcoming' || activeTab === 'finished') && (
                     <div className="flex bg-muted/50 border border-border p-1 rounded-none overflow-x-auto">
                       {[
                         { id: 'all', label: 'ALL' },
@@ -245,32 +249,43 @@ export default function DashboardPage() {
           </div>
 
           <div className="space-y-6 hidden lg:block">
-            <Card className="glass-morphism classic-border rounded-none overflow-hidden">
-              <CardHeader className="pb-3 border-b border-border bg-primary/5">
-                <CardTitle className="text-sm font-headline font-black uppercase flex items-center gap-2">
-                  <ListOrdered className="h-4 w-4 text-primary" />
-                  Elite Leaderboard
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-4 p-0">
-                <div className="divide-y divide-border">
-                  {leaderboard.filter(u => !u.isAdmin).slice(0, 15).map((u, idx) => (
-                    <div key={u.id} className={`flex items-center justify-between px-4 py-3 transition-colors ${u.id === user.id ? 'bg-primary/5' : 'hover:bg-muted/30'}`}>
-                      <div className="flex items-center gap-3">
-                        <span className={`w-5 text-[10px] font-black ${idx === 0 ? 'text-yellow-600' : idx === 1 ? 'text-slate-400' : idx === 2 ? 'text-amber-700' : 'text-muted-foreground'}`}>
-                          #{idx + 1}
-                        </span>
-                        <div>
-                          <p className={`text-xs font-bold uppercase ${u.id === user.id ? 'text-primary' : ''}`}>{u.username}</p>
-                          <p className="text-[9px] text-muted-foreground uppercase font-medium">{u.year} | {u.department}</p>
+            {settings.leaderboardVisible ? (
+              <Card className="glass-morphism classic-border rounded-none overflow-hidden">
+                <CardHeader className="pb-3 border-b border-border bg-primary/5">
+                  <CardTitle className="text-sm font-headline font-black uppercase flex items-center gap-2">
+                    <ListOrdered className="h-4 w-4 text-primary" />
+                    Elite Leaderboard
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4 p-0">
+                  <div className="divide-y divide-border">
+                    {leaderboard.filter(u => !u.isAdmin).slice(0, 15).map((u, idx) => (
+                      <div key={u.id} className={`flex items-center justify-between px-4 py-3 transition-colors ${u.id === user.id ? 'bg-primary/5' : 'hover:bg-muted/30'}`}>
+                        <div className="flex items-center gap-3">
+                          <span className={`w-5 text-[10px] font-black ${idx === 0 ? 'text-yellow-600' : idx === 1 ? 'text-slate-400' : idx === 2 ? 'text-amber-700' : 'text-muted-foreground'}`}>
+                            #{idx + 1}
+                          </span>
+                          <div>
+                            <p className={`text-xs font-bold uppercase ${u.id === user.id ? 'text-primary' : ''}`}>{u.username}</p>
+                            <p className="text-[9px] text-muted-foreground uppercase font-medium">{u.year} | {u.department}</p>
+                          </div>
                         </div>
+                        <span className="font-headline font-black text-xs text-primary">{u.points}</span>
                       </div>
-                      <span className="font-headline font-black text-xs text-primary">{u.points}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card className="glass-morphism border-dashed border-primary/20 rounded-none overflow-hidden">
+                <CardContent className="py-12 flex flex-col items-center justify-center text-center px-6">
+                  <EyeOff className="h-8 w-8 text-muted-foreground/40 mb-3" />
+                  <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest leading-relaxed">
+                    Leaderboard is currently<br />hidden by Admin
+                  </p>
+                </CardContent>
+              </Card>
+            )}
 
             <Card className="glass-morphism classic-border rounded-none overflow-hidden">
               <CardHeader className="pb-3 border-b border-border bg-primary/5">

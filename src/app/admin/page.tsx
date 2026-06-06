@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { db, Match, User, UserMessage } from '@/lib/db';
+import { db, Match, UserMessage, AppSettings } from '@/lib/db';
 import { BrandingHeader } from '@/components/branding-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -15,6 +15,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { useToast } from '@/hooks/use-toast';
 import { Toaster } from '@/components/ui/toaster';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { 
   ShieldCheck, 
   Plus, 
@@ -26,7 +27,10 @@ import {
   ArrowLeft,
   Trash2,
   Mail,
-  Edit2
+  Edit2,
+  RefreshCcw,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -36,6 +40,7 @@ export default function AdminPage() {
   const { toast } = useToast();
   const [matches, setMatches] = useState<Match[]>([]);
   const [messages, setMessages] = useState<UserMessage[]>([]);
+  const [settings, setSettings] = useState<AppSettings>({ leaderboardVisible: true });
   const [broadcast, setBroadcast] = useState('');
   const [editingMatch, setEditingMatch] = useState<string | null>(null);
   const [newMatch, setNewMatch] = useState({
@@ -60,6 +65,7 @@ export default function AdminPage() {
   const refresh = () => {
     setMatches(db.matches.all());
     setMessages(db.inbox.all());
+    setSettings(db.settings.get());
   };
 
   const handleCreateMatch = (e: React.FormEvent) => {
@@ -75,6 +81,20 @@ export default function AdminPage() {
     toast({ title: "Match Added", description: `${newMatch.teamA} vs ${newMatch.teamB} scheduled.` });
     refresh();
     setNewMatch({ teamA: '', teamB: '', flagA: '', flagB: '', group: 'Group A', round: 1, date: '', time: '', venue: '' });
+  };
+
+  const toggleLeaderboard = (visible: boolean) => {
+    db.settings.update({ leaderboardVisible: visible });
+    refresh();
+    toast({ title: visible ? "Leaderboard Visible" : "Leaderboard Hidden" });
+  };
+
+  const handleResetSystem = () => {
+    if (confirm("NUCLEAR OPTION: This will delete all predictions, messages, reset all points, and restore default matches. Are you absolutely sure?")) {
+      db.system.resetAll();
+      refresh();
+      toast({ title: "System Reset Complete", description: "All data has been cleared." });
+    }
   };
 
   const toggleLock = (matchId: string, currentStatus: boolean) => {
@@ -323,6 +343,38 @@ export default function AdminPage() {
           </div>
 
           <div className="space-y-6">
+            <Card className="glass-morphism rounded-none classic-border overflow-hidden">
+              <CardHeader className="bg-primary/5 border-b border-border">
+                <CardTitle className="font-headline font-black uppercase text-sm flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-primary" />
+                  System Controls
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6 space-y-6">
+                <div className="flex items-center justify-between p-3 bg-background/40 border border-border">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] font-black uppercase">Leaderboard Visibility</span>
+                    <span className="text-[8px] text-muted-foreground uppercase">Hide or show the Hall of Fame</span>
+                  </div>
+                  <Switch 
+                    checked={settings.leaderboardVisible} 
+                    onCheckedChange={toggleLeaderboard} 
+                  />
+                </div>
+
+                <div className="pt-4 border-t border-border">
+                  <Button 
+                    variant="destructive" 
+                    className="w-full rounded-none font-black text-[10px] uppercase h-11"
+                    onClick={handleResetSystem}
+                  >
+                    <RefreshCcw className="h-3 w-3 mr-2" />
+                    Nuclear Reset (All Data)
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
             <Card className="glass-morphism rounded-none classic-border">
               <CardHeader className="bg-primary/5 border-b border-border">
                 <CardTitle className="font-headline font-black uppercase text-sm flex items-center gap-2">
@@ -331,7 +383,7 @@ export default function AdminPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
-                <ScrollArea className="h-[400px]">
+                <ScrollArea className="h-[300px]">
                   <div className="space-y-3">
                     {messages.length > 0 ? messages.map(msg => (
                       <div key={msg.id} className="p-3 border border-border bg-card/30 relative group">

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -42,7 +43,11 @@ export default function RegisterPage() {
     });
 
     localStorage.setItem('kw_current_user', JSON.stringify(user));
-    router.push('/dashboard');
+    if (user.isAdmin) {
+      router.push('/admin');
+    } else {
+      router.push('/dashboard');
+    }
   };
 
   return (
