@@ -140,10 +140,10 @@ export default function AdminPage() {
   };
 
   const deleteMatch = (matchId: string) => {
-    if (confirm("Delete match?")) {
+    if (confirm("Are you sure you want to delete this match? This action cannot be undone.")) {
       db.matches.delete(matchId);
       refresh();
-      toast({ title: "Match Deleted" });
+      toast({ title: "Match Deleted", description: "The fixture has been removed from the tournament." });
     }
   };
 
@@ -165,12 +165,12 @@ export default function AdminPage() {
       });
     });
     refresh();
+    toast({ title: "Standings Recalculated", description: "All points have been updated based on final scores." });
   };
 
   const handleUpdateScore = (matchId: string, scoreA: number, scoreB: number) => {
     db.matches.update(matchId, { scoreA, scoreB, isFinished: true, isLocked: true });
     recalculatePoints();
-    toast({ title: "Score Applied", description: `Points updated.` });
   };
 
   const saveEdit = (matchId: string, updates: any) => {
@@ -446,9 +446,14 @@ export default function AdminPage() {
                     <ListOrdered className="h-5 w-5 text-primary" />
                     Student Standing Table
                   </div>
-                  <div className="flex items-center gap-4 bg-background/50 px-6 py-2 border border-border">
-                    <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{settings.leaderboardVisible ? "LIVE TO USERS" : "HIDDEN FROM USERS"}</span>
-                    <Switch checked={settings.leaderboardVisible} onCheckedChange={toggleLeaderboardVisibility} />
+                  <div className="flex items-center gap-4">
+                    <Button variant="outline" size="sm" onClick={recalculatePoints} className="rounded-none border-primary/30 text-[9px] font-black uppercase h-8 px-4 bg-primary/5 hover:bg-primary hover:text-white transition-all">
+                      <RefreshCcw className="h-3 w-3 mr-2" /> Recalculate Points
+                    </Button>
+                    <div className="flex items-center gap-4 bg-background/50 px-6 py-2 border border-border">
+                      <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{settings.leaderboardVisible ? "LIVE TO USERS" : "HIDDEN FROM USERS"}</span>
+                      <Switch checked={settings.leaderboardVisible} onCheckedChange={toggleLeaderboardVisibility} />
+                    </div>
                   </div>
                 </CardTitle>
               </CardHeader>
