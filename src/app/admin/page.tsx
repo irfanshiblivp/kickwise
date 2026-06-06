@@ -201,23 +201,25 @@ export default function AdminPage() {
 
       <main className="container mx-auto p-4 md:p-8 space-y-8 z-10 flex-1 max-w-6xl">
         <Tabs defaultValue="manage" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto bg-muted/50 border border-border p-1 rounded-none mb-8">
-            <TabsTrigger value="create" className="rounded-none py-3 text-[10px] font-black uppercase tracking-widest gap-2">
-              <Plus className="h-3 w-3" /> New Match
-            </TabsTrigger>
-            <TabsTrigger value="manage" className="rounded-none py-3 text-[10px] font-black uppercase tracking-widest gap-2">
-              <History className="h-3 w-3" /> Fixtures & Scores
-            </TabsTrigger>
-            <TabsTrigger value="leadership" className="rounded-none py-3 text-[10px] font-black uppercase tracking-widest gap-2">
-              <Trophy className="h-3 w-3" /> Leadership
-            </TabsTrigger>
-            <TabsTrigger value="rounds" className="rounded-none py-3 text-[10px] font-black uppercase tracking-widest gap-2">
-              <Lock className="h-3 w-3" /> Rounds
-            </TabsTrigger>
-            <TabsTrigger value="system" className="rounded-none py-3 text-[10px] font-black uppercase tracking-widest gap-2">
-              <ShieldCheck className="h-3 w-3" /> System
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto pb-2 scrollbar-hide">
+            <TabsList className="flex w-full min-w-max md:grid md:grid-cols-5 h-auto bg-muted/50 border border-border p-1 rounded-none mb-4">
+              <TabsTrigger value="create" className="rounded-none py-3 text-[10px] font-black uppercase tracking-widest gap-2 flex-1">
+                <Plus className="h-3 w-3" /> New Match
+              </TabsTrigger>
+              <TabsTrigger value="manage" className="rounded-none py-3 text-[10px] font-black uppercase tracking-widest gap-2 flex-1">
+                <History className="h-3 w-3" /> Fixtures & Scores
+              </TabsTrigger>
+              <TabsTrigger value="leadership" className="rounded-none py-3 text-[10px] font-black uppercase tracking-widest gap-2 flex-1">
+                <Trophy className="h-3 w-3" /> Leadership
+              </TabsTrigger>
+              <TabsTrigger value="rounds" className="rounded-none py-3 text-[10px] font-black uppercase tracking-widest gap-2 flex-1">
+                <Lock className="h-3 w-3" /> Rounds
+              </TabsTrigger>
+              <TabsTrigger value="system" className="rounded-none py-3 text-[10px] font-black uppercase tracking-widest gap-2 flex-1">
+                <ShieldCheck className="h-3 w-3" /> System
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="create">
             <Card className="glass-morphism rounded-none classic-border">
@@ -419,17 +421,19 @@ export default function AdminPage() {
                   { label: "ROUND 3", val: 3 },
                   { label: "KNOCKOUTS", val: 4 }
                 ].map(r => (
-                  <div key={r.val} className="flex items-center justify-between p-4 border border-border bg-card/30">
-                    <div>
+                  <div key={r.val} className="flex flex-col md:flex-row md:items-center justify-between p-4 border border-border bg-card/30 gap-4">
+                    <div className="space-y-1">
                       <span className="text-xs font-black uppercase block">{r.label}</span>
                       <span className="text-[9px] text-muted-foreground uppercase font-bold">Manage entry access for all matches in this round</span>
                     </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline" className="h-10 text-[10px] font-black px-6" onClick={() => handleLockRound(r.val, false)}>
-                        <Unlock className="h-3 w-3 mr-2" /> UNLOCK ENTIRE ROUND
+                    <div className="grid grid-cols-2 md:flex gap-2 w-full md:w-auto">
+                      <Button size="sm" variant="outline" className="h-10 text-[9px] md:text-[10px] font-black px-2 md:px-6 flex items-center justify-center gap-2" onClick={() => handleLockRound(r.val, false)}>
+                        <Unlock className="h-3 w-3" /> 
+                        <span className="truncate">UNLOCK ROUND</span>
                       </Button>
-                      <Button size="sm" variant="default" className="h-10 text-[10px] font-black px-6 bg-primary" onClick={() => handleLockRound(r.val, true)}>
-                        <Lock className="h-3 w-3 mr-2" /> LOCK ENTIRE ROUND
+                      <Button size="sm" variant="default" className="h-10 text-[9px] md:text-[10px] font-black px-2 md:px-6 bg-primary flex items-center justify-center gap-2" onClick={() => handleLockRound(r.val, true)}>
+                        <Lock className="h-3 w-3" /> 
+                        <span className="truncate">LOCK ROUND</span>
                       </Button>
                     </div>
                   </div>
