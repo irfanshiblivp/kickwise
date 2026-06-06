@@ -1,4 +1,3 @@
-
 "use client";
 
 export type AcademicYear = '2nd' | '3rd' | '4th';
@@ -145,14 +144,14 @@ const save = () => {
 
 export const db = {
   settings: {
-    get: () => settings,
+    get: () => ({ ...settings }),
     update: (updates: Partial<AppSettings>) => {
       settings = { ...settings, ...updates };
       save();
     }
   },
   users: {
-    all: () => users.sort((a, b) => b.points - a.points),
+    all: () => [...users].sort((a, b) => b.points - a.points),
     find: (username: string) => users.find(u => u.username === username),
     create: (userData: Omit<User, 'id' | 'points' | 'isAdmin'>) => {
       const newUser: User = { ...userData, id: Math.random().toString(36), points: 0, isAdmin: userData.username === 'admin12' };
@@ -196,7 +195,7 @@ export const db = {
     }
   },
   predictions: {
-    all: () => predictions,
+    all: () => [...predictions],
     forMatch: (matchId: string) => predictions.filter(p => p.matchId === matchId),
     forUser: (userId: string) => predictions.filter(p => p.userId === userId),
     submit: (prediction: Prediction) => {
@@ -210,14 +209,14 @@ export const db = {
     }
   },
   broadcasts: {
-    all: () => broadcasts,
+    all: () => [...broadcasts],
     add: (msg: string, author: string) => {
       broadcasts.unshift({ id: Math.random().toString(36), message: msg, author, timestamp: new Date().toISOString() });
       save();
     }
   },
   inbox: {
-    all: () => userMessages,
+    all: () => [...userMessages],
     add: (username: string, message: string) => {
       userMessages.unshift({ id: Math.random().toString(36), username, message, timestamp: new Date().toISOString() });
       save();
