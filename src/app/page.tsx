@@ -40,16 +40,16 @@ export default function Home() {
 
   return (
     <div className="min-h-screen relative flex flex-col items-center bg-background selection:bg-primary selection:text-white overflow-x-hidden">
-      {/* Stadium Background */}
+      {/* Stadium Background - Visibility Increased */}
       <div className="fixed inset-0 z-0 overflow-hidden">
         <Image 
           src={stadiumBg?.imageUrl || ''} 
           alt="Stadium Background" 
           fill 
-          className="object-cover opacity-20 dark:opacity-10 blur-[6px] scale-105"
+          className="object-cover opacity-40 dark:opacity-20 blur-[4px] scale-105"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/80 to-background dark:via-background/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/10 via-background/60 to-background dark:via-background/80" />
       </div>
 
       <div className="absolute top-4 right-4 z-50">
