@@ -1,23 +1,51 @@
-
 "use client";
 
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export function BrandingHeader({ compact = false }: { compact?: boolean }) {
-  const leftLogo = PlaceHolderImages.find(img => img.id === 'left-logo');
+  const [isDark, setIsDark] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    // Initial check for dark mode
+    setIsDark(document.documentElement.classList.contains('dark'));
+    
+    // Observer to watch for theme class changes
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          setIsDark(document.documentElement.classList.contains('dark'));
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, { attributes: true });
+    return () => observer.disconnect();
+  }, []);
+
+  const leftLogoDark = PlaceHolderImages.find(img => img.id === 'left-logo');
+  const leftLogoLight = PlaceHolderImages.find(img => img.id === 'left-logo-light');
+  
   const cemLogo = PlaceHolderImages.find(img => img.id === 'cem-logo');
-  const rightAltLogo = PlaceHolderImages.find(img => img.id === 'right-alt-logo');
+  
+  const rightAltLogoDark = PlaceHolderImages.find(img => img.id === 'right-alt-logo');
+  const rightAltLogoLight = PlaceHolderImages.find(img => img.id === 'right-alt-logo-light');
+  
   const kickwiseLogo = PlaceHolderImages.find(img => img.id === 'kickwise-logo');
+
+  // Logic to select the correct logo based on the current theme
+  const currentLeftLogo = (!mounted || isDark) ? leftLogoDark : (leftLogoLight || leftLogoDark);
+  const currentRightLogo = (!mounted || isDark) ? rightAltLogoDark : (rightAltLogoLight || rightAltLogoDark);
 
   return (
     <header className={`w-full relative z-20 ${compact ? 'bg-card/80 border-b border-border' : ''}`}>
-      {/* Topmost Logo Bar */}
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-        {/* Left Logo */}
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 transition-opacity duration-300">
           <Image 
-            src={leftLogo?.imageUrl || ''} 
+            src={currentLeftLogo?.imageUrl || ''} 
             alt="Association Logo" 
             width={compact ? 45 : 60} 
             height={compact ? 45 : 60} 
@@ -25,7 +53,6 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
           />
         </div>
 
-        {/* Right Logos with Thin Divider */}
         <div className="flex items-center gap-4">
           <Image 
             src={cemLogo?.imageUrl || ''} 
@@ -35,27 +62,26 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
             className="object-contain rounded-full"
           />
           <div className="h-8 w-[1px] bg-foreground/20 opacity-20" />
-          <Image 
-            src={rightAltLogo?.imageUrl || ''} 
-            alt="Right Logo" 
-            width={compact ? 40 : 55} 
-            height={compact ? 40 : 55} 
-            className="object-contain"
-          />
+          <div className="transition-opacity duration-300">
+            <Image 
+              src={currentRightLogo?.imageUrl || ''} 
+              alt="Right Logo" 
+              width={compact ? 40 : 55} 
+              height={compact ? 40 : 55} 
+              className="object-contain"
+            />
+          </div>
         </div>
       </div>
 
-      {/* Center Branding Content */}
       <div className={`container mx-auto px-4 text-center ${compact ? 'py-4' : 'mt-2 mb-8'}`}>
         <div className="space-y-4">
-          {/* Top Level: College Name */}
           <p className="text-[10px] md:text-sm font-headline font-bold uppercase tracking-[0.4em] text-foreground/80">
             College of Engineering Munnar
           </p>
           
-          <div className="py-2" /> {/* Requested Gap */}
+          <div className="py-2" />
 
-          {/* Middle Level: Dhruva and Dept (Same manner) */}
           <div className="space-y-2">
             <h2 className={`${compact ? 'text-2xl' : 'text-3xl md:text-4xl'} font-headline font-black text-primary tracking-widest uppercase`}>
               Dhruva
@@ -66,7 +92,6 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
             </p>
           </div>
           
-          {/* Bottom Level: Presents */}
           <p className="text-[11px] font-headline font-black italic text-primary/70 uppercase tracking-[0.3em] mt-4">
             Presents
           </p>

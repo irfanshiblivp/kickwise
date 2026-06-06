@@ -2,9 +2,15 @@
   "placeholderImages": [
     {
       "id": "left-logo",
-      "description": "Left Association Logo",
+      "description": "Left Association Logo (Dark/Default Mode)",
       "imageUrl": "https://i.ibb.co/Y4X2y5rx/Picsart-26-06-06-23-32-17-109.png",
       "imageHint": "association logo"
+    },
+    {
+      "id": "left-logo-light",
+      "description": "Left Association Logo (Light/Day Mode)",
+      "imageUrl": "https://i.ibb.co/HLtk9Gxf/IMG-20260607-025606.png",
+      "imageHint": "association logo light"
     },
     {
       "id": "cem-logo",
@@ -14,9 +20,15 @@
     },
     {
       "id": "right-alt-logo",
-      "description": "Right Association Logo",
+      "description": "Right Association Logo (Dark/Default Mode)",
       "imageUrl": "https://i.ibb.co/wr0v4BL7/Picsart-26-06-06-23-34-24-654.png",
       "imageHint": "association logo"
+    },
+    {
+      "id": "right-alt-logo-light",
+      "description": "Right Association Logo (Light/Day Mode)",
+      "imageUrl": "https://i.ibb.co/twJRmhSn/Picsart-26-06-07-02-52-35-114.png",
+      "imageHint": "association logo light"
     },
     {
       "id": "kickwise-logo",
