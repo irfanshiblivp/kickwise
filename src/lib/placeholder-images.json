@@ -1,3 +1,28 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "college-logo",
+      "description": "CEM Munnar Logo",
+      "imageUrl": "https://picsum.photos/seed/cem-munnar/200/200",
+      "imageHint": "college logo"
+    },
+    {
+      "id": "union-logo",
+      "description": "Student Union Logo",
+      "imageUrl": "https://picsum.photos/seed/union/200/200",
+      "imageHint": "union logo"
+    },
+    {
+      "id": "club-logo",
+      "description": "Computer Science Association Logo",
+      "imageUrl": "https://picsum.photos/seed/club/200/200",
+      "imageHint": "club logo"
+    },
+    {
+      "id": "world-cup-bg",
+      "description": "World Cup 2026 Background",
+      "imageUrl": "https://picsum.photos/seed/soccer-stadium/1200/600",
+      "imageHint": "soccer stadium"
+    }
+  ]
 }
