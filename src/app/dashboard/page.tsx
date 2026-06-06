@@ -11,7 +11,17 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { LogOut, Trophy, MessageSquare, LayoutDashboard, ListOrdered, Filter } from 'lucide-react';
+import { 
+  LogOut, 
+  Trophy, 
+  MessageSquare, 
+  LayoutDashboard, 
+  ListOrdered, 
+  CalendarCheck, 
+  History,
+  TrendingUp,
+  Filter
+} from 'lucide-react';
 import { Toaster } from '@/components/ui/toaster';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -94,7 +104,7 @@ export default function DashboardPage() {
         <div className="container mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
-              <Trophy className="h-3 w-3 text-primary" />
+              <TrendingUp className="h-3 w-3 text-primary" />
               <span className="text-xs font-black text-primary uppercase">{user.points} XP</span>
             </div>
             {user.isAdmin && (
@@ -124,72 +134,127 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           
           <div className="lg:col-span-3 space-y-6">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-              <div className="space-y-4 w-full">
+            <div className="flex flex-col gap-6">
+              <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-headline font-black flex items-center gap-2 tracking-tighter uppercase">
                   <LayoutDashboard className="h-6 w-6 text-primary" />
-                  Arena Dashboard
+                  Predictor Arena
                 </h2>
-                
-                <div className="flex flex-wrap items-center gap-3">
-                  <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full sm:w-auto">
-                    <TabsList className="bg-muted/50 border border-border w-full rounded-none h-11">
-                      <TabsTrigger value="upcoming" className="flex-1 rounded-none text-[10px] font-bold uppercase">Active Fixtures</TabsTrigger>
-                      <TabsTrigger value="finished" className="flex-1 rounded-none text-[10px] font-bold uppercase">Past Results</TabsTrigger>
-                    </TabsList>
-                  </Tabs>
-
-                  <div className="flex bg-muted/50 border border-border p-1 rounded-none overflow-x-auto whitespace-nowrap">
-                    {[
-                      { id: 'all', label: 'ALL ROUNDS' },
-                      { id: '1', label: 'R1' },
-                      { id: '2', label: 'R2' },
-                      { id: '3', label: 'R3' },
-                      { id: '4', label: 'KNOCKOUTS' }
-                    ].map(round => (
-                      <button
-                        key={round.id}
-                        onClick={() => setSelectedRound(round.id)}
-                        className={`px-3 py-1.5 text-[9px] font-black uppercase transition-all ${selectedRound === round.id ? 'bg-primary text-white shadow-lg' : 'text-muted-foreground hover:text-primary'}`}
-                      >
-                        {round.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
               </div>
-            </div>
+              
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                  <TabsList className="bg-muted/50 border border-border rounded-none h-11 p-1">
+                    <TabsTrigger value="upcoming" className="flex-1 rounded-none px-6 text-[10px] font-bold uppercase flex items-center gap-2">
+                      <CalendarCheck className="h-3 w-3" />
+                      Active Fixtures
+                    </TabsTrigger>
+                    <TabsTrigger value="finished" className="flex-1 rounded-none px-6 text-[10px] font-bold uppercase flex items-center gap-2">
+                      <History className="h-3 w-3" />
+                      Past Results
+                    </TabsTrigger>
+                    <TabsTrigger value="leaderboard" className="lg:hidden flex-1 rounded-none px-6 text-[10px] font-bold uppercase flex items-center gap-2">
+                      <ListOrdered className="h-3 w-3" />
+                      Leaderboard
+                    </TabsTrigger>
+                  </TabsList>
 
-            <div className="bento-grid">
-              {filteredMatches.length > 0 ? (
-                filteredMatches.map(match => (
-                  <MatchCard 
-                    key={match.id} 
-                    match={match} 
-                    user={user} 
-                    existingPrediction={db.predictions.forUser(user.id).find(p => p.matchId === match.id)}
-                    onPredictionSubmit={refreshData}
-                  />
-                ))
-              ) : (
-                <div className="col-span-full py-20 text-center glass-morphism rounded-none border border-dashed border-muted">
-                  <p className="text-muted-foreground font-bold uppercase text-xs tracking-widest">No matches found for this selection.</p>
+                  {activeTab !== 'leaderboard' && (
+                    <div className="flex bg-muted/50 border border-border p-1 rounded-none overflow-x-auto">
+                      {[
+                        { id: 'all', label: 'ALL' },
+                        { id: '1', label: 'R1' },
+                        { id: '2', label: 'R2' },
+                        { id: '3', label: 'R3' },
+                        { id: '4', label: 'KO' }
+                      ].map(round => (
+                        <button
+                          key={round.id}
+                          onClick={() => setSelectedRound(round.id)}
+                          className={`px-4 py-1.5 text-[9px] font-black uppercase transition-all min-w-[50px] ${selectedRound === round.id ? 'bg-primary text-white shadow-lg' : 'text-muted-foreground hover:text-primary'}`}
+                        >
+                          {round.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
+
+                <TabsContent value="upcoming" className="m-0">
+                  <div className="bento-grid">
+                    {filteredMatches.length > 0 ? (
+                      filteredMatches.map(match => (
+                        <MatchCard 
+                          key={match.id} 
+                          match={match} 
+                          user={user} 
+                          existingPrediction={db.predictions.forUser(user.id).find(p => p.matchId === match.id)}
+                          onPredictionSubmit={refreshData}
+                        />
+                      ))
+                    ) : (
+                      <div className="col-span-full py-20 text-center glass-morphism rounded-none border border-dashed border-muted">
+                        <p className="text-muted-foreground font-bold uppercase text-xs tracking-widest">No active fixtures found.</p>
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="finished" className="m-0">
+                   <div className="bento-grid">
+                    {filteredMatches.length > 0 ? (
+                      filteredMatches.map(match => (
+                        <MatchCard 
+                          key={match.id} 
+                          match={match} 
+                          user={user} 
+                          existingPrediction={db.predictions.forUser(user.id).find(p => p.matchId === match.id)}
+                          onPredictionSubmit={refreshData}
+                        />
+                      ))
+                    ) : (
+                      <div className="col-span-full py-20 text-center glass-morphism rounded-none border border-dashed border-muted">
+                        <p className="text-muted-foreground font-bold uppercase text-xs tracking-widest">No past results found.</p>
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="leaderboard" className="m-0 lg:hidden">
+                  <Card className="glass-morphism rounded-none classic-border overflow-hidden">
+                    <CardContent className="p-0">
+                      <div className="divide-y divide-border">
+                        {leaderboard.filter(u => !u.isAdmin).map((u, idx) => (
+                          <div key={u.id} className={`flex items-center justify-between px-6 py-4 ${u.id === user.id ? 'bg-primary/5' : ''}`}>
+                            <div className="flex items-center gap-4">
+                              <span className={`w-6 text-xs font-black ${idx < 3 ? 'text-primary' : 'text-muted-foreground'}`}>#{idx + 1}</span>
+                              <div>
+                                <p className="font-bold uppercase text-sm">{u.username}</p>
+                                <p className="text-[10px] text-muted-foreground uppercase">{u.year} | {u.department}</p>
+                              </div>
+                            </div>
+                            <span className="font-headline font-black text-primary">{u.points} XP</span>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
             </div>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-6 hidden lg:block">
             <Card className="glass-morphism classic-border rounded-none overflow-hidden">
               <CardHeader className="pb-3 border-b border-border bg-primary/5">
                 <CardTitle className="text-sm font-headline font-black uppercase flex items-center gap-2">
                   <ListOrdered className="h-4 w-4 text-primary" />
-                  Leaderboard
+                  Elite Leaderboard
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4 p-0">
                 <div className="divide-y divide-border">
-                  {leaderboard.filter(u => !u.isAdmin).slice(0, 10).map((u, idx) => (
+                  {leaderboard.filter(u => !u.isAdmin).slice(0, 15).map((u, idx) => (
                     <div key={u.id} className={`flex items-center justify-between px-4 py-3 transition-colors ${u.id === user.id ? 'bg-primary/5' : 'hover:bg-muted/30'}`}>
                       <div className="flex items-center gap-3">
                         <span className={`w-5 text-[10px] font-black ${idx === 0 ? 'text-yellow-600' : idx === 1 ? 'text-slate-400' : idx === 2 ? 'text-amber-700' : 'text-muted-foreground'}`}>
@@ -211,7 +276,7 @@ export default function DashboardPage() {
               <CardHeader className="pb-3 border-b border-border bg-primary/5">
                 <CardTitle className="text-sm font-headline font-black uppercase flex items-center gap-2">
                   <MessageSquare className="h-4 w-4 text-primary" />
-                  Admin Bulletins
+                  Bulletins
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4 px-0">
@@ -228,7 +293,7 @@ export default function DashboardPage() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-center text-muted-foreground text-[10px] py-10 uppercase font-black tracking-tighter">No recent updates.</p>
+                      <p className="text-center text-muted-foreground text-[10px] py-10 uppercase font-black tracking-tighter">No updates.</p>
                     )}
                   </div>
                 </ScrollArea>
