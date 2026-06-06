@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -66,6 +67,15 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
 
   const isUrl = (str: string) => str.startsWith('http') || str.startsWith('https') || str.startsWith('/');
 
+  // Helper to format 24h internal time to 12h display
+  const format12h = (time24: string) => {
+    if (!time24) return '';
+    const [hours, minutes] = time24.split(':').map(Number);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+  };
+
   return (
     <Card className={`glass-morphism rounded-none border-primary/10 relative overflow-hidden transition-all duration-300 animate-fade-in-up ${effectiveLocked && !match.isFinished ? 'opacity-80' : 'hover:border-primary/40 hover:shadow-2xl hover:-translate-y-1'}`}>
       <CardHeader className="pb-2">
@@ -125,7 +135,7 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
         <div className="flex flex-col gap-1.5 text-[10px] font-bold uppercase text-foreground/50 bg-muted/30 p-3">
           <div className="flex items-center gap-2">
             <Calendar className="h-3 w-3 text-primary" />
-            <span>{match.date} @ {match.time}</span>
+            <span>{match.date} @ {format12h(match.time)}</span>
           </div>
           <div className="flex items-center gap-2">
             <MapPin className="h-3 w-3 text-primary" />

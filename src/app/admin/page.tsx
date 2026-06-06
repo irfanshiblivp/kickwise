@@ -166,6 +166,15 @@ export default function AdminPage() {
     router.push('/');
   };
 
+  // Helper to format internal 24h time to 12h display
+  const format12h = (time24: string) => {
+    if (!time24) return '';
+    const [hours, minutes] = time24.split(':').map(Number);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+  };
+
   return (
     <div className="min-h-screen bg-background relative flex flex-col">
       <div className="fixed inset-0 z-0 overflow-hidden">
@@ -327,7 +336,7 @@ export default function AdminPage() {
                             <p className="font-bold text-sm uppercase tracking-tighter">
                               {m.flagA} {m.teamA} vs {m.teamB} {m.flagB}
                             </p>
-                            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{m.date} | {m.time} | {m.venue}</p>
+                            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{m.date} | {format12h(m.time)} | {m.venue}</p>
                           </div>
                         </div>
 
