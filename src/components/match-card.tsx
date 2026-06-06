@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -7,7 +6,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MapPin, Lock, Trophy, Timer } from 'lucide-react';
+import { Calendar, MapPin, Lock, Trophy, Timer, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 
@@ -22,6 +21,7 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
   const [scoreA, setScoreA] = useState(existingPrediction?.scoreA.toString() || '');
   const [scoreB, setScoreB] = useState(existingPrediction?.scoreB.toString() || '');
   const [isAutoLocked, setIsAutoLocked] = useState(false);
+  const [isClosingSoon, setIsClosingSoon] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -29,15 +29,22 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
       if (!match.date || !match.time) return;
       const matchStart = new Date(`${match.date}T${match.time}`);
       const now = new Date();
-      // Lock 30 minutes before match starts
-      const lockThreshold = new Date(matchStart.getTime() - 30 * 60 * 1000);
+      
+      // Auto-lock 10 minutes before kickoff
+      const lockThreshold = new Date(matchStart.getTime() - 10 * 60 * 1000);
+      // Warning 30 minutes before kickoff
+      const warningThreshold = new Date(matchStart.getTime() - 30 * 60 * 1000);
+
       if (now >= lockThreshold) {
         setIsAutoLocked(true);
+        setIsClosingSoon(false);
+      } else if (now >= warningThreshold) {
+        setIsClosingSoon(true);
       }
     };
 
     checkLock();
-    const timer = setInterval(checkLock, 30000); // Check every 30 seconds
+    const timer = setInterval(checkLock, 10000); // Check every 10 seconds
     return () => clearInterval(timer);
   }, [match.date, match.time]);
 
@@ -67,7 +74,6 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
 
   const isUrl = (str: string) => str.startsWith('http') || str.startsWith('https') || str.startsWith('/');
 
-  // Helper to format 24h internal time to 12h display
   const format12h = (time24: string) => {
     if (!time24) return '';
     const [hours, minutes] = time24.split(':').map(Number);
@@ -78,6 +84,9 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
 
   return (
     <Card className={`glass-morphism rounded-none border-primary/10 relative overflow-hidden transition-all duration-300 animate-fade-in-up ${effectiveLocked && !match.isFinished ? 'opacity-80' : 'hover:border-primary/40 hover:shadow-2xl hover:-translate-y-1'}`}>
+      {isClosingSoon && !effectiveLocked && (
+        <div className="absolute top-0 left-0 w-full h-1 bg-amber-500 animate-pulse z-50" />
+      )}
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center mb-4">
           <Badge variant="secondary" className="bg-primary/10 text-primary border-none text-[9px] font-black uppercase rounded-none px-2 py-0.5">
@@ -89,8 +98,12 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
             <Badge variant="outline" className="text-muted-foreground border-muted-foreground/30 rounded-none text-[8px] font-bold uppercase">
               <Lock className="h-2.5 w-2.5 mr-1" /> Entries Closed
             </Badge>
+          ) : isClosingSoon ? (
+            <Badge variant="destructive" className="rounded-none text-[8px] font-black uppercase animate-pulse flex items-center gap-1">
+              <AlertTriangle className="h-2.5 w-2.5" /> CLOSING SOON
+            </Badge>
           ) : (
-            <Badge variant="outline" className="text-amber-600 border-amber-600/30 rounded-none text-[8px] font-black uppercase animate-pulse">
+            <Badge variant="outline" className="text-amber-600 border-amber-600/30 rounded-none text-[8px] font-black uppercase">
               <Timer className="h-2.5 w-2.5 mr-1" /> Open for Entries
             </Badge>
           )}
