@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Match, db, User, Prediction } from '@/lib/db';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,11 +21,31 @@ interface MatchCardProps {
 export function MatchCard({ match, user, existingPrediction, onPredictionSubmit }: MatchCardProps) {
   const [scoreA, setScoreA] = useState(existingPrediction?.scoreA.toString() || '');
   const [scoreB, setScoreB] = useState(existingPrediction?.scoreB.toString() || '');
+  const [isAutoLocked, setIsAutoLocked] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const checkLock = () => {
+      if (!match.date || !match.time) return;
+      const matchStart = new Date(`${match.date}T${match.time}`);
+      const now = new Date();
+      // Lock 30 minutes before match starts
+      const lockThreshold = new Date(matchStart.getTime() - 30 * 60 * 1000);
+      if (now >= lockThreshold) {
+        setIsAutoLocked(true);
+      }
+    };
+
+    checkLock();
+    const timer = setInterval(checkLock, 30000); // Check every 30 seconds
+    return () => clearInterval(timer);
+  }, [match.date, match.time]);
+
+  const effectiveLocked = match.isLocked || isAutoLocked || match.isFinished;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (match.isLocked) return;
+    if (effectiveLocked) return;
     if (scoreA === '' || scoreB === '') {
       toast({ title: "Scores Required", description: "Please enter both scores.", variant: "destructive" });
       return;
@@ -48,7 +68,7 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
   const isUrl = (str: string) => str.startsWith('http') || str.startsWith('https') || str.startsWith('/');
 
   return (
-    <Card className={`glass-morphism rounded-none border-primary/10 relative overflow-hidden transition-all duration-300 ${match.isLocked && !match.isFinished ? 'opacity-80' : 'hover:border-primary/30 hover:shadow-xl'}`}>
+    <Card className={`glass-morphism rounded-none border-primary/10 relative overflow-hidden transition-all duration-300 ${effectiveLocked && !match.isFinished ? 'opacity-80' : 'hover:border-primary/30 hover:shadow-xl'}`}>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center mb-4">
           <Badge variant="secondary" className="bg-primary/10 text-primary border-none text-[9px] font-black uppercase rounded-none px-2 py-0.5">
@@ -56,7 +76,7 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
           </Badge>
           {match.isFinished ? (
             <Badge variant="default" className="bg-green-600 text-white rounded-none text-[8px] font-bold uppercase">Result Final</Badge>
-          ) : match.isLocked ? (
+          ) : effectiveLocked ? (
             <Badge variant="outline" className="text-muted-foreground border-muted-foreground/30 rounded-none text-[8px] font-bold uppercase">
               <Lock className="h-2.5 w-2.5 mr-1" /> Entries Closed
             </Badge>
@@ -136,7 +156,7 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
               </div>
             )}
           </div>
-        ) : !match.isLocked ? (
+        ) : !effectiveLocked ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex items-center justify-center gap-3">
               <div className="w-14">

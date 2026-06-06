@@ -53,21 +53,10 @@ export interface UserMessage {
 }
 
 const INITIAL_MATCHES: Match[] = [
-  // ROUND 1 (OPEN)
   { id: 'm1', round: 1, group: 'Group A', teamA: 'Mexico', teamB: 'South Africa', flagA: '🇲🇽', flagB: '🇿🇦', date: '2026-06-11', time: '18:00', venue: 'Mexico City Stadium', isLocked: false, isFinished: false },
   { id: 'm2', round: 1, group: 'Group A', teamA: 'Korea Republic', teamB: 'Czechia', flagA: '🇰🇷', flagB: '🇨🇿', date: '2026-06-11', time: '21:00', venue: 'Estadio Guadalajara', isLocked: false, isFinished: false },
-  { id: 'm3', round: 1, group: 'Group B', teamA: 'Canada', teamB: 'Bosnia and Herzegovina', flagA: '🇨🇦', flagB: '🇧🇦', date: '2026-06-12', time: '19:00', venue: 'Toronto Stadium', isLocked: false, isFinished: false },
+  { id: 'm3', round: 1, group: 'Group B', teamA: 'Canada', teamB: 'Bosnia', flagA: '🇨🇦', flagB: '🇧🇦', date: '2026-06-12', time: '19:00', venue: 'Toronto Stadium', isLocked: false, isFinished: false },
   { id: 'm4', round: 1, group: 'Group D', teamA: 'USA', teamB: 'Paraguay', flagA: '🇺🇸', flagB: '🇵🇾', date: '2026-06-12', time: '20:00', venue: 'Los Angeles Stadium', isLocked: false, isFinished: false },
-  
-  // ROUND 2 (LOCKED)
-  { id: 'm25', round: 2, group: 'Group A', teamA: 'Mexico', teamB: 'Korea Republic', flagA: '🇲🇽', flagB: '🇰🇷', date: '2026-06-16', time: '20:00', venue: 'Estadio Guadalajara', isLocked: true, isFinished: false },
-  { id: 'm26', round: 2, group: 'Group A', teamA: 'South Africa', teamB: 'Czechia', flagA: '🇿🇦', flagB: '🇨🇿', date: '2026-06-16', time: '18:00', venue: 'Mexico City Stadium', isLocked: true, isFinished: false },
-  
-  // ROUND 3 (LOCKED)
-  { id: 'm49', round: 3, group: 'Group A', teamA: 'Czechia', teamB: 'Mexico', flagA: '🇨🇿', flagB: '🇲🇽', date: '2026-06-20', time: '16:00', venue: 'Mexico City Stadium', isLocked: true, isFinished: false },
-  
-  // KNOCKOUTS (LOCKED)
-  { id: 'm100', round: 4, group: 'Round of 32', teamA: 'TBD', teamB: 'TBD', flagA: '🏳️', flagB: '🏳️', date: '2026-06-28', time: '15:00', venue: 'Los Angeles Stadium', isLocked: true, isFinished: false },
 ];
 
 let users: User[] = [
@@ -127,10 +116,14 @@ export const db = {
         user.points += pts;
         save();
       }
+    },
+    resetPoints: () => {
+      users = users.map(u => ({ ...u, points: 0 }));
+      save();
     }
   },
   matches: {
-    all: () => matches,
+    all: () => [...matches],
     update: (matchId: string, updates: Partial<Match>) => {
       const idx = matches.findIndex(m => m.id === matchId);
       if (idx !== -1) {
@@ -142,9 +135,14 @@ export const db = {
       const newMatch = { ...match, id: Math.random().toString(36), isFinished: false };
       matches.push(newMatch);
       save();
+    },
+    delete: (matchId: string) => {
+      matches = matches.filter(m => m.id !== matchId);
+      save();
     }
   },
   predictions: {
+    all: () => predictions,
     forMatch: (matchId: string) => predictions.filter(p => p.matchId === matchId),
     forUser: (userId: string) => predictions.filter(p => p.userId === userId),
     submit: (prediction: Prediction) => {

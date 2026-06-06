@@ -22,12 +22,11 @@ import {
   Lock, 
   CheckCircle, 
   MessageSquare,
-  Users,
   LogOut,
   ArrowLeft,
   Trash2,
   Mail,
-  Upload
+  Edit2
 } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -36,9 +35,9 @@ export default function AdminPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [matches, setMatches] = useState<Match[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
   const [messages, setMessages] = useState<UserMessage[]>([]);
   const [broadcast, setBroadcast] = useState('');
+  const [editingMatch, setEditingMatch] = useState<string | null>(null);
   const [newMatch, setNewMatch] = useState({
     teamA: '', teamB: '', flagA: '', flagB: '', group: 'Group A', round: 1, date: '', time: '', venue: ''
   });
@@ -60,7 +59,6 @@ export default function AdminPage() {
 
   const refresh = () => {
     setMatches(db.matches.all());
-    setUsers(db.users.all());
     setMessages(db.inbox.all());
   };
 
@@ -72,7 +70,7 @@ export default function AdminPage() {
     }
     db.matches.add({
       ...newMatch,
-      isLocked: true
+      isLocked: false
     });
     toast({ title: "Match Added", description: `${newMatch.teamA} vs ${newMatch.teamB} scheduled.` });
     refresh();
@@ -85,39 +83,44 @@ export default function AdminPage() {
     toast({ title: `Match ${!currentStatus ? 'Locked' : 'Unlocked'}` });
   };
 
-  const deleteMsg = (id: string) => {
-    db.inbox.delete(id);
-    refresh();
-    toast({ title: "Message Deleted" });
+  const deleteMatch = (matchId: string) => {
+    if (confirm("Are you sure you want to delete this match?")) {
+      db.matches.delete(matchId);
+      refresh();
+      toast({ title: "Match Deleted" });
+    }
   };
 
-  const logout = () => {
-    localStorage.removeItem('kw_current_user');
-    router.push('/');
+  const recalculatePoints = () => {
+    db.users.resetPoints();
+    const allMatches = db.matches.all().filter(m => m.isFinished);
+    allMatches.forEach(m => {
+      const predictions = db.predictions.forMatch(m.id);
+      predictions.forEach(pred => {
+        let pointsAwarded = 0;
+        if (pred.scoreA === m.scoreA && pred.scoreB === m.scoreB) {
+          pointsAwarded = 10;
+        } else {
+          const actualWinner = m.scoreA! > m.scoreB! ? 'A' : m.scoreA! < m.scoreB! ? 'B' : 'Draw';
+          const predictedWinner = pred.scoreA > pred.scoreB ? 'A' : pred.scoreA < pred.scoreB ? 'B' : 'Draw';
+          if (actualWinner === predictedWinner) pointsAwarded = 5;
+        }
+        if (pointsAwarded > 0) db.users.addPoints(pred.userId, pointsAwarded);
+      });
+    });
   };
 
   const handleUpdateScore = (matchId: string, scoreA: number, scoreB: number) => {
     db.matches.update(matchId, { scoreA, scoreB, isFinished: true, isLocked: true });
+    recalculatePoints();
+    toast({ title: "Score Updated!", description: `Results applied and points recalculated.` });
+    refresh();
+  };
 
-    // Points logic
-    const predictions = db.predictions.forMatch(matchId);
-    predictions.forEach(pred => {
-      let pointsAwarded = 0;
-      if (pred.scoreA === scoreA && pred.scoreB === scoreB) {
-        pointsAwarded = 10;
-      } else {
-        const actualWinner = scoreA > scoreB ? 'A' : scoreA < scoreB ? 'B' : 'Draw';
-        const predictedWinner = pred.scoreA > pred.scoreB ? 'A' : pred.scoreA < pred.scoreB ? 'B' : 'Draw';
-        if (actualWinner === predictedWinner) {
-          pointsAwarded = 5;
-        }
-      }
-      if (pointsAwarded > 0) {
-        db.users.addPoints(pred.userId, pointsAwarded);
-      }
-    });
-
-    toast({ title: "Score Updated!", description: `Results applied and points distributed.` });
+  const saveEdit = (matchId: string, updates: any) => {
+    db.matches.update(matchId, updates);
+    setEditingMatch(null);
+    toast({ title: "Match Updated" });
     refresh();
   };
 
@@ -126,6 +129,11 @@ export default function AdminPage() {
     db.broadcasts.add(broadcast, 'ADMIN');
     setBroadcast('');
     toast({ title: "Broadcast Sent" });
+  };
+
+  const logout = () => {
+    localStorage.removeItem('kw_current_user');
+    router.push('/');
   };
 
   return (
@@ -154,12 +162,7 @@ export default function AdminPage() {
             <Button variant="ghost" size="sm" onClick={() => router.push('/dashboard')} className="font-bold uppercase text-[10px]">
               <ArrowLeft className="h-3 w-3 mr-2" /> View Dashboard
             </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={logout} 
-              className="text-destructive hover:bg-destructive/10 border-destructive/20 font-bold uppercase text-[10px]"
-            >
+            <Button variant="outline" size="sm" onClick={logout} className="text-destructive border-destructive/20 font-bold uppercase text-[10px]">
               <LogOut className="h-3 w-3 mr-2" /> Logout
             </Button>
           </div>
@@ -170,7 +173,6 @@ export default function AdminPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           <div className="lg:col-span-2 space-y-8">
-            {/* Create Match Form */}
             <Card className="glass-morphism rounded-none classic-border">
               <CardHeader className="bg-primary/5 border-b border-border">
                 <CardTitle className="font-headline font-black uppercase tracking-tighter text-sm flex items-center gap-2">
@@ -237,56 +239,83 @@ export default function AdminPage() {
 
             <Card className="glass-morphism rounded-none classic-border">
               <CardHeader className="flex flex-row items-center justify-between border-b border-border bg-primary/5">
-                <CardTitle className="font-headline font-black uppercase tracking-tighter text-sm">Active Fixtures</CardTitle>
+                <CardTitle className="font-headline font-black uppercase tracking-tighter text-sm">Manage Fixtures</CardTitle>
                 <Badge variant="outline" className="text-primary border-primary/30 rounded-none text-[9px] font-black">{matches.length} MATCHES</Badge>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
                 {matches.sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()).map(m => (
-                  <div key={m.id} className="p-4 rounded-none border border-border bg-card/40 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all">
-                    <div className="flex items-center gap-4">
-                      <div className="text-center w-12 border-r border-border pr-4">
-                        <Badge className="bg-primary/10 text-primary mb-1 uppercase font-bold text-[9px] rounded-none">R{m.round}</Badge>
-                      </div>
-                      <div>
-                        <p className="font-bold text-sm uppercase tracking-tighter">
-                          {m.flagA} {m.teamA} vs {m.teamB} {m.flagB}
-                        </p>
-                        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{m.date} | {m.venue}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-3">
-                      <Button 
-                        size="sm" 
-                        variant={m.isLocked ? "outline" : "secondary"}
-                        onClick={() => toggleLock(m.id, m.isLocked)}
-                        className={m.isLocked ? "text-[10px] font-bold uppercase h-8 rounded-none w-24" : "bg-green-600/10 text-green-600 hover:bg-green-600/20 text-[10px] font-bold uppercase h-8 rounded-none w-24"}
-                      >
-                        {m.isLocked ? <Lock className="h-3 w-3 mr-2" /> : <Unlock className="h-3 w-3 mr-2" />}
-                        {m.isLocked ? "Locked" : "Unlocked"}
-                      </Button>
-
-                      {!m.isFinished ? (
-                        <div className="flex items-center gap-2 bg-background/50 p-1 rounded-none border border-border">
-                          <Input className="w-10 h-8 p-1 text-center bg-transparent border-none text-xs font-black" placeholder="A" id={`scoreA-${m.id}`} />
-                          <span className="font-bold">-</span>
-                          <Input className="w-10 h-8 p-1 text-center bg-transparent border-none text-xs font-black" placeholder="B" id={`scoreB-${m.id}`} />
-                          <Button 
-                            size="icon" 
-                            className="h-8 w-8 bg-primary hover:bg-primary/90 rounded-none"
-                            onClick={() => {
-                              const sA = (document.getElementById(`scoreA-${m.id}`) as HTMLInputElement).value;
-                              const sB = (document.getElementById(`scoreB-${m.id}`) as HTMLInputElement).value;
-                              if (sA && sB) handleUpdateScore(m.id, parseInt(sA), parseInt(sB));
-                            }}
-                          >
-                            <CheckCircle className="h-4 w-4" />
-                          </Button>
+                  <div key={m.id} className="p-4 rounded-none border border-border bg-card/40 flex flex-col gap-4">
+                    {editingMatch === m.id ? (
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <Input className="text-xs h-8" defaultValue={m.teamA} id={`editTeamA-${m.id}`} />
+                        <Input className="text-xs h-8" defaultValue={m.teamB} id={`editTeamB-${m.id}`} />
+                        <Input className="text-xs h-8" defaultValue={m.venue} id={`editVenue-${m.id}`} />
+                        <Input type="date" className="text-xs h-8" defaultValue={m.date} id={`editDate-${m.id}`} />
+                        <Input type="time" className="text-xs h-8" defaultValue={m.time} id={`editTime-${m.id}`} />
+                        <div className="flex gap-2">
+                          <Button size="sm" className="flex-1 text-[10px] font-bold" onClick={() => {
+                            const updates = {
+                              teamA: (document.getElementById(`editTeamA-${m.id}`) as HTMLInputElement).value,
+                              teamB: (document.getElementById(`editTeamB-${m.id}`) as HTMLInputElement).value,
+                              venue: (document.getElementById(`editVenue-${m.id}`) as HTMLInputElement).value,
+                              date: (document.getElementById(`editDate-${m.id}`) as HTMLInputElement).value,
+                              time: (document.getElementById(`editTime-${m.id}`) as HTMLInputElement).value,
+                            };
+                            saveEdit(m.id, updates);
+                          }}>Save</Button>
+                          <Button size="sm" variant="outline" className="flex-1 text-[10px] font-bold" onClick={() => setEditingMatch(null)}>Cancel</Button>
                         </div>
-                      ) : (
-                        <Badge variant="default" className="bg-primary/10 text-primary border border-primary/20 font-black uppercase text-[10px] rounded-none">Final: {m.scoreA}-{m.scoreB}</Badge>
-                      )}
-                    </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                          <div className="text-center w-12 border-r border-border pr-4">
+                            <Badge className="bg-primary/10 text-primary mb-1 uppercase font-bold text-[9px] rounded-none">R{m.round}</Badge>
+                          </div>
+                          <div>
+                            <p className="font-bold text-sm uppercase tracking-tighter">
+                              {m.flagA} {m.teamA} vs {m.teamB} {m.flagB}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{m.date} | {m.time} | {m.venue}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Button size="icon" variant="ghost" onClick={() => setEditingMatch(m.id)} className="h-8 w-8 text-primary">
+                            <Edit2 className="h-3 w-3" />
+                          </Button>
+                          <Button size="icon" variant="ghost" onClick={() => deleteMatch(m.id)} className="h-8 w-8 text-destructive">
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant={m.isLocked ? "outline" : "secondary"}
+                            onClick={() => toggleLock(m.id, m.isLocked)}
+                            className={m.isLocked ? "text-[10px] font-bold uppercase h-8 rounded-none w-24" : "bg-green-600/10 text-green-600 text-[10px] font-bold uppercase h-8 rounded-none w-24"}
+                          >
+                            {m.isLocked ? <Lock className="h-3 w-3 mr-2" /> : <Unlock className="h-3 w-3 mr-2" />}
+                            {m.isLocked ? "Locked" : "Unlocked"}
+                          </Button>
+
+                          <div className="flex items-center gap-2 bg-background/50 p-1 rounded-none border border-border">
+                            <Input className="w-10 h-8 p-1 text-center bg-transparent border-none text-xs font-black" defaultValue={m.scoreA} id={`scoreA-${m.id}`} placeholder="A" />
+                            <span className="font-bold">-</span>
+                            <Input className="w-10 h-8 p-1 text-center bg-transparent border-none text-xs font-black" defaultValue={m.scoreB} id={`scoreB-${m.id}`} placeholder="B" />
+                            <Button 
+                              size="icon" 
+                              className="h-8 w-8 bg-primary rounded-none"
+                              onClick={() => {
+                                const sA = (document.getElementById(`scoreA-${m.id}`) as HTMLInputElement).value;
+                                const sB = (document.getElementById(`scoreB-${m.id}`) as HTMLInputElement).value;
+                                if (sA && sB) handleUpdateScore(m.id, parseInt(sA), parseInt(sB));
+                              }}
+                            >
+                              <CheckCircle className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </CardContent>
@@ -308,12 +337,7 @@ export default function AdminPage() {
                       <div key={msg.id} className="p-3 border border-border bg-card/30 relative group">
                         <div className="flex justify-between items-start mb-2">
                           <span className="text-[10px] font-black uppercase text-primary">{msg.username}</span>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-6 w-6 text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={() => deleteMsg(msg.id)}
-                          >
+                          <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => { db.inbox.delete(msg.id); refresh(); }}>
                             <Trash2 className="h-3 w-3" />
                           </Button>
                         </div>
@@ -336,17 +360,11 @@ export default function AdminPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
-                <Input 
-                  placeholder="Announce tournament updates..." 
-                  value={broadcast} 
-                  onChange={e => setBroadcast(e.target.value)}
-                  className="bg-card/50 text-[11px] font-bold rounded-none h-10 border-border"
-                />
-                <Button onClick={sendBroadcast} className="w-full bg-primary hover:bg-primary/90 text-[10px] font-black uppercase tracking-widest rounded-none h-10 shadow-lg">SEND BULLETIN</Button>
+                <Input placeholder="Announce tournament updates..." value={broadcast} onChange={e => setBroadcast(e.target.value)} className="bg-card/50 text-[11px] font-bold rounded-none h-10 border-border" />
+                <Button onClick={sendBroadcast} className="w-full bg-primary text-[10px] font-black uppercase tracking-widest rounded-none h-10 shadow-lg">SEND BULLETIN</Button>
               </CardContent>
             </Card>
           </div>
-
         </div>
       </main>
       <Toaster />
