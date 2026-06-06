@@ -80,14 +80,15 @@ if (typeof window !== 'undefined') {
   const savedInbox = localStorage.getItem('kw_inbox');
   const savedSettings = localStorage.getItem('kw_settings');
   
-  if (!localStorage.getItem('kw_initialized')) {
+  if (!localStorage.getItem('kw_initialized_v2')) {
+    localStorage.clear();
     localStorage.setItem('kw_users', JSON.stringify(users));
-    localStorage.setItem('kw_matches', JSON.stringify(matches));
+    localStorage.setItem('kw_matches', JSON.stringify(INITIAL_MATCHES));
     localStorage.setItem('kw_predictions', JSON.stringify([]));
     localStorage.setItem('kw_broadcasts', JSON.stringify([]));
     localStorage.setItem('kw_inbox', JSON.stringify([]));
     localStorage.setItem('kw_settings', JSON.stringify(settings));
-    localStorage.setItem('kw_initialized', 'true');
+    localStorage.setItem('kw_initialized_v2', 'true');
   } else {
     if (savedUsers) users = JSON.parse(savedUsers);
     if (savedMatches) matches = JSON.parse(savedMatches);
@@ -96,7 +97,6 @@ if (typeof window !== 'undefined') {
     if (savedInbox) userMessages = JSON.parse(savedInbox);
     if (savedSettings) settings = JSON.parse(savedSettings);
 
-    // Ensure admin user is always present even after resets if logic changes
     if (!users.some(u => u.username === 'admin12')) {
       users.push({ id: 'admin-seed', username: 'admin12', password: 'admdhr12', year: '4th', department: 'CSE', points: 0, isAdmin: true });
     }
@@ -196,17 +196,10 @@ export const db = {
   },
   system: {
     resetAll: () => {
-      matches = [...INITIAL_MATCHES];
-      predictions = [];
-      broadcasts = [];
-      userMessages = [];
-      users = users.map(u => ({ ...u, points: 0 }));
-      // Keep admin
-      if (!users.some(u => u.username === 'admin12')) {
-        users.push({ id: 'admin-seed', username: 'admin12', password: 'admdhr12', year: '4th', department: 'CSE', points: 0, isAdmin: true });
+      if (typeof window !== 'undefined') {
+        localStorage.clear();
+        window.location.reload();
       }
-      settings = { leaderboardVisible: true };
-      save();
     }
   }
 };

@@ -28,9 +28,7 @@ import {
   Trash2,
   Mail,
   Edit2,
-  RefreshCcw,
-  Eye,
-  EyeOff
+  RefreshCcw
 } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -90,10 +88,8 @@ export default function AdminPage() {
   };
 
   const handleResetSystem = () => {
-    if (confirm("NUCLEAR OPTION: This will delete all predictions, messages, reset all points, and restore default matches. Are you absolutely sure?")) {
+    if (confirm("NUCLEAR OPTION: This will permanently delete all users, predictions, messages, and restore default matches. The app will reload and you will need to log in again. Are you absolutely sure?")) {
       db.system.resetAll();
-      refresh();
-      toast({ title: "System Reset Complete", description: "All data has been cleared." });
     }
   };
 
