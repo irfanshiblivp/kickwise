@@ -42,7 +42,7 @@ const STADIUMS = {
   USA: [
     "Mercedes-Benz Stadium (Atlanta)",
     "Gillette Stadium (Boston)",
-    "AT&T Stadium (Dallas)",
+    "AT&T Stadium (Dallas - 9 matches)",
     "NRG Stadium (Houston)",
     "Arrowhead Stadium (Kansas City)",
     "SoFi Stadium (Los Angeles)",
@@ -233,7 +233,7 @@ export default function AdminPage() {
       </nav>
 
       <main className="container mx-auto p-4 md:p-8 space-y-8 z-10 flex-1 max-w-6xl">
-        <Tabs defaultValue="manage" className="w-full">
+        <Tabs defaultValue="create" className="w-full">
           <div className="overflow-x-auto pb-2 scrollbar-hide">
             <TabsList className="flex w-full min-max md:grid md:grid-cols-5 h-auto bg-muted/50 border border-border p-1 rounded-none mb-4">
               <TabsTrigger value="create" className="rounded-none py-3 text-[10px] font-black uppercase tracking-widest gap-2 flex-1">
