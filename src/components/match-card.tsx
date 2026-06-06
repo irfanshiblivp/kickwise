@@ -161,7 +161,7 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
               <Trophy className="h-3 w-3" />
               <span className="text-[10px] font-black uppercase">Official Result: {match.scoreA} - {match.scoreB}</span>
             </div>
-            {existingPrediction && (
+            {existingPrediction ? (
               <div className="mt-2 text-center border-t border-primary/5 pt-2">
                 <p className="text-[9px] text-muted-foreground uppercase font-bold">
                   Your entry: <span className="text-foreground">{existingPrediction.scoreA} - {existingPrediction.scoreB}</span>
@@ -175,6 +175,8 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
                   <p className="text-[8px] text-amber-600 font-black mt-1 animate-bounce">+5 POINTS EARNED</p>
                 )}
               </div>
+            ) : (
+              <p className="text-[8px] text-destructive font-black mt-2 text-center">NO PREDICTION SUBMITTED</p>
             )}
           </div>
         ) : !effectiveLocked ? (
@@ -209,7 +211,7 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
           </form>
         ) : (
           <div className="bg-muted/40 p-4 text-center border border-border/50">
-            <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest mb-2">Predictions Locked</p>
+            <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest mb-2">Entries Closed</p>
             {existingPrediction ? (
               <div className="space-y-1">
                 <p className="text-[11px] font-black uppercase text-primary">Your Final Entry</p>

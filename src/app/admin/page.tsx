@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { db, Match, UserMessage, AppSettings, User } from '@/lib/db';
 import { BrandingHeader } from '@/components/branding-header';
@@ -48,9 +48,9 @@ const STADIUMS = {
     "Arrowhead Stadium (Kansas City)",
     "SoFi Stadium (Los Angeles)",
     "Hard Rock Stadium (Miami)",
-    "MetLife Stadium (New York/New Jersey)",
+    "MetLife Stadium (NY/NJ)",
     "Lincoln Financial Field (Philadelphia)",
-    "Levi's Stadium (San Francisco Bay Area)",
+    "Levi's Stadium (SF Bay Area)",
     "Lumen Field (Seattle)"
   ],
   Mexico: [
@@ -78,12 +78,12 @@ export default function AdminPage() {
   });
   const stadiumBg = PlaceHolderImages.find(img => img.id === 'stadium-bg');
 
-  const refresh = () => {
+  const refresh = useCallback(() => {
     setMatches(db.matches.all());
     setMessages(db.inbox.all());
     setUsers(db.users.all());
     setSettings(db.settings.get());
-  };
+  }, []);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('kw_current_user');
@@ -97,7 +97,7 @@ export default function AdminPage() {
       return;
     }
     refresh();
-  }, [router]);
+  }, [router, refresh]);
 
   const handleCreateMatch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -171,6 +171,7 @@ export default function AdminPage() {
   const handleUpdateScore = (matchId: string, scoreA: number, scoreB: number) => {
     db.matches.update(matchId, { scoreA, scoreB, isFinished: true, isLocked: true });
     recalculatePoints();
+    toast({ title: "Score Updated", description: "The match result has been logged." });
   };
 
   const saveEdit = (matchId: string, updates: any) => {

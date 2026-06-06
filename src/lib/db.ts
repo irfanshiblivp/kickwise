@@ -90,17 +90,15 @@ const INITIAL_MATCHES: Match[] = [
   { id: 'm24', round: 1, group: 'Group K', teamA: 'Uzbekistan', teamB: 'Colombia', flagA: '🇺🇿', flagB: '🇨🇴', date: '2026-06-18', time: '07:30', venue: 'Mexico City Stadium', isLocked: false, isFinished: false },
 ];
 
-let users: User[] = [
-  { id: 'admin-seed', username: 'admin12', password: 'admdhr12', year: '4th', department: 'CSE', points: 0, isAdmin: true }
-];
-let matches: Match[] = [...INITIAL_MATCHES];
+let users: User[] = [];
+let matches: Match[] = [];
 let predictions: Prediction[] = [];
 let broadcasts: Broadcast[] = [];
 let userMessages: UserMessage[] = [];
 let settings: AppSettings = { leaderboardVisible: true };
 
 if (typeof window !== 'undefined') {
-  const CURRENT_DB_VERSION = 'kw_initialized_v6';
+  const CURRENT_DB_VERSION = 'kw_arena_v7';
   const savedUsers = localStorage.getItem('kw_users');
   const savedMatches = localStorage.getItem('kw_matches');
   const savedPredictions = localStorage.getItem('kw_predictions');
@@ -110,14 +108,20 @@ if (typeof window !== 'undefined') {
   
   if (!localStorage.getItem(CURRENT_DB_VERSION)) {
     localStorage.clear();
+    users = [{ id: 'admin-seed', username: 'admin12', password: 'admdhr12', year: '4th', department: 'CSE', points: 0, isAdmin: true }];
+    matches = [...INITIAL_MATCHES];
+    predictions = [];
+    broadcasts = [];
+    userMessages = [];
+    settings = { leaderboardVisible: true };
+    
     localStorage.setItem('kw_users', JSON.stringify(users));
-    localStorage.setItem('kw_matches', JSON.stringify(INITIAL_MATCHES));
-    localStorage.setItem('kw_predictions', JSON.stringify([]));
-    localStorage.setItem('kw_broadcasts', JSON.stringify([]));
-    localStorage.setItem('kw_inbox', JSON.stringify([]));
+    localStorage.setItem('kw_matches', JSON.stringify(matches));
+    localStorage.setItem('kw_predictions', JSON.stringify(predictions));
+    localStorage.setItem('kw_broadcasts', JSON.stringify(broadcasts));
+    localStorage.setItem('kw_inbox', JSON.stringify(userMessages));
     localStorage.setItem('kw_settings', JSON.stringify(settings));
     localStorage.setItem(CURRENT_DB_VERSION, 'true');
-    window.location.reload();
   } else {
     if (savedUsers) users = JSON.parse(savedUsers);
     if (savedMatches) matches = JSON.parse(savedMatches);
