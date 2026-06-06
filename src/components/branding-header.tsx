@@ -52,14 +52,14 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
             College of Engineering Munnar
           </p>
           
-          <div className="py-2" /> {/* Gap as requested */}
+          <div className="py-2" /> {/* Requested Gap */}
 
           <div className="space-y-1">
-            <h2 className={`${compact ? 'text-2xl' : 'text-4xl md:text-6xl'} font-headline font-black text-primary tracking-widest uppercase`}>
+            <h2 className={`${compact ? 'text-2xl' : 'text-4xl md:text-5xl'} font-headline font-black text-primary tracking-widest uppercase`}>
               Dhruva
             </h2>
             
-            <p className={`${compact ? 'text-xs' : 'text-lg md:text-xl'} font-headline font-black text-primary tracking-widest uppercase`}>
+            <p className={`${compact ? 'text-[10px]' : 'text-lg md:text-xl'} font-headline font-black text-primary tracking-widest uppercase`}>
               Department of Computer Science and Engineering
             </p>
           </div>

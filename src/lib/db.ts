@@ -61,7 +61,17 @@ const INITIAL_MATCHES: Match[] = [
 ];
 
 // Memory Store (Simulated DB)
-let users: User[] = [];
+let users: User[] = [
+  {
+    id: 'admin-1',
+    username: 'admin',
+    password: 'admin',
+    year: '4th',
+    department: 'CSE',
+    points: 0,
+    isAdmin: true
+  }
+];
 let matches: Match[] = [...INITIAL_MATCHES];
 let predictions: Prediction[] = [];
 let broadcasts: Broadcast[] = [];
@@ -73,7 +83,14 @@ if (typeof window !== 'undefined') {
   const savedPredictions = localStorage.getItem('kw_predictions');
   const savedBroadcasts = localStorage.getItem('kw_broadcasts');
   
-  if (savedUsers) users = JSON.parse(savedUsers);
+  if (savedUsers) {
+    const parsedUsers = JSON.parse(savedUsers);
+    // Ensure default admin always exists
+    if (!parsedUsers.find((u: any) => u.username === 'admin')) {
+      parsedUsers.push(users[0]);
+    }
+    users = parsedUsers;
+  }
   if (savedMatches) matches = JSON.parse(savedMatches);
   if (savedPredictions) predictions = JSON.parse(savedPredictions);
   if (savedBroadcasts) broadcasts = JSON.parse(savedBroadcasts);

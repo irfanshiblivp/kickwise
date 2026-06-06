@@ -1,8 +1,10 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { db, Match, User } from '@/lib/db';
+import { BrandingHeader } from '@/components/branding-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -18,8 +20,11 @@ import {
   CheckCircle, 
   MessageSquare,
   Users,
-  LogOut
+  LogOut,
+  ArrowLeft
 } from 'lucide-react';
+import Image from 'next/image';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function AdminPage() {
   const router = useRouter();
@@ -30,6 +35,7 @@ export default function AdminPage() {
   const [newMatch, setNewMatch] = useState({
     teamA: '', teamB: '', flagA: '🏳️', flagB: '🏳️', round: 1, date: '', time: '', venue: ''
   });
+  const stadiumBg = PlaceHolderImages.find(img => img.id === 'stadium-bg');
 
   useEffect(() => {
     const savedUser = localStorage.getItem('kw_current_user');
@@ -52,12 +58,14 @@ export default function AdminPage() {
 
   const handleCreateMatch = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!newMatch.teamA || !newMatch.teamB) return;
     db.matches.add({
       ...newMatch,
       isLocked: true
     });
     toast({ title: "Match Added", description: `${newMatch.teamA} vs ${newMatch.teamB} scheduled.` });
     refresh();
+    setNewMatch({ teamA: '', teamB: '', flagA: '🏳️', flagB: '🏳️', round: 1, date: '', time: '', venue: '' });
   };
 
   const toggleLock = (matchId: string, currentStatus: boolean) => {
@@ -75,7 +83,7 @@ export default function AdminPage() {
     const match = matches.find(m => m.id === matchId);
     if (!match) return;
 
-    db.matches.update(matchId, { scoreA, scoreB, isFinished: true });
+    db.matches.update(matchId, { scoreA, scoreB, isFinished: true, isLocked: true });
 
     const predictions = db.predictions.forMatch(matchId);
     predictions.forEach(pred => {
@@ -109,15 +117,31 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <nav className="border-b border-border bg-card p-4">
-        <div className="container mx-auto flex justify-between items-center">
+    <div className="min-h-screen bg-background relative flex flex-col">
+      {/* Background Image */}
+      <div className="fixed inset-0 z-0 overflow-hidden">
+        <Image 
+          src={stadiumBg?.imageUrl || ''} 
+          alt="Stadium Background" 
+          fill 
+          className="object-cover opacity-10 blur-[4px]"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/50 to-background" />
+      </div>
+
+      <BrandingHeader compact />
+
+      <nav className="border-b border-border bg-card/50 backdrop-blur-md sticky top-0 z-40">
+        <div className="container mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="text-accent h-6 w-6" />
-            <h1 className="font-headline font-black text-xl uppercase tracking-widest">ADMIN PANEL</h1>
+            <ShieldCheck className="text-primary h-5 w-5" />
+            <h1 className="font-headline font-black text-sm uppercase tracking-widest text-primary">ADMIN CONTROL</h1>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={() => router.push('/dashboard')} className="font-bold uppercase text-[10px]">Back to App</Button>
+            <Button variant="ghost" size="sm" onClick={() => router.push('/dashboard')} className="font-bold uppercase text-[10px]">
+              <ArrowLeft className="h-3 w-3 mr-2" /> View Dashboard
+            </Button>
             <Button 
               variant="outline" 
               size="sm" 
@@ -130,24 +154,24 @@ export default function AdminPage() {
         </div>
       </nav>
 
-      <main className="container mx-auto p-4 md:p-8 space-y-8">
+      <main className="container mx-auto p-4 md:p-8 space-y-8 z-10 flex-1">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           <div className="lg:col-span-2 space-y-6">
-            <Card className="glass-morphism border-accent/20">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="font-headline font-black uppercase tracking-tighter">Live Tournament Schedule</CardTitle>
-                <Badge variant="outline" className="text-accent border-accent/30">{matches.length} Total Matches</Badge>
+            <Card className="glass-morphism rounded-none border-primary/10">
+              <CardHeader className="flex flex-row items-center justify-between border-b border-border bg-primary/5">
+                <CardTitle className="font-headline font-black uppercase tracking-tighter text-sm">Active Fixtures</CardTitle>
+                <Badge variant="outline" className="text-primary border-primary/30 rounded-none text-[9px] font-black">{matches.length} MATCHES</Badge>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="pt-6 space-y-4">
                 {matches.map(m => (
-                  <div key={m.id} className="p-4 rounded-xl border border-border bg-muted/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div key={m.id} className="p-4 rounded-none border border-border bg-white/40 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                      <div className="text-center w-12">
-                        <Badge className="bg-accent/20 text-accent mb-1 uppercase font-bold text-[9px]">R{m.round}</Badge>
+                      <div className="text-center w-12 border-r border-border pr-4">
+                        <Badge className="bg-primary/10 text-primary mb-1 uppercase font-bold text-[9px] rounded-none">R{m.round}</Badge>
                       </div>
                       <div>
-                        <p className="font-bold text-lg uppercase tracking-tighter">{m.flagA} {m.teamA} vs {m.teamB} {m.flagB}</p>
+                        <p className="font-bold text-sm uppercase tracking-tighter">{m.flagA} {m.teamA} vs {m.teamB} {m.flagB}</p>
                         <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{m.date} | {m.venue}</p>
                       </div>
                     </div>
@@ -157,20 +181,20 @@ export default function AdminPage() {
                         size="sm" 
                         variant={m.isLocked ? "outline" : "secondary"}
                         onClick={() => toggleLock(m.id, m.isLocked)}
-                        className={m.isLocked ? "text-[10px] font-bold uppercase" : "bg-green-600/10 text-green-600 hover:bg-green-600/20 text-[10px] font-bold uppercase"}
+                        className={m.isLocked ? "text-[10px] font-bold uppercase h-8 rounded-none" : "bg-green-600/10 text-green-600 hover:bg-green-600/20 text-[10px] font-bold uppercase h-8 rounded-none"}
                       >
                         {m.isLocked ? <Lock className="h-3 w-3 mr-2" /> : <Unlock className="h-3 w-3 mr-2" />}
-                        {m.isLocked ? "Unlock" : "Lock"}
+                        {m.isLocked ? "Locked" : "Unlocked"}
                       </Button>
 
                       {!m.isFinished ? (
-                        <div className="flex items-center gap-2 bg-background/50 p-1 rounded-md border border-border">
-                          <Input className="w-10 h-8 p-1 text-center bg-transparent border-none text-sm font-black" placeholder="A" id={`scoreA-${m.id}`} />
+                        <div className="flex items-center gap-2 bg-background/50 p-1 rounded-none border border-border">
+                          <Input className="w-10 h-8 p-1 text-center bg-transparent border-none text-xs font-black" placeholder="A" id={`scoreA-${m.id}`} />
                           <span className="font-bold">-</span>
-                          <Input className="w-10 h-8 p-1 text-center bg-transparent border-none text-sm font-black" placeholder="B" id={`scoreB-${m.id}`} />
+                          <Input className="w-10 h-8 p-1 text-center bg-transparent border-none text-xs font-black" placeholder="B" id={`scoreB-${m.id}`} />
                           <Button 
                             size="icon" 
-                            className="h-8 w-8 bg-primary hover:bg-primary/90"
+                            className="h-8 w-8 bg-primary hover:bg-primary/90 rounded-none"
                             onClick={() => {
                               const sA = (document.getElementById(`scoreA-${m.id}`) as HTMLInputElement).value;
                               const sB = (document.getElementById(`scoreB-${m.id}`) as HTMLInputElement).value;
@@ -181,7 +205,7 @@ export default function AdminPage() {
                           </Button>
                         </div>
                       ) : (
-                        <Badge variant="default" className="bg-primary/20 text-primary font-black uppercase text-[10px]">Finished: {m.scoreA}-{m.scoreB}</Badge>
+                        <Badge variant="default" className="bg-primary/10 text-primary border border-primary/20 font-black uppercase text-[10px] rounded-none">Final: {m.scoreA}-{m.scoreB}</Badge>
                       )}
                     </div>
                   </div>
@@ -189,88 +213,88 @@ export default function AdminPage() {
               </CardContent>
             </Card>
 
-            <Card className="glass-morphism border-primary/20">
-              <CardHeader>
-                <CardTitle className="font-headline font-black uppercase flex items-center gap-2">
-                  <Plus className="h-5 w-5 text-primary" />
-                  Add New Fixture
+            <Card className="glass-morphism rounded-none border-primary/10">
+              <CardHeader className="bg-primary/5 border-b border-border">
+                <CardTitle className="font-headline font-black uppercase text-sm flex items-center gap-2">
+                  <Plus className="h-4 w-4 text-primary" />
+                  Create New Fixture
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-6">
                 <form onSubmit={handleCreateMatch} className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="space-y-2">
                     <Label className="text-[10px] uppercase font-black opacity-60">Team A</Label>
-                    <Input placeholder="Nation A" value={newMatch.teamA} onChange={e => setNewMatch({...newMatch, teamA: e.target.value})} />
+                    <Input className="rounded-none bg-white/50 h-9" placeholder="Nation A" value={newMatch.teamA} onChange={e => setNewMatch({...newMatch, teamA: e.target.value})} />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] uppercase font-black opacity-60">Flag A</Label>
-                    <Input placeholder="Emoji" value={newMatch.flagA} onChange={e => setNewMatch({...newMatch, flagA: e.target.value})} />
+                    <Input className="rounded-none bg-white/50 h-9" placeholder="Emoji" value={newMatch.flagA} onChange={e => setNewMatch({...newMatch, flagA: e.target.value})} />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] uppercase font-black opacity-60">Team B</Label>
-                    <Input placeholder="Nation B" value={newMatch.teamB} onChange={e => setNewMatch({...newMatch, teamB: e.target.value})} />
+                    <Input className="rounded-none bg-white/50 h-9" placeholder="Nation B" value={newMatch.teamB} onChange={e => setNewMatch({...newMatch, teamB: e.target.value})} />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] uppercase font-black opacity-60">Flag B</Label>
-                    <Input placeholder="Emoji" value={newMatch.flagB} onChange={e => setNewMatch({...newMatch, flagB: e.target.value})} />
+                    <Input className="rounded-none bg-white/50 h-9" placeholder="Emoji" value={newMatch.flagB} onChange={e => setNewMatch({...newMatch, flagB: e.target.value})} />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] uppercase font-black opacity-60">Round</Label>
-                    <Input type="number" value={newMatch.round} onChange={e => setNewMatch({...newMatch, round: parseInt(e.target.value)})} />
+                    <Input className="rounded-none bg-white/50 h-9" type="number" value={newMatch.round} onChange={e => setNewMatch({...newMatch, round: parseInt(e.target.value)})} />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] uppercase font-black opacity-60">Date</Label>
-                    <Input type="date" value={newMatch.date} onChange={e => setNewMatch({...newMatch, date: e.target.value})} />
+                    <Input className="rounded-none bg-white/50 h-9" type="date" value={newMatch.date} onChange={e => setNewMatch({...newMatch, date: e.target.value})} />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] uppercase font-black opacity-60">Time</Label>
-                    <Input type="time" value={newMatch.time} onChange={e => setNewMatch({...newMatch, time: e.target.value})} />
+                    <Input className="rounded-none bg-white/50 h-9" type="time" value={newMatch.time} onChange={e => setNewMatch({...newMatch, time: e.target.value})} />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] uppercase font-black opacity-60">Venue</Label>
-                    <Input placeholder="Stadium" value={newMatch.venue} onChange={e => setNewMatch({...newMatch, venue: e.target.value})} />
+                    <Input className="rounded-none bg-white/50 h-9" placeholder="Stadium" value={newMatch.venue} onChange={e => setNewMatch({...newMatch, venue: e.target.value})} />
                   </div>
-                  <Button type="submit" className="col-span-full bg-primary hover:bg-primary/90 mt-2 font-headline font-black uppercase tracking-widest">PUBLISH SCHEDULE</Button>
+                  <Button type="submit" className="col-span-full bg-primary hover:bg-primary/90 mt-2 font-headline font-black uppercase tracking-widest rounded-none h-11">PUBLISH TO ARENA</Button>
                 </form>
               </CardContent>
             </Card>
           </div>
 
           <div className="space-y-6">
-            <Card className="glass-morphism border-accent/20">
-              <CardHeader>
-                <CardTitle className="font-headline font-black uppercase flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5 text-accent" />
-                  Bulletins
+            <Card className="glass-morphism rounded-none border-primary/10">
+              <CardHeader className="bg-primary/5 border-b border-border">
+                <CardTitle className="font-headline font-black uppercase text-sm flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4 text-primary" />
+                  Broadcaster
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="pt-6 space-y-4">
                 <Input 
                   placeholder="Announce tournament updates..." 
                   value={broadcast} 
                   onChange={e => setBroadcast(e.target.value)}
-                  className="bg-background/50 text-xs font-bold"
+                  className="bg-white/50 text-[11px] font-bold rounded-none h-10"
                 />
-                <Button onClick={sendBroadcast} className="w-full bg-accent hover:bg-accent/90 text-[10px] font-black uppercase tracking-widest">SEND BROADCAST</Button>
+                <Button onClick={sendBroadcast} className="w-full bg-primary hover:bg-primary/90 text-[10px] font-black uppercase tracking-widest rounded-none h-10">SEND BULLETIN</Button>
               </CardContent>
             </Card>
 
-            <Card className="glass-morphism border-primary/20">
-              <CardHeader>
-                <CardTitle className="font-headline font-black uppercase flex items-center gap-2">
-                  <Users className="h-5 w-5 text-primary" />
-                  Active Players
+            <Card className="glass-morphism rounded-none border-primary/10">
+              <CardHeader className="bg-primary/5 border-b border-border">
+                <CardTitle className="font-headline font-black uppercase text-sm flex items-center gap-2">
+                  <Users className="h-4 w-4 text-primary" />
+                  Leaderboard Data
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-6">
                 <div className="space-y-2">
-                  {users.map(u => (
-                    <div key={u.id} className="flex justify-between items-center p-3 rounded bg-muted/10 border border-border/50">
+                  {users.slice(0, 10).map(u => (
+                    <div key={u.id} className="flex justify-between items-center p-3 rounded-none bg-white/30 border border-border/50">
                       <div className="flex flex-col">
-                        <span className="font-bold text-xs uppercase">{u.username}</span>
+                        <span className="font-bold text-[10px] uppercase">{u.username}</span>
                         <span className="text-[8px] text-muted-foreground uppercase font-black">{u.department}</span>
                       </div>
-                      <Badge variant="outline" className="text-[9px] font-black border-primary/20 text-primary">{u.points} PTS</Badge>
+                      <Badge variant="outline" className="text-[9px] font-black border-primary/20 text-primary rounded-none">{u.points} XP</Badge>
                     </div>
                   ))}
                 </div>
