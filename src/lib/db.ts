@@ -1,3 +1,4 @@
+
 "use client";
 
 export type AcademicYear = '2nd' | '3rd' | '4th';
@@ -99,7 +100,7 @@ let userMessages: UserMessage[] = [];
 let settings: AppSettings = { leaderboardVisible: true };
 
 if (typeof window !== 'undefined') {
-  const CURRENT_DB_VERSION = 'kw_initialized_v5';
+  const CURRENT_DB_VERSION = 'kw_initialized_v6';
   const savedUsers = localStorage.getItem('kw_users');
   const savedMatches = localStorage.getItem('kw_matches');
   const savedPredictions = localStorage.getItem('kw_predictions');

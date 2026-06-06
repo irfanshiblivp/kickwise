@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -22,7 +23,6 @@ import {
   Unlock, 
   Lock, 
   CheckCircle, 
-  MessageSquare,
   LogOut,
   ArrowLeft,
   Trash2,
@@ -157,7 +157,7 @@ export default function AdminPage() {
         if (pred.scoreA === m.scoreA && pred.scoreB === m.scoreB) {
           pointsAwarded = 10;
         } else {
-          const actualWinner = m.scoreA! > m.scoreB! ? 'A' : m.scoreA! < m.scoreB! ? 'B' : 'Draw';
+          const actualWinner = (m.scoreA ?? 0) > (m.scoreB ?? 0) ? 'A' : (m.scoreA ?? 0) < (m.scoreB ?? 0) ? 'B' : 'Draw';
           const predictedWinner = pred.scoreA > pred.scoreB ? 'A' : pred.scoreA < pred.scoreB ? 'B' : 'Draw';
           if (actualWinner === predictedWinner) pointsAwarded = 5;
         }

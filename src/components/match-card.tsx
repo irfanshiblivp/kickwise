@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -6,10 +7,9 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MapPin, Lock, Trophy, Timer, AlertTriangle, Sparkles, Loader2 } from 'lucide-react';
+import { Calendar, MapPin, Lock, Trophy, Timer, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
-import { predictMatch, type PredictionAssistantOutput } from '@/ai/flows/prediction-assistant-flow';
 
 interface MatchCardProps {
   match: Match;
@@ -23,8 +23,6 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
   const [scoreB, setScoreB] = useState(existingPrediction?.scoreB.toString() || '');
   const [isAutoLocked, setIsAutoLocked] = useState(false);
   const [isClosingSoon, setIsClosingSoon] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [aiAnalysis, setAiAnalysis] = useState<PredictionAssistantOutput | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -73,25 +71,6 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
     onPredictionSubmit();
   };
 
-  const handleGetAiInsight = async () => {
-    setIsAnalyzing(true);
-    try {
-      const result = await predictMatch({
-        teamA: match.teamA,
-        teamB: match.teamB,
-        pastMatchesData: `Previous encounter history for ${match.teamA} and ${match.teamB} in international tournaments.`,
-        teamAStats: `${match.teamA} recent form and world ranking.`,
-        teamBStats: `${match.teamB} recent form and world ranking.`,
-        matchContext: `${match.group} - FIFA World Cup 2026 at ${match.venue}`
-      });
-      setAiAnalysis(result);
-    } catch (error) {
-      toast({ title: "AI Assistant Offline", description: "Could not generate insights at this time.", variant: "destructive" });
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
-
   const isUrl = (str: string) => str.startsWith('http') || str.startsWith('https') || str.startsWith('/');
 
   const format12h = (time24: string) => {
@@ -103,7 +82,7 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
   };
 
   return (
-    <Card className={`glass-morphism rounded-none border-primary/10 relative overflow-hidden transition-all duration-300 animate-fade-in-up ${effectiveLocked && !match.isFinished ? 'opacity-80' : 'hover:border-primary/40 hover:shadow-2xl hover:-translate-y-1'}`}>
+    <Card className={`glass-morphism rounded-none border-primary/10 relative overflow-hidden transition-all duration-300 animate-fade-in-up ${effectiveLocked && !match.isFinished ? 'opacity-90' : 'hover:border-primary/40 hover:shadow-2xl hover:-translate-y-1'}`}>
       {isClosingSoon && !effectiveLocked && (
         <div className="absolute top-0 left-0 w-full h-1 bg-amber-500 animate-pulse z-50" />
       )}
@@ -176,17 +155,6 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
           </div>
         </div>
 
-        {aiAnalysis && (
-          <div className="bg-primary/5 border border-primary/20 p-4 space-y-2 animate-fade-in-up">
-            <div className="flex items-center gap-2 text-primary">
-              <Sparkles className="h-3 w-3" />
-              <span className="text-[9px] font-black uppercase tracking-widest">AI Analyst Prediction</span>
-            </div>
-            <p className="text-[10px] font-black uppercase">Suggested: {aiAnalysis.predictedScore} ({aiAnalysis.predictedOutcome})</p>
-            <p className="text-[9px] text-muted-foreground leading-relaxed italic line-clamp-2">{aiAnalysis.insights}</p>
-          </div>
-        )}
-
         {match.isFinished ? (
           <div className="bg-primary/5 p-3 border border-primary/10">
             <div className="flex items-center justify-center gap-2 text-primary">
@@ -201,9 +169,9 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
                 {existingPrediction.scoreA === match.scoreA && existingPrediction.scoreB === match.scoreB ? (
                   <p className="text-[8px] text-green-600 font-black mt-1 animate-bounce">+10 POINTS EARNED</p>
                 ) : (
-                  ((existingPrediction.scoreA > existingPrediction.scoreB && match.scoreA! > match.scoreB!) ||
-                   (existingPrediction.scoreA < existingPrediction.scoreB && match.scoreA! < match.scoreB!) ||
-                   (existingPrediction.scoreA === existingPrediction.scoreB && match.scoreA! === match.scoreB!)) &&
+                  ((existingPrediction.scoreA > existingPrediction.scoreB && (match.scoreA ?? 0) > (match.scoreB ?? 0)) ||
+                   (existingPrediction.scoreA < existingPrediction.scoreB && (match.scoreA ?? 0) < (match.scoreB ?? 0)) ||
+                   (existingPrediction.scoreA === existingPrediction.scoreB && (match.scoreA ?? 0) === (match.scoreB ?? 0))) &&
                   <p className="text-[8px] text-amber-600 font-black mt-1 animate-bounce">+5 POINTS EARNED</p>
                 )}
               </div>
@@ -235,29 +203,22 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
               </div>
             </div>
             
-            <div className="grid grid-cols-1 gap-2">
-              <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white font-black uppercase text-[10px] tracking-widest rounded-none h-10 transition-transform active:scale-95 shadow-md hover:shadow-primary/20">
-                LOCK PREDICTION
-              </Button>
-              {!aiAnalysis && (
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  disabled={isAnalyzing}
-                  onClick={handleGetAiInsight}
-                  className="w-full border-primary/20 text-primary hover:bg-primary/5 font-black uppercase text-[9px] tracking-widest rounded-none h-8"
-                >
-                  {isAnalyzing ? <Loader2 className="h-3 w-3 animate-spin mr-2" /> : <Sparkles className="h-3 w-3 mr-2" />}
-                  {isAnalyzing ? "ANALYZING..." : "GET AI INSIGHT"}
-                </Button>
-              )}
-            </div>
+            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white font-black uppercase text-[10px] tracking-widest rounded-none h-10 transition-transform active:scale-95 shadow-md hover:shadow-primary/20">
+              LOCK PREDICTION
+            </Button>
           </form>
         ) : (
-          <div className="bg-muted/40 p-3 text-center">
-            <p className="text-[10px] font-bold uppercase text-muted-foreground">Entries are closed for this match.</p>
-            {existingPrediction && (
-              <p className="text-[9px] font-black uppercase mt-1">Your Prediction: {existingPrediction.scoreA} - {existingPrediction.scoreB}</p>
+          <div className="bg-muted/40 p-4 text-center border border-border/50">
+            <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest mb-2">Predictions Locked</p>
+            {existingPrediction ? (
+              <div className="space-y-1">
+                <p className="text-[11px] font-black uppercase text-primary">Your Final Entry</p>
+                <div className="text-2xl font-headline font-black tracking-widest">
+                  {existingPrediction.scoreA} : {existingPrediction.scoreB}
+                </div>
+              </div>
+            ) : (
+              <p className="text-[9px] font-bold uppercase text-destructive italic">No prediction was submitted.</p>
             )}
           </div>
         )}
