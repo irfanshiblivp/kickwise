@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { LogOut, Trophy, MessageSquare, LayoutDashboard, ListOrdered, User as UserIcon } from 'lucide-react';
+import { LogOut, Trophy, MessageSquare, LayoutDashboard, ListOrdered } from 'lucide-react';
 import { Toaster } from '@/components/ui/toaster';
 
 export default function DashboardPage() {
@@ -27,7 +27,6 @@ export default function DashboardPage() {
       return;
     }
     const parsedUser = JSON.parse(savedUser);
-    // Refresh user data from "DB" to get latest points
     const freshUser = db.users.find(parsedUser.username);
     setUser(freshUser || parsedUser);
     refreshData();
@@ -37,7 +36,6 @@ export default function DashboardPage() {
     setMatches(db.matches.all());
     setBroadcasts(db.broadcasts.all());
     setLeaderboard(db.users.all());
-    // Also update local user state points
     const savedUser = localStorage.getItem('kw_current_user');
     if (savedUser) {
       const parsed = JSON.parse(savedUser);
@@ -70,12 +68,18 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <div className="hidden sm:flex flex-col items-end">
+            <div className="hidden sm:flex flex-col items-end mr-2">
               <span className="text-xs font-black uppercase">{user.username}</span>
               <span className="text-[9px] text-muted-foreground font-bold">{user.year} {user.department}</span>
             </div>
-            <Button variant="ghost" size="icon" onClick={logout} className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive">
-              <LogOut className="h-4 w-4" />
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={logout} 
+              className="h-9 px-4 hover:bg-destructive/10 hover:text-destructive text-xs font-bold uppercase tracking-wider transition-colors border-primary/10"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Logout
             </Button>
           </div>
         </div>
