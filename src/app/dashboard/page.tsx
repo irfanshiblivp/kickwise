@@ -11,7 +11,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { LogOut, Trophy, MessageSquare, LayoutDashboard, ListOrdered } from 'lucide-react';
+import { LogOut, Trophy, MessageSquare, LayoutDashboard, ListOrdered, Filter } from 'lucide-react';
 import { Toaster } from '@/components/ui/toaster';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -23,6 +23,7 @@ export default function DashboardPage() {
   const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
   const [leaderboard, setLeaderboard] = useState<User[]>([]);
   const [activeTab, setActiveTab] = useState('upcoming');
+  const [selectedRound, setSelectedRound] = useState<string>('all');
   const stadiumBg = PlaceHolderImages.find(img => img.id === 'stadium-bg');
 
   useEffect(() => {
@@ -55,20 +56,27 @@ export default function DashboardPage() {
   };
 
   const filteredMatches = useMemo(() => {
-    if (activeTab === 'upcoming') {
-      return matches.filter(m => !m.isFinished).sort((a, b) => {
+    let base = activeTab === 'upcoming' 
+      ? matches.filter(m => !m.isFinished)
+      : matches.filter(m => m.isFinished);
+
+    if (selectedRound !== 'all') {
+      base = base.filter(m => m.round.toString() === selectedRound);
+    }
+
+    return base.sort((a, b) => {
+      if (activeTab === 'upcoming') {
         if (a.isLocked !== b.isLocked) return a.isLocked ? 1 : -1;
         return new Date(a.date).getTime() - new Date(b.date).getTime();
-      });
-    }
-    return matches.filter(m => m.isFinished).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }, [matches, activeTab]);
+      }
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
+  }, [matches, activeTab, selectedRound]);
 
   if (!user) return null;
 
   return (
     <div className="min-h-screen relative flex flex-col bg-background">
-      {/* Stadium Background */}
       <div className="fixed inset-0 z-0 overflow-hidden">
         <Image 
           src={stadiumBg?.imageUrl || ''} 
@@ -116,18 +124,40 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           
           <div className="lg:col-span-3 space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <h2 className="text-2xl font-headline font-black flex items-center gap-2 tracking-tighter uppercase">
-                <LayoutDashboard className="h-6 w-6 text-primary" />
-                Live Matches
-              </h2>
-              
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto">
-                <TabsList className="bg-muted/50 border border-border w-full rounded-none">
-                  <TabsTrigger value="upcoming" className="flex-1 rounded-none text-[10px] font-bold uppercase">Active Fixtures</TabsTrigger>
-                  <TabsTrigger value="finished" className="flex-1 rounded-none text-[10px] font-bold uppercase">Past Results</TabsTrigger>
-                </TabsList>
-              </Tabs>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+              <div className="space-y-4 w-full">
+                <h2 className="text-2xl font-headline font-black flex items-center gap-2 tracking-tighter uppercase">
+                  <LayoutDashboard className="h-6 w-6 text-primary" />
+                  Arena Dashboard
+                </h2>
+                
+                <div className="flex flex-wrap items-center gap-3">
+                  <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full sm:w-auto">
+                    <TabsList className="bg-muted/50 border border-border w-full rounded-none h-11">
+                      <TabsTrigger value="upcoming" className="flex-1 rounded-none text-[10px] font-bold uppercase">Active Fixtures</TabsTrigger>
+                      <TabsTrigger value="finished" className="flex-1 rounded-none text-[10px] font-bold uppercase">Past Results</TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+
+                  <div className="flex bg-muted/50 border border-border p-1 rounded-none overflow-x-auto whitespace-nowrap">
+                    {[
+                      { id: 'all', label: 'ALL ROUNDS' },
+                      { id: '1', label: 'R1' },
+                      { id: '2', label: 'R2' },
+                      { id: '3', label: 'R3' },
+                      { id: '4', label: 'KNOCKOUTS' }
+                    ].map(round => (
+                      <button
+                        key={round.id}
+                        onClick={() => setSelectedRound(round.id)}
+                        className={`px-3 py-1.5 text-[9px] font-black uppercase transition-all ${selectedRound === round.id ? 'bg-primary text-white shadow-lg' : 'text-muted-foreground hover:text-primary'}`}
+                      >
+                        {round.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="bento-grid">
@@ -143,7 +173,7 @@ export default function DashboardPage() {
                 ))
               ) : (
                 <div className="col-span-full py-20 text-center glass-morphism rounded-none border border-dashed border-muted">
-                  <p className="text-muted-foreground font-bold uppercase text-xs tracking-widest">No matches available.</p>
+                  <p className="text-muted-foreground font-bold uppercase text-xs tracking-widest">No matches found for this selection.</p>
                 </div>
               )}
             </div>
@@ -154,7 +184,7 @@ export default function DashboardPage() {
               <CardHeader className="pb-3 border-b border-border bg-primary/5">
                 <CardTitle className="text-sm font-headline font-black uppercase flex items-center gap-2">
                   <ListOrdered className="h-4 w-4 text-primary" />
-                  Hall of Fame
+                  Leaderboard
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4 p-0">
@@ -181,7 +211,7 @@ export default function DashboardPage() {
               <CardHeader className="pb-3 border-b border-border bg-primary/5">
                 <CardTitle className="text-sm font-headline font-black uppercase flex items-center gap-2">
                   <MessageSquare className="h-4 w-4 text-primary" />
-                  Bulletins
+                  Admin Bulletins
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4 px-0">
@@ -207,7 +237,6 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
-      
       <Toaster />
     </div>
   );

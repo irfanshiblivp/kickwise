@@ -52,17 +52,12 @@ export interface UserMessage {
   timestamp: string;
 }
 
-// Initial Data based on FIFA World Cup 2026 Schedule
 const INITIAL_MATCHES: Match[] = [
   // ROUND 1 (OPEN)
   { id: 'm1', round: 1, group: 'Group A', teamA: 'Mexico', teamB: 'South Africa', flagA: '🇲🇽', flagB: '🇿🇦', date: '2026-06-11', time: '18:00', venue: 'Mexico City Stadium', isLocked: false, isFinished: false },
   { id: 'm2', round: 1, group: 'Group A', teamA: 'Korea Republic', teamB: 'Czechia', flagA: '🇰🇷', flagB: '🇨🇿', date: '2026-06-11', time: '21:00', venue: 'Estadio Guadalajara', isLocked: false, isFinished: false },
   { id: 'm3', round: 1, group: 'Group B', teamA: 'Canada', teamB: 'Bosnia and Herzegovina', flagA: '🇨🇦', flagB: '🇧🇦', date: '2026-06-12', time: '19:00', venue: 'Toronto Stadium', isLocked: false, isFinished: false },
   { id: 'm4', round: 1, group: 'Group D', teamA: 'USA', teamB: 'Paraguay', flagA: '🇺🇸', flagB: '🇵🇾', date: '2026-06-12', time: '20:00', venue: 'Los Angeles Stadium', isLocked: false, isFinished: false },
-  { id: 'm5', round: 1, group: 'Group C', teamA: 'Haiti', teamB: 'Scotland', flagA: '🇭🇹', flagB: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', date: '2026-06-13', time: '15:00', venue: 'Boston Stadium', isLocked: false, isFinished: false },
-  { id: 'm6', round: 1, group: 'Group D', teamA: 'Australia', teamB: 'Türkiye', flagA: '🇦🇺', flagB: '🇹🇷', date: '2026-06-13', time: '17:00', venue: 'BC Place Vancouver', isLocked: false, isFinished: false },
-  { id: 'm7', round: 1, group: 'Group C', teamA: 'Brazil', teamB: 'Morocco', flagA: '🇧🇷', flagB: '🇲🇦', date: '2026-06-13', time: '19:00', venue: 'New York New Jersey Stadium', isLocked: false, isFinished: false },
-  { id: 'm8', round: 1, group: 'Group B', teamA: 'Qatar', teamB: 'Switzerland', flagA: '🇶🇦', flagB: '🇨🇭', date: '2026-06-13', time: '21:00', venue: 'San Francisco Bay Area Stadium', isLocked: false, isFinished: false },
   
   // ROUND 2 (LOCKED)
   { id: 'm25', round: 2, group: 'Group A', teamA: 'Mexico', teamB: 'Korea Republic', flagA: '🇲🇽', flagB: '🇰🇷', date: '2026-06-16', time: '20:00', venue: 'Estadio Guadalajara', isLocked: true, isFinished: false },

@@ -14,6 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { useToast } from '@/hooks/use-toast';
 import { Toaster } from '@/components/ui/toaster';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   ShieldCheck, 
   Plus, 
@@ -25,7 +26,8 @@ import {
   LogOut,
   ArrowLeft,
   Trash2,
-  Mail
+  Mail,
+  Upload
 } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -64,7 +66,10 @@ export default function AdminPage() {
 
   const handleCreateMatch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMatch.teamA || !newMatch.teamB) return;
+    if (!newMatch.teamA || !newMatch.teamB) {
+      toast({ title: "Validation Error", description: "Teams names are required.", variant: "destructive" });
+      return;
+    }
     db.matches.add({
       ...newMatch,
       isLocked: true
@@ -94,6 +99,7 @@ export default function AdminPage() {
   const handleUpdateScore = (matchId: string, scoreA: number, scoreB: number) => {
     db.matches.update(matchId, { scoreA, scoreB, isFinished: true, isLocked: true });
 
+    // Points logic
     const predictions = db.predictions.forMatch(matchId);
     predictions.forEach(pred => {
       let pointsAwarded = 0;
@@ -163,14 +169,79 @@ export default function AdminPage() {
       <main className="container mx-auto p-4 md:p-8 space-y-8 z-10 flex-1">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-8">
+            {/* Create Match Form */}
+            <Card className="glass-morphism rounded-none classic-border">
+              <CardHeader className="bg-primary/5 border-b border-border">
+                <CardTitle className="font-headline font-black uppercase tracking-tighter text-sm flex items-center gap-2">
+                  <Plus className="h-4 w-4 text-primary" />
+                  Enter New Match
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <form onSubmit={handleCreateMatch} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase text-muted-foreground">Team A & Flag</Label>
+                    <div className="flex gap-2">
+                      <Input placeholder="Team A" value={newMatch.teamA} onChange={e => setNewMatch({...newMatch, teamA: e.target.value})} className="rounded-none bg-card/50 border-border text-xs h-10" />
+                      <Input placeholder="Flag A" value={newMatch.flagA} onChange={e => setNewMatch({...newMatch, flagA: e.target.value})} className="w-20 rounded-none bg-card/50 border-border text-xs h-10" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase text-muted-foreground">Team B & Flag</Label>
+                    <div className="flex gap-2">
+                      <Input placeholder="Team B" value={newMatch.teamB} onChange={e => setNewMatch({...newMatch, teamB: e.target.value})} className="rounded-none bg-card/50 border-border text-xs h-10" />
+                      <Input placeholder="Flag B" value={newMatch.flagB} onChange={e => setNewMatch({...newMatch, flagB: e.target.value})} className="w-20 rounded-none bg-card/50 border-border text-xs h-10" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase text-muted-foreground">Round</Label>
+                      <Select value={newMatch.round.toString()} onValueChange={v => setNewMatch({...newMatch, round: parseInt(v)})}>
+                        <SelectTrigger className="rounded-none bg-card/50 border-border text-xs h-10">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1">Round 1</SelectItem>
+                          <SelectItem value="2">Round 2</SelectItem>
+                          <SelectItem value="3">Round 3</SelectItem>
+                          <SelectItem value="4">Knockouts</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase text-muted-foreground">Group</Label>
+                      <Input placeholder="Group A" value={newMatch.group} onChange={e => setNewMatch({...newMatch, group: e.target.value})} className="rounded-none bg-card/50 border-border text-xs h-10" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase text-muted-foreground">Date</Label>
+                      <Input type="date" value={newMatch.date} onChange={e => setNewMatch({...newMatch, date: e.target.value})} className="rounded-none bg-card/50 border-border text-xs h-10" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase text-muted-foreground">Time</Label>
+                      <Input type="time" value={newMatch.time} onChange={e => setNewMatch({...newMatch, time: e.target.value})} className="rounded-none bg-card/50 border-border text-xs h-10" />
+                    </div>
+                  </div>
+                  <div className="md:col-span-2 space-y-2">
+                    <Label className="text-[10px] font-black uppercase text-muted-foreground">Venue</Label>
+                    <Input placeholder="Stadium Name" value={newMatch.venue} onChange={e => setNewMatch({...newMatch, venue: e.target.value})} className="rounded-none bg-card/50 border-border text-xs h-10" />
+                  </div>
+                  <Button type="submit" className="md:col-span-2 w-full bg-primary hover:bg-primary/90 rounded-none font-black uppercase text-xs h-11 shadow-lg">
+                    CREATE OFFICIAL FIXTURE
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+
             <Card className="glass-morphism rounded-none classic-border">
               <CardHeader className="flex flex-row items-center justify-between border-b border-border bg-primary/5">
                 <CardTitle className="font-headline font-black uppercase tracking-tighter text-sm">Active Fixtures</CardTitle>
                 <Badge variant="outline" className="text-primary border-primary/30 rounded-none text-[9px] font-black">{matches.length} MATCHES</Badge>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
-                {matches.map(m => (
+                {matches.sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()).map(m => (
                   <div key={m.id} className="p-4 rounded-none border border-border bg-card/40 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all">
                     <div className="flex items-center gap-4">
                       <div className="text-center w-12 border-r border-border pr-4">
@@ -189,7 +260,7 @@ export default function AdminPage() {
                         size="sm" 
                         variant={m.isLocked ? "outline" : "secondary"}
                         onClick={() => toggleLock(m.id, m.isLocked)}
-                        className={m.isLocked ? "text-[10px] font-bold uppercase h-8 rounded-none" : "bg-green-600/10 text-green-600 hover:bg-green-600/20 text-[10px] font-bold uppercase h-8 rounded-none"}
+                        className={m.isLocked ? "text-[10px] font-bold uppercase h-8 rounded-none w-24" : "bg-green-600/10 text-green-600 hover:bg-green-600/20 text-[10px] font-bold uppercase h-8 rounded-none w-24"}
                       >
                         {m.isLocked ? <Lock className="h-3 w-3 mr-2" /> : <Unlock className="h-3 w-3 mr-2" />}
                         {m.isLocked ? "Locked" : "Unlocked"}
