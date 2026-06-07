@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -82,17 +83,25 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
           
           <div className="py-2" />
 
-          <div className="space-y-2">
-            <h2 className={`${compact ? 'text-2xl' : 'text-3xl md:text-4xl'} font-headline font-black text-primary tracking-widest uppercase`}>
-              dhruva and Department of Computer Science
+          <div className="flex flex-col items-center gap-1 md:gap-2">
+            <h2 className={`${compact ? 'text-2xl md:text-3xl' : 'text-4xl md:text-6xl'} font-headline font-black text-primary tracking-widest uppercase`}>
+              Dhruva 2026
             </h2>
             
-            <p className={`${compact ? 'text-[10px]' : 'text-lg md:text-xl'} font-headline font-black text-primary tracking-widest uppercase`}>
+            <span className="text-[10px] md:text-sm font-body font-medium text-foreground opacity-80 lowercase italic">
+              And
+            </span>
+
+            <h3 className={`${compact ? 'text-[9px] md:text-xs' : 'text-xs md:text-xl'} font-headline font-black text-primary tracking-[0.1em] uppercase whitespace-nowrap`}>
+              Department of Computer Science and Engineering
+            </h3>
+            
+            <p className={`${compact ? 'text-[7px]' : 'text-[10px] md:text-xs'} font-headline font-black text-primary/70 tracking-[0.3em] uppercase mt-1`}>
               CSE Association Munnar
             </p>
           </div>
           
-          <p className="text-[11px] font-headline font-black italic text-primary/70 uppercase tracking-[0.3em] mt-4">
+          <p className="text-[11px] font-headline font-black italic text-primary/70 uppercase tracking-[0.3em] mt-6">
             Presents
           </p>
         </div>
