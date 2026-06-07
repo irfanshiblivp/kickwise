@@ -84,11 +84,11 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
 
           <div className="space-y-2">
             <h2 className={`${compact ? 'text-2xl' : 'text-3xl md:text-4xl'} font-headline font-black text-primary tracking-widest uppercase`}>
-              Dhruva
+              dhruva and Department of Computer Science
             </h2>
             
             <p className={`${compact ? 'text-[10px]' : 'text-lg md:text-xl'} font-headline font-black text-primary tracking-widest uppercase`}>
-              Department of Computer Science and Engineering
+              CSE Association Munnar
             </p>
           </div>
           

@@ -349,7 +349,7 @@ export default function AdminPage() {
                 <Badge variant="outline" className="text-primary border-primary/30 rounded-none text-[9px] font-black tracking-widest px-4 py-1">{matches.length} REGISTERED</Badge>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
-                {matches.length > 0 ? matches.sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()).map(m => (
+                {matches.length > 0 ? [...matches].sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()).map(m => (
                   <div key={m.id} className="p-6 rounded-none border border-border bg-background/40 hover:bg-primary/5 transition-all">
                     {editingMatch === m.id ? (
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
