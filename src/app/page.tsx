@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { Trophy, ChevronRight, UserPlus, LogIn, Info, Star, Send, MessageSquare } from 'lucide-react';
+import { Trophy, ChevronRight, UserPlus, LogIn, Star, Send, MessageSquare } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { db } from '@/lib/db';
@@ -39,7 +39,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen relative flex flex-col items-center bg-background selection:bg-primary selection:text-white overflow-x-hidden">
-      {/* Stadium Background - Visibility Increased */}
+      {/* Stadium Background */}
       <div className="fixed inset-0 z-0 overflow-hidden">
         <Image 
           src={stadiumBg?.imageUrl || ''} 
@@ -101,7 +101,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Points & Messaging Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full mb-20">
           <Card className="glass-morphism rounded-none classic-border animate-fade-in-up delay-1">
             <CardHeader className="bg-primary/5 border-b border-primary/10">
