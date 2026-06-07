@@ -78,7 +78,7 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
           <div className="py-2" />
 
           <div className="flex flex-col items-center gap-1 md:gap-2">
-            <h2 className={`${compact ? 'text-xl md:text-2xl' : 'text-2xl md:text-4xl'} font-headline font-black text-primary tracking-widest uppercase`}>
+            <h2 className={`${compact ? 'text-lg md:text-xl' : 'text-xl md:text-3xl'} font-headline font-black text-primary tracking-widest uppercase`}>
               Dhruva 2026
             </h2>
             
@@ -103,13 +103,13 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
               <Image 
                 src={kickwiseLogo?.imageUrl || ''} 
                 alt="Kickwise Logo" 
-                width={160} 
-                height={160} 
+                width={300} 
+                height={300} 
                 className="object-contain animate-pop"
                 priority
               />
             </a>
-            <div className="w-48 h-[1px] bg-primary/20" />
+            <div className="w-64 h-[1px] bg-primary/20" />
             <p className="text-xs md:text-sm font-headline font-black text-foreground tracking-[0.5em] uppercase">
               2026 PREDICTION ARENA
             </p>
