@@ -96,10 +96,6 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
               <span>Department of</span>
               <span>Computer Science and Engineering</span>
             </div>
-            
-            <p className={`${compact ? 'text-[7px]' : 'text-[10px] md:text-xs'} font-headline font-black text-primary/70 tracking-[0.3em] uppercase mt-1`}>
-              CSE Association Munnar
-            </p>
           </div>
           
           <p className="text-[11px] font-headline font-black italic text-primary/70 uppercase tracking-[0.3em] mt-6">
