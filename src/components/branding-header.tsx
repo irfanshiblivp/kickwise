@@ -11,10 +11,8 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
 
   useEffect(() => {
     setMounted(true);
-    // Initial check for dark mode
     setIsDark(document.documentElement.classList.contains('dark'));
     
-    // Observer to watch for theme class changes
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.attributeName === 'class') {
@@ -29,15 +27,11 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
 
   const leftLogoDark = PlaceHolderImages.find(img => img.id === 'left-logo');
   const leftLogoLight = PlaceHolderImages.find(img => img.id === 'left-logo-light');
-  
   const cemLogo = PlaceHolderImages.find(img => img.id === 'cem-logo');
-  
   const rightAltLogoDark = PlaceHolderImages.find(img => img.id === 'right-alt-logo');
   const rightAltLogoLight = PlaceHolderImages.find(img => img.id === 'right-alt-logo-light');
-  
   const kickwiseLogo = PlaceHolderImages.find(img => img.id === 'kickwise-logo');
 
-  // Logic to select the correct logo based on the current theme
   const currentLeftLogo = (!mounted || isDark) ? leftLogoDark : (leftLogoLight || leftLogoDark);
   const currentRightLogo = (!mounted || isDark) ? rightAltLogoDark : (rightAltLogoLight || rightAltLogoDark);
 
@@ -108,9 +102,10 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
              <Image 
               src={kickwiseLogo?.imageUrl || ''} 
               alt="Kickwise Logo" 
-              width={140} 
-              height={140} 
+              width={160} 
+              height={160} 
               className="object-contain animate-pop"
+              priority
             />
             <div className="w-48 h-[1px] bg-primary/20" />
             <p className="text-xs md:text-sm font-headline font-black text-foreground tracking-[0.5em] uppercase">
