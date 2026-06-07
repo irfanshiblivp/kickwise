@@ -1,6 +1,8 @@
+
 import type {Metadata} from 'next';
 import './globals.css';
 import { MatchNotifier } from '@/components/match-notifier';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export const metadata: Metadata = {
   title: 'Kickwise 2026 | Dhruva CEM Munnar',
@@ -21,6 +23,7 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased bg-background text-foreground min-h-screen">
         <MatchNotifier />
+        <ThemeToggle />
         {children}
       </body>
     </html>

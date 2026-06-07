@@ -11,7 +11,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ThemeToggle } from '@/components/theme-toggle';
 import { useToast } from '@/hooks/use-toast';
 import { Toaster } from '@/components/ui/toaster';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -38,7 +37,7 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
-import Image from 'next/image';
+import Image from 'image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const STADIUMS = {
@@ -229,7 +228,6 @@ export default function AdminPage() {
             <h1 className="font-headline font-black text-xs uppercase tracking-[0.3em] text-primary">Command Center</h1>
           </div>
           <div className="flex items-center gap-4">
-            <ThemeToggle />
             <Button variant="outline" size="sm" onClick={() => router.push('/dashboard')} className="font-black uppercase text-[9px] tracking-widest rounded-none border-primary/20">
               <ArrowLeft className="h-3 w-3 mr-2" /> User View
             </Button>

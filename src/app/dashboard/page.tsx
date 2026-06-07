@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ThemeToggle } from '@/components/theme-toggle';
 import { 
   LogOut, 
   Trophy, 
@@ -118,7 +117,6 @@ export default function DashboardPage() {
             )}
           </div>
           <div className="flex items-center gap-3">
-            <ThemeToggle />
             <div className="hidden sm:flex flex-col items-end mr-2">
               <span className="text-[10px] font-black uppercase text-primary tracking-widest">{user.username}</span>
               <span className="text-[9px] text-muted-foreground font-bold uppercase">{user.year} {user.department}</span>

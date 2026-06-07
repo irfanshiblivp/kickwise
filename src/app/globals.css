@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -23,7 +24,7 @@
     --border: 40 20% 85%;
     --input: 40 20% 85%;
     --ring: 45 93% 40%;
-    --radius: 0.5rem;
+    --radius: 0rem;
   }
 
   .dark {
@@ -68,7 +69,8 @@
 }
 
 .glass-morphism {
-  @apply bg-card/70 backdrop-blur-xl border border-white/10 dark:border-white/5;
+  @apply bg-card/70 backdrop-blur-xl border border-white/10 dark:border-white/5 shadow-xl;
+  transition: all 0.3s ease;
 }
 
 .hero-overlay {
@@ -119,3 +121,18 @@
 .delay-1 { animation-delay: 0.1s; }
 .delay-2 { animation-delay: 0.2s; }
 .delay-3 { animation-delay: 0.3s; }
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-background;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-primary/20 hover:bg-primary/40 transition-colors;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
