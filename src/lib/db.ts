@@ -89,9 +89,8 @@ const INITIAL_MATCHES: Match[] = [
   { id: 'm23', round: 1, group: 'Group L', teamA: 'Ghana', teamB: 'Panama', flagA: '🇬🇭', flagB: '🇵🇦', date: '2026-06-18', time: '04:30', venue: 'Toronto Stadium', isLocked: false, isFinished: false },
   { id: 'm24', round: 1, group: 'Group K', teamA: 'Uzbekistan', teamB: 'Colombia', flagA: '🇺🇿', flagB: '🇨🇴', date: '2026-06-18', time: '07:30', venue: 'Mexico City Stadium', isLocked: false, isFinished: false },
 
-  // Round 2 - 19 June 2026
+  // Round 2
   { id: 'm25', round: 2, teamA: 'Czechia', teamB: 'South Africa', flagA: '🇨🇿', flagB: '🇿🇦', date: '2026-06-19', time: '21:30', venue: 'Mercedes-Benz Stadium (Atlanta)', isLocked: false, isFinished: false },
-  // Round 2 - 20 June 2026
   { id: 'm26', round: 2, teamA: 'Switzerland', teamB: 'Bosnia & Herzegovina', flagA: '🇨🇭', flagB: '🇧🇦', date: '2026-06-20', time: '00:30', venue: 'SoFi Stadium (Los Angeles)', isLocked: false, isFinished: false },
   { id: 'm27', round: 2, teamA: 'Canada', teamB: 'Qatar', flagA: '🇨🇦', flagB: '🇶🇦', date: '2026-06-20', time: '03:30', venue: 'BC Place (Vancouver)', isLocked: false, isFinished: false },
   { id: 'm28', round: 2, teamA: 'Mexico', teamB: 'South Korea', flagA: '🇲🇽', flagB: '🇰🇷', date: '2026-06-20', time: '06:30', venue: 'Estadio Akron (Guadalajara)', isLocked: false, isFinished: false },
@@ -100,25 +99,47 @@ const INITIAL_MATCHES: Match[] = [
   { id: 'm31', round: 2, teamA: 'Brazil', teamB: 'Haiti', flagA: '🇧🇷', flagB: '🇭🇹', date: '2026-06-20', time: '06:00', venue: 'Lincoln Financial Field (Philadelphia)', isLocked: false, isFinished: false },
   { id: 'm32', round: 2, teamA: 'Türkiye', teamB: 'Paraguay', flagA: '🇹🇷', flagB: '🇵🇾', date: '2026-06-20', time: '08:30', venue: 'Levi\'s Stadium (SF Bay Area)', isLocked: false, isFinished: false },
   { id: 'm33', round: 2, teamA: 'Netherlands', teamB: 'Sweden', flagA: '🇳🇱', flagB: '🇸🇪', date: '2026-06-20', time: '22:30', venue: 'NRG Stadium (Houston)', isLocked: false, isFinished: false },
-  // Round 2 - 21 June 2026
   { id: 'm34', round: 2, teamA: 'Germany', teamB: 'Côte d\'Ivoire', flagA: '🇩🇪', flagB: '🇨🇮', date: '2026-06-21', time: '01:30', venue: 'BMO Field (Toronto)', isLocked: false, isFinished: false },
   { id: 'm35', round: 2, teamA: 'Ecuador', teamB: 'Curaçao', flagA: '🇪🇨', flagB: '🇨🇼', date: '2026-06-21', time: '05:30', venue: 'Arrowhead Stadium (Kansas City)', isLocked: false, isFinished: false },
   { id: 'm36', round: 2, teamA: 'Tunisia', teamB: 'Japan', flagA: '🇹🇳', flagB: '🇯🇵', date: '2026-06-21', time: '09:30', venue: 'Estadio BBVA (Monterrey)', isLocked: false, isFinished: false },
   { id: 'm37', round: 2, teamA: 'Spain', teamB: 'Saudi Arabia', flagA: '🇪🇸', flagB: '🇸🇦', date: '2026-06-21', time: '21:30', venue: 'Mercedes-Benz Stadium (Atlanta)', isLocked: false, isFinished: false },
-  // Round 2 - 22 June 2026
   { id: 'm38', round: 2, teamA: 'Belgium', teamB: 'Iran', flagA: '🇧🇪', flagB: '🇮🇷', date: '2026-06-22', time: '00:30', venue: 'SoFi Stadium (Los Angeles)', isLocked: false, isFinished: false },
   { id: 'm39', round: 2, teamA: 'Uruguay', teamB: 'Cabo Verde', flagA: '🇺🇾', flagB: '🇨🇻', date: '2026-06-22', time: '03:30', venue: 'Hard Rock Stadium (Miami)', isLocked: false, isFinished: false },
   { id: 'm40', round: 2, teamA: 'New Zealand', teamB: 'Egypt', flagA: '🇳🇿', flagB: '🇪🇬', date: '2026-06-22', time: '06:30', venue: 'BC Place (Vancouver)', isLocked: false, isFinished: false },
   { id: 'm41', round: 2, teamA: 'Argentina', teamB: 'Austria', flagA: '🇦🇷', flagB: '🇦🇹', date: '2026-06-22', time: '22:30', venue: 'AT&T Stadium (Dallas)', isLocked: false, isFinished: false },
-  // Round 2 - 23 June 2026
   { id: 'm42', round: 2, teamA: 'France', teamB: 'Iraq', flagA: '🇫🇷', flagB: '🇮🇶', date: '2026-06-23', time: '02:30', venue: 'Lincoln Financial Field (Philadelphia)', isLocked: false, isFinished: false },
   { id: 'm43', round: 2, teamA: 'Norway', teamB: 'Senegal', flagA: '🇳🇴', flagB: '🇸🇳', date: '2026-06-23', time: '05:30', venue: 'MetLife Stadium (NY/NJ)', isLocked: false, isFinished: false },
   { id: 'm44', round: 2, teamA: 'Jordan', teamB: 'Algeria', flagA: '🇯🇴', flagB: '🇩🇿', date: '2026-06-23', time: '08:30', venue: 'Levi\'s Stadium (SF Bay Area)', isLocked: false, isFinished: false },
   { id: 'm45', round: 2, teamA: 'Portugal', teamB: 'Uzbekistan', flagA: '🇵🇹', flagB: '🇺🇿', date: '2026-06-23', time: '22:30', venue: 'NRG Stadium (Houston)', isLocked: false, isFinished: false },
-  // Round 2 - 24 June 2026
   { id: 'm46', round: 2, teamA: 'England', teamB: 'Ghana', flagA: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', flagB: '🇬🇭', date: '2026-06-24', time: '01:30', venue: 'Gillette Stadium (Boston)', isLocked: false, isFinished: false },
   { id: 'm47', round: 2, teamA: 'Panama', teamB: 'Croatia', flagA: '🇵🇦', flagB: '🇭🇷', date: '2026-06-24', time: '04:30', venue: 'BMO Field (Toronto)', isLocked: false, isFinished: false },
   { id: 'm48', round: 2, teamA: 'Colombia', teamB: 'DR Congo', flagA: '🇨🇴', flagB: '🇨🇩', date: '2026-06-24', time: '07:30', venue: 'Estadio Akron (Guadalajara)', isLocked: false, isFinished: false },
+
+  // Round 3
+  { id: 'm49', round: 3, teamA: 'Bosnia & Herzegovina', teamB: 'Qatar', flagA: '🇧🇦', flagB: '🇶🇦', date: '2026-06-25', time: '00:30', venue: 'Lumen Field (Seattle)', isLocked: false, isFinished: false },
+  { id: 'm50', round: 3, teamA: 'Switzerland', teamB: 'Canada', flagA: '🇨🇭', flagB: '🇨🇦', date: '2026-06-25', time: '00:30', venue: 'BC Place (Vancouver)', isLocked: false, isFinished: false },
+  { id: 'm51', round: 3, teamA: 'Morocco', teamB: 'Haiti', flagA: '🇲🇦', flagB: '🇭🇹', date: '2026-06-25', time: '03:30', venue: 'Mercedes-Benz Stadium (Atlanta)', isLocked: false, isFinished: false },
+  { id: 'm52', round: 3, teamA: 'Scotland', teamB: 'Brazil', flagA: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', flagB: '🇧🇷', date: '2026-06-25', time: '03:30', venue: 'Hard Rock Stadium (Miami)', isLocked: false, isFinished: false },
+  { id: 'm53', round: 3, teamA: 'Czechia', teamB: 'Mexico', flagA: '🇨🇿', flagB: '🇲🇽', date: '2026-06-25', time: '06:30', venue: 'Estadio Banorte (Mexico City)', isLocked: false, isFinished: false },
+  { id: 'm54', round: 3, teamA: 'South Africa', teamB: 'South Korea', flagA: '🇿🇦', flagB: '🇰🇷', date: '2026-06-25', time: '06:30', venue: 'Estadio BBVA (Monterrey)', isLocked: false, isFinished: false },
+  { id: 'm55', round: 3, teamA: 'Curaçao', teamB: 'Côte d\'Ivoire', flagA: '🇨🇼', flagB: '🇨🇮', date: '2026-06-26', time: '01:30', venue: 'Lincoln Financial Field (Philadelphia)', isLocked: false, isFinished: false },
+  { id: 'm56', round: 3, teamA: 'Ecuador', teamB: 'Germany', flagA: '🇪🇨', flagB: '🇩🇪', date: '2026-06-26', time: '01:30', venue: 'MetLife Stadium (NY/NJ)', isLocked: false, isFinished: false },
+  { id: 'm57', round: 3, teamA: 'Japan', teamB: 'Sweden', flagA: '🇯🇵', flagB: '🇸🇪', date: '2026-06-26', time: '04:30', venue: 'AT&T Stadium (Dallas)', isLocked: false, isFinished: false },
+  { id: 'm58', round: 3, teamA: 'Tunisia', teamB: 'Netherlands', flagA: '🇹🇳', flagB: '🇳🇱', date: '2026-06-26', time: '04:30', venue: 'Arrowhead Stadium (Kansas City)', isLocked: false, isFinished: false },
+  { id: 'm59', round: 3, teamA: 'Paraguay', teamB: 'Australia', flagA: '🇵🇾', flagB: '🇦🇺', date: '2026-06-26', time: '07:30', venue: 'Levi\'s Stadium (SF Bay Area)', isLocked: false, isFinished: false },
+  { id: 'm60', round: 3, teamA: 'Türkiye', teamB: 'USA', flagA: '🇹🇷', flagB: '🇺🇸', date: '2026-06-26', time: '07:30', venue: 'SoFi Stadium (Los Angeles)', isLocked: false, isFinished: false },
+  { id: 'm61', round: 3, teamA: 'Norway', teamB: 'France', flagA: '🇳🇴', flagB: '🇫🇷', date: '2026-06-27', time: '00:30', venue: 'Gillette Stadium (Boston)', isLocked: false, isFinished: false },
+  { id: 'm62', round: 3, teamA: 'Senegal', teamB: 'Iraq', flagA: '🇸🇳', flagB: '🇮🇶', date: '2026-06-27', time: '00:30', venue: 'BMO Field (Toronto)', isLocked: false, isFinished: false },
+  { id: 'm63', round: 3, teamA: 'Cabo Verde', teamB: 'Saudi Arabia', flagA: '🇨🇻', flagB: '🇸🇦', date: '2026-06-27', time: '05:30', venue: 'NRG Stadium (Houston)', isLocked: false, isFinished: false },
+  { id: 'm64', round: 3, teamA: 'Uruguay', teamB: 'Spain', flagA: '🇺🇾', flagB: '🇪🇸', date: '2026-06-27', time: '05:30', venue: 'Estadio Akron (Guadalajara)', isLocked: false, isFinished: false },
+  { id: 'm65', round: 3, teamA: 'Egypt', teamB: 'Iran', flagA: '🇪🇬', flagB: '🇮🇷', date: '2026-06-27', time: '08:30', venue: 'Lumen Field (Seattle)', isLocked: false, isFinished: false },
+  { id: 'm66', round: 3, teamA: 'New Zealand', teamB: 'Belgium', flagA: '🇳🇿', flagB: '🇧🇪', date: '2026-06-27', time: '08:30', venue: 'BC Place (Vancouver)', isLocked: false, isFinished: false },
+  { id: 'm67', round: 3, teamA: 'Croatia', teamB: 'Ghana', flagA: '🇭🇷', flagB: '🇬🇭', date: '2026-06-28', time: '02:30', venue: 'Lincoln Financial Field (Philadelphia)', isLocked: false, isFinished: false },
+  { id: 'm68', round: 3, teamA: 'Panama', teamB: 'England', flagA: '🇵🇦', flagB: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', date: '2026-06-28', time: '02:30', venue: 'MetLife Stadium (NY/NJ)', isLocked: false, isFinished: false },
+  { id: 'm69', round: 3, teamA: 'Colombia', teamB: 'Portugal', flagA: '🇨🇴', flagB: '🇵🇹', date: '2026-06-28', time: '05:00', venue: 'Hard Rock Stadium (Miami)', isLocked: false, isFinished: false },
+  { id: 'm70', round: 3, teamA: 'DR Congo', teamB: 'Uzbekistan', flagA: '🇨🇩', flagB: '🇺🇿', date: '2026-06-28', time: '05:00', venue: 'Mercedes-Benz Stadium (Atlanta)', isLocked: false, isFinished: false },
+  { id: 'm71', round: 3, teamA: 'Algeria', teamB: 'Austria', flagA: '🇩🇿', flagB: '🇦🇹', date: '2026-06-28', time: '07:30', venue: 'Arrowhead Stadium (Kansas City)', isLocked: false, isFinished: false },
+  { id: 'm72', round: 3, teamA: 'Jordan', teamB: 'Argentina', flagA: '🇯🇴', flagB: '🇦🇷', date: '2026-06-28', time: '07:30', venue: 'AT&T Stadium (Dallas)', isLocked: false, isFinished: false },
 ];
 
 let users: User[] = [];
@@ -129,7 +150,7 @@ let userMessages: UserMessage[] = [];
 let settings: AppSettings = { leaderboardVisible: true };
 
 if (typeof window !== 'undefined') {
-  const CURRENT_DB_VERSION = 'kw_arena_v9'; // Bumped version for R2 matches
+  const CURRENT_DB_VERSION = 'kw_arena_v11'; // Bumped version for R3 matches
   const savedUsers = localStorage.getItem('kw_users');
   const savedMatches = localStorage.getItem('kw_matches');
   const savedPredictions = localStorage.getItem('kw_predictions');
