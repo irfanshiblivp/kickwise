@@ -271,8 +271,8 @@ export default function AdminPage() {
                     <div className="space-y-2">
                       <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Home Team Identity</Label>
                       <div className="flex gap-4">
-                        <Input placeholder="e.g. Mexico" value={newMatch.teamA} onChange={e => setNewMatch({...newMatch, teamA: e.target.value})} className="rounded-none bg-background/50 border-border h-12 font-bold" />
-                        <Input placeholder="🇲🇽" value={newMatch.flagA} onChange={e => setNewMatch({...newMatch, flagA: e.target.value})} className="w-24 rounded-none bg-background/50 border-border text-center text-2xl h-12" />
+                        <Input value={newMatch.teamA} onChange={e => setNewMatch({...newMatch, teamA: e.target.value})} className="rounded-none bg-background/50 border-border h-12 font-bold" />
+                        <Input value={newMatch.flagA} onChange={e => setNewMatch({...newMatch, flagA: e.target.value})} className="w-24 rounded-none bg-background/50 border-border text-center text-2xl h-12" />
                       </div>
                     </div>
                   </div>
@@ -280,8 +280,8 @@ export default function AdminPage() {
                     <div className="space-y-2">
                       <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Away Team Identity</Label>
                       <div className="flex gap-4">
-                        <Input placeholder="e.g. South Africa" value={newMatch.teamB} onChange={e => setNewMatch({...newMatch, teamB: e.target.value})} className="rounded-none bg-background/50 border-border h-12 font-bold" />
-                        <Input placeholder="🇿🇦" value={newMatch.flagB} onChange={e => setNewMatch({...newMatch, flagB: e.target.value})} className="w-24 rounded-none bg-background/50 border-border text-center text-2xl h-12" />
+                        <Input value={newMatch.teamB} onChange={e => setNewMatch({...newMatch, teamB: e.target.value})} className="rounded-none bg-background/50 border-border h-12 font-bold" />
+                        <Input value={newMatch.flagB} onChange={e => setNewMatch({...newMatch, flagB: e.target.value})} className="w-24 rounded-none bg-background/50 border-border text-center text-2xl h-12" />
                       </div>
                     </div>
                   </div>
@@ -303,7 +303,7 @@ export default function AdminPage() {
                     </div>
                     <div className="space-y-2">
                       <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Group / Pool</Label>
-                      <Input placeholder="Group A" value={newMatch.group} onChange={e => setNewMatch({...newMatch, group: e.target.value})} className="rounded-none bg-background/50 border-border h-12 font-bold" />
+                      <Input value={newMatch.group} onChange={e => setNewMatch({...newMatch, group: e.target.value})} className="rounded-none bg-background/50 border-border h-12 font-bold" />
                     </div>
                   </div>
 
@@ -397,9 +397,9 @@ export default function AdminPage() {
 
                         <div className="flex flex-wrap items-center gap-4">
                           <div className="flex items-center gap-3 bg-muted/50 p-1.5 rounded-none border border-border">
-                            <Input className="w-12 h-10 p-0 text-center bg-transparent border-none text-base font-black focus-visible:ring-0" defaultValue={m.scoreA} id={`scoreA-${m.id}`} placeholder="A" />
+                            <Input className="w-12 h-10 p-0 text-center bg-transparent border-none text-base font-black focus-visible:ring-0" defaultValue={m.scoreA} id={`scoreA-${m.id}`} />
                             <span className="font-black text-xs text-muted-foreground">:</span>
-                            <Input className="w-12 h-10 p-0 text-center bg-transparent border-none text-base font-black focus-visible:ring-0" defaultValue={m.scoreB} id={`scoreB-${m.id}`} placeholder="B" />
+                            <Input className="w-12 h-10 p-0 text-center bg-transparent border-none text-base font-black focus-visible:ring-0" defaultValue={m.scoreB} id={`scoreB-${m.id}`} />
                             <Button 
                               size="icon" 
                               className="h-10 w-10 bg-primary hover:bg-primary/90 rounded-none shadow-lg"
@@ -531,7 +531,6 @@ export default function AdminPage() {
                 <div className="space-y-4">
                   <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Message Payload</Label>
                   <Input 
-                    placeholder="Enter urgent broadcast message for all players..." 
                     value={broadcast} 
                     onChange={e => setBroadcast(e.target.value)} 
                     className="bg-background/50 font-bold rounded-none h-20 border-border px-6 focus:ring-primary/30 text-base" 

@@ -189,7 +189,6 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
                   onChange={(e) => setScoreA(e.target.value)}
                   className="text-center text-lg font-black h-10 border-primary/20 rounded-none bg-white/50 transition-all focus:bg-white focus:scale-105"
                   min="0"
-                  placeholder="-"
                 />
               </div>
               <span className="text-sm font-black text-muted-foreground">:</span>
@@ -200,7 +199,6 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
                   onChange={(e) => setScoreB(e.target.value)}
                   className="text-center text-lg font-black h-10 border-primary/20 rounded-none bg-white/50 transition-all focus:bg-white focus:scale-105"
                   min="0"
-                  placeholder="-"
                 />
               </div>
             </div>

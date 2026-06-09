@@ -73,7 +73,6 @@ export default function LoginPage() {
               <Input 
                 id="username" 
                 required 
-                placeholder="e.g. admin12"
                 className="bg-background/50 rounded-none h-12 border-border focus:ring-primary/30 font-bold"
                 value={formData.username}
                 onChange={(e) => setFormData({...formData, username: e.target.value})}
@@ -86,7 +85,6 @@ export default function LoginPage() {
                 <Input 
                   id="password" 
                   type="password" 
-                  placeholder="••••••••"
                   required 
                   className="bg-background/50 rounded-none h-12 border-border focus:ring-primary/30 font-bold pl-10"
                   value={formData.password}

@@ -76,7 +76,6 @@ export default function RegisterPage() {
               <Label htmlFor="username" className="text-[10px] font-black uppercase tracking-widest text-foreground/60">Player Alias</Label>
               <Input 
                 id="username" 
-                placeholder="Unique Username" 
                 required 
                 className="bg-white/50 border-primary/10 rounded-none h-11 focus-visible:ring-primary/30"
                 value={formData.username}
