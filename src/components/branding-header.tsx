@@ -77,7 +77,7 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
           
           <div className="py-2" />
 
-          <div className="flex flex-col items-center gap-0.5 md:gap-1">
+          <div className="flex flex-col items-center gap-2">
             <h2 className={`${compact ? 'text-lg md:text-xl' : 'text-2xl md:text-3xl'} font-headline font-black text-primary tracking-widest uppercase`}>
               Dhruva 2026
             </h2>
@@ -103,8 +103,8 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
               <Image 
                 src={kickwiseLogo?.imageUrl || ''} 
                 alt="Kickwise Logo" 
-                width={700} 
-                height={700} 
+                width={400} 
+                height={400} 
                 className="object-contain animate-pop"
                 priority
               />
