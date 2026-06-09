@@ -91,7 +91,7 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
 
         {!compact && (
           <div className="-mt-12 flex flex-col items-center gap-2">
-            <a href="https://ibb.co/HLMCFFCQ" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105 active:scale-95">
+            <a href="https://ibb.co/C3SScxtc" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105 active:scale-95">
               <Image 
                 src={kickwiseLogo?.imageUrl || ''} 
                 alt="Kickwise Logo" 
