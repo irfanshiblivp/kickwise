@@ -92,9 +92,14 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
               />
             </a>
             <div className="w-64 h-[1px] bg-primary/20 mt-2" />
-            <p className="text-xs md:text-sm font-headline font-black text-foreground tracking-[0.5em] uppercase">
-              PREDICTION LEAGUE
-            </p>
+            <div className="flex flex-col items-center leading-none mt-1">
+              <p className="text-base md:text-xl font-headline font-black text-foreground tracking-[0.3em] uppercase">
+                FIFA PREDICTION
+              </p>
+              <p className="text-[10px] md:text-xs font-headline font-black text-foreground tracking-[0.8em] uppercase opacity-70">
+                LEAGUE
+              </p>
+            </div>
           </div>
         )}
       </div>
