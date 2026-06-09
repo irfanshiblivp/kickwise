@@ -63,7 +63,7 @@ export default function LoginPage() {
               <ShieldCheck className="h-10 w-10 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-3xl font-headline font-black uppercase tracking-tight">Access Key</CardTitle>
+          <CardTitle className="text-3xl font-headline font-black uppercase tracking-tight">Identity Access</CardTitle>
           <CardDescription className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Command Center Authentication</CardDescription>
         </CardHeader>
         <CardContent className="pt-6 px-10 pb-10">
@@ -81,7 +81,7 @@ export default function LoginPage() {
             </div>
             
             <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Security Phrase</Label>
+              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Password</Label>
               <div className="relative">
                 <Input 
                   id="password" 

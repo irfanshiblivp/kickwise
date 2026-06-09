@@ -116,7 +116,7 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" spellCheck={false} className="text-[10px] font-black uppercase tracking-widest text-foreground/60">Access Key</Label>
+              <Label htmlFor="password" spellCheck={false} className="text-[10px] font-black uppercase tracking-widest text-foreground/60">Password</Label>
               <Input 
                 id="password" 
                 type="password" 
