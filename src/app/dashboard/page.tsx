@@ -142,7 +142,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-headline font-black flex items-center gap-3 tracking-tighter uppercase">
                   <LayoutDashboard className="h-6 w-6 text-primary" />
-                  Predictor Arena
+                  Prediction League
                 </h2>
               </div>
               
@@ -200,7 +200,7 @@ export default function DashboardPage() {
                       ))
                     ) : (
                       <div className="col-span-full py-24 text-center glass-morphism rounded-none border-2 border-dashed border-primary/10">
-                        <p className="text-muted-foreground font-black uppercase text-[10px] tracking-[0.3em]">System clear: No active matches in the arena.</p>
+                        <p className="text-muted-foreground font-black uppercase text-[10px] tracking-[0.3em]">System clear: No active matches in the league.</p>
                       </div>
                     )}
                   </div>
@@ -340,7 +340,7 @@ export default function DashboardPage() {
       </main>
       
       <footer className="w-full py-8 text-foreground/30 text-[8px] uppercase font-black tracking-[0.6em] text-center border-t border-border/20 z-10 bg-background/50 backdrop-blur-sm">
-        Dhruva 2026 • Prediction Arena • CSE Association Munnar
+        Dhruva 2026 • Prediction League • CSE Association Munnar
       </footer>
       <Toaster />
     </div>

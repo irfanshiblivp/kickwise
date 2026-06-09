@@ -90,10 +90,10 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
         </div>
 
         {!compact && (
-          <div className="mt-1 flex flex-col items-center gap-2">
+          <div className="mt-2 flex flex-col items-center gap-2">
             <a href="https://ibb.co/C3SScxtc" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105 active:scale-95">
               <Image 
-                src={kickwiseLogo?.imageUrl || ''} 
+                src="https://i.ibb.co/FLddrGWr/Picsart-26-06-09-22-18-44-081.png" 
                 alt="Kickwise Logo" 
                 width={250} 
                 height={250} 
@@ -101,9 +101,9 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
                 priority
               />
             </a>
-            <div className="w-64 h-[1px] bg-primary/20 mt-1" />
+            <div className="w-64 h-[1px] bg-primary/20 mt-2" />
             <p className="text-xs md:text-sm font-headline font-black text-foreground tracking-[0.5em] uppercase">
-              2026 PREDICTION ARENA
+              PREDICTION LEAGUE
             </p>
           </div>
         )}

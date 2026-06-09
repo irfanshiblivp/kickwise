@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -60,7 +61,7 @@ export default function Home() {
       <main className="container mx-auto px-4 z-10 flex flex-col items-center flex-grow max-w-5xl">
         <div className="text-center space-y-8 mb-20 mt-10 animate-fade-in-up">
           <div className="max-w-2xl mx-auto">
-            <h1 className="text-xl font-headline font-bold text-foreground/80 mb-4 uppercase tracking-[0.2em]">Official Predictor League</h1>
+            <h1 className="text-xl font-headline font-bold text-foreground/80 mb-4 uppercase tracking-[0.2em]">Official Prediction League</h1>
             <p className="text-sm text-foreground/60 leading-relaxed font-medium">
               Join the College of Engineering Munnar's premier prediction tournament for FIFA World Cup 2026. 
               Analyze real match-ups, submit your scores, and climb the campus leaderboard to become the ultimate football strategist.
@@ -76,7 +77,7 @@ export default function Home() {
                   className="bg-primary hover:bg-primary/90 text-white font-headline font-bold px-10 h-14 transition-all hover:scale-105 shadow-2xl rounded-none border-2 border-primary"
                 >
                   <UserPlus className="mr-2 h-5 w-5" />
-                  JOIN THE ARENA
+                  JOIN THE LEAGUE
                 </Button>
                 <Button 
                   onClick={() => router.push('/login')}
@@ -94,7 +95,7 @@ export default function Home() {
                 size="lg" 
                 className="bg-primary hover:bg-primary/90 text-white font-headline font-bold px-12 h-16 transition-all hover:scale-105 shadow-2xl rounded-none border-2 border-white/10"
               >
-                ACCESS ARENA
+                ACCESS LEAGUE
                 <ChevronRight className="ml-2 h-6 w-6" />
               </Button>
             )}

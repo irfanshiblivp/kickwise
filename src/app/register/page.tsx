@@ -61,7 +61,7 @@ export default function RegisterPage() {
       <Card className="w-full max-w-md glass-morphism border-primary/20 shadow-2xl rounded-none">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-3xl font-headline font-black tracking-tight text-primary">CREATE PLAYER</CardTitle>
-          <CardDescription className="text-xs uppercase font-bold tracking-widest text-foreground/40">Dhruva 2026 Prediction Arena</CardDescription>
+          <CardDescription className="text-xs uppercase font-bold tracking-widest text-foreground/40">Dhruva 2026 Prediction League</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleRegister} className="space-y-4">

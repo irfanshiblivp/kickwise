@@ -5,8 +5,8 @@ import { MatchNotifier } from '@/components/match-notifier';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 export const metadata: Metadata = {
-  title: 'Kickwise 2026 | Dhruva CEM Munnar',
-  description: 'FIFA World Cup 2026 Prediction App for CEM Munnar',
+  title: 'Kickwise 2026 | Prediction League',
+  description: 'FIFA World Cup 2026 Prediction League for CEM Munnar',
 };
 
 export default function RootLayout({

@@ -616,7 +616,7 @@ export default function AdminPage() {
                 </Card>
 
                 <div className="p-10 text-center glass-morphism classic-border">
-                   <p className="text-[10px] font-black uppercase tracking-[0.5em] text-muted-foreground opacity-50">Dhruva 2026 Prediction Arena Core</p>
+                   <p className="text-[10px] font-black uppercase tracking-[0.5em] text-muted-foreground opacity-50">Dhruva 2026 Prediction League Core</p>
                 </div>
               </div>
             </div>
