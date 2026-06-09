@@ -30,7 +30,6 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
   const cemLogo = PlaceHolderImages.find(img => img.id === 'cem-logo');
   const rightAltLogoDark = PlaceHolderImages.find(img => img.id === 'right-alt-logo');
   const rightAltLogoLight = PlaceHolderImages.find(img => img.id === 'right-alt-logo-light');
-  const kickwiseLogo = PlaceHolderImages.find(img => img.id === 'kickwise-logo');
 
   const currentLeftLogo = (!mounted || isDark) ? leftLogoDark : (leftLogoLight || leftLogoDark);
   const currentRightLogo = (!mounted || isDark) ? rightAltLogoDark : (rightAltLogoLight || rightAltLogoDark);
@@ -49,11 +48,6 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="hidden sm:flex flex-col items-end mr-2">
-            <h1 className="text-[9px] md:text-[11px] font-headline font-black text-foreground tracking-[0.2em] uppercase leading-tight text-right">
-              College of <br className="md:hidden" /> Engineering Munnar
-            </h1>
-          </div>
           <Image 
             src={cemLogo?.imageUrl || ''} 
             alt="CEM Logo" 
