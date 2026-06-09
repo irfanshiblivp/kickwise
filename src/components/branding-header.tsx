@@ -70,7 +70,11 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
       </div>
 
       <div className={`container mx-auto px-4 text-center ${compact ? 'py-4' : 'mt-1'}`}>
-        <div className="space-y-0.5">
+        <div className="space-y-0.5 flex flex-col items-center">
+          <h1 className="text-[10px] md:text-xs font-headline font-black text-foreground tracking-[0.4em] uppercase mb-1">
+            College of Engineering Munnar
+          </h1>
+          
           <h2 className={`${compact ? 'text-lg md:text-xl' : 'text-xl md:text-2xl'} font-headline font-black text-primary tracking-widest uppercase`}>
             Dhruva 2026
           </h2>
@@ -90,7 +94,7 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
         </div>
 
         {!compact && (
-          <div className="mt-2 flex flex-col items-center gap-2">
+          <div className="mt-4 flex flex-col items-center gap-2">
             <a href="https://ibb.co/C3SScxtc" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105 active:scale-95">
               <Image 
                 src="https://i.ibb.co/FLddrGWr/Picsart-26-06-09-22-18-44-081.png" 
