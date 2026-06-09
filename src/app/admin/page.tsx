@@ -217,7 +217,7 @@ export default function AdminPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/90 to-background" />
       </div>
 
-      <BrandingHeader compact />
+      <BrandingHeader compact showPredictingLogo />
 
       <nav className="border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-40">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">

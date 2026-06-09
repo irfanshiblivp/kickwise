@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
-export function BrandingHeader({ compact = false }: { compact?: boolean }) {
+export function BrandingHeader({ compact = false, showPredictingLogo = false }: { compact?: boolean, showPredictingLogo?: boolean }) {
   const [isDark, setIsDark] = useState(true);
   const [mounted, setMounted] = useState(false);
 
@@ -77,6 +77,21 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
           <p className="text-[10px] font-headline font-black italic text-black dark:text-white uppercase tracking-[0.3em] mt-1">
             Presents
           </p>
+
+          {showPredictingLogo && (
+            <div className="mt-2 flex justify-center">
+              <a href="https://ibb.co/PGfkJTpH" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105 active:scale-95">
+                <Image 
+                  src="https://i.ibb.co/7t6hBgcm/Picsart-26-06-09-22-18-44-081.png" 
+                  alt="Tournament Logo" 
+                  width={150} 
+                  height={150} 
+                  className="object-contain animate-pop"
+                  priority
+                />
+              </a>
+            </div>
+          )}
         </div>
 
         {!compact && (

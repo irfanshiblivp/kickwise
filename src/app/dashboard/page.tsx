@@ -101,7 +101,7 @@ export default function DashboardPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-background/50 to-background dark:via-background/90" />
       </div>
 
-      <BrandingHeader compact />
+      <BrandingHeader compact showPredictingLogo />
 
       <nav className="border-b border-border bg-card/50 backdrop-blur-md sticky top-0 z-40">
         <div className="container mx-auto px-4 h-14 flex items-center justify-between">
