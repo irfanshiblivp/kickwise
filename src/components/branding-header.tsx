@@ -28,11 +28,8 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
   const leftLogoDark = PlaceHolderImages.find(img => img.id === 'left-logo');
   const leftLogoLight = PlaceHolderImages.find(img => img.id === 'left-logo-light');
   const cemLogo = PlaceHolderImages.find(img => img.id === 'cem-logo');
-  const rightAltLogoDark = PlaceHolderImages.find(img => img.id === 'right-alt-logo');
-  const rightAltLogoLight = PlaceHolderImages.find(img => img.id === 'right-alt-logo-light');
 
   const currentLeftLogo = (!mounted || isDark) ? leftLogoDark : (leftLogoLight || leftLogoDark);
-  const currentRightLogo = (!mounted || isDark) ? rightAltLogoDark : (rightAltLogoLight || rightAltLogoDark);
 
   return (
     <header className={`w-full relative z-20 ${compact ? 'bg-card/80 border-b border-border' : ''}`}>
@@ -47,7 +44,7 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
           />
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center">
           <Image 
             src={cemLogo?.imageUrl || ''} 
             alt="CEM Logo" 
@@ -55,16 +52,6 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
             height={compact ? 40 : 55} 
             className="object-contain rounded-full"
           />
-          <div className="h-8 w-[1px] bg-foreground/20 opacity-20" />
-          <div className="transition-opacity duration-300">
-            <Image 
-              src={currentRightLogo?.imageUrl || ''} 
-              alt="Right Logo" 
-              width={compact ? 40 : 55} 
-              height={compact ? 40 : 55} 
-              className="object-contain"
-            />
-          </div>
         </div>
       </div>
 
