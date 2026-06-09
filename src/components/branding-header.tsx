@@ -77,7 +77,7 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
           
           <div className="py-2" />
 
-          <div className="flex flex-col items-center gap-1 md:gap-2">
+          <div className="flex flex-col items-center gap-0.5 md:gap-1">
             <h2 className={`${compact ? 'text-lg md:text-xl' : 'text-2xl md:text-3xl'} font-headline font-black text-primary tracking-widest uppercase`}>
               Dhruva 2026
             </h2>
@@ -86,25 +86,25 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
               And
             </span>
 
-            <div className={`${compact ? 'text-[9px] md:text-xs' : 'text-xs md:text-sm'} font-headline font-black text-primary tracking-[0.1em] uppercase flex flex-col items-center text-center leading-tight`}>
+            <div className={`${compact ? 'text-[9px] md:text-xs' : 'text-[11px] md:text-sm'} font-headline font-black text-primary tracking-[0.1em] uppercase flex flex-col items-center text-center leading-tight`}>
               <span>Department of</span>
               <span>Computer Science and Engineering</span>
             </div>
           </div>
           
-          <p className="text-[10px] font-headline font-black italic text-primary/70 uppercase tracking-[0.3em] mt-6">
+          <p className="text-[10px] font-headline font-black italic text-primary/70 uppercase tracking-[0.3em] mt-4">
             Presents
           </p>
         </div>
 
         {!compact && (
           <div className="mt-8 flex flex-col items-center gap-6">
-            <a href="https://ibb.co/PbXn066" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105 active:scale-95">
+            <a href="https://ibb.co/zWDPsSrn" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105 active:scale-95">
               <Image 
                 src={kickwiseLogo?.imageUrl || ''} 
                 alt="Kickwise Logo" 
-                width={550} 
-                height={550} 
+                width={700} 
+                height={700} 
                 className="object-contain animate-pop"
                 priority
               />
