@@ -89,7 +89,7 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
             <span>Computer Science and Engineering</span>
           </div>
           
-          <p className="text-[10px] font-headline font-black italic text-white uppercase tracking-[0.3em] mt-1">
+          <p className="text-[10px] font-headline font-black italic text-black dark:text-white uppercase tracking-[0.3em] mt-1">
             Presents
           </p>
         </div>
