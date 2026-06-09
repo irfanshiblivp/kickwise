@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -68,13 +69,13 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
         </div>
       </div>
 
-      <div className={`container mx-auto px-4 text-center ${compact ? 'py-4' : 'mt-1 mb-6'}`}>
-        <div className="space-y-1">
+      <div className={`container mx-auto px-4 text-center ${compact ? 'py-4' : 'mt-1'}`}>
+        <div className="space-y-0.5">
           <h2 className={`${compact ? 'text-lg md:text-xl' : 'text-xl md:text-2xl'} font-headline font-black text-primary tracking-widest uppercase`}>
             Dhruva 2026
           </h2>
           
-          <p className="text-[10px] md:text-xs font-body font-medium text-foreground opacity-90 lowercase italic py-0.5">
+          <p className="text-[10px] md:text-xs font-body font-medium text-foreground opacity-90 lowercase italic">
             And
           </p>
 
@@ -83,13 +84,13 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
             <span>Computer Science and Engineering</span>
           </div>
           
-          <p className="text-[10px] font-headline font-black italic text-primary/70 uppercase tracking-[0.3em] mt-3">
+          <p className="text-[10px] font-headline font-black italic text-primary/70 uppercase tracking-[0.3em] mt-1">
             Presents
           </p>
         </div>
 
         {!compact && (
-          <div className="mt-2 flex flex-col items-center gap-4">
+          <div className="-mt-4 flex flex-col items-center gap-2">
             <a href="https://ibb.co/zWDPsSrn" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105 active:scale-95">
               <Image 
                 src={kickwiseLogo?.imageUrl || ''} 
