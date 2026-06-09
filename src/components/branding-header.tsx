@@ -71,25 +71,17 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
 
       <div className={`container mx-auto px-4 text-center ${compact ? 'py-4' : 'mt-2 mb-8'}`}>
         <div className="space-y-1">
-          <p className="text-[10px] md:text-sm font-headline font-bold uppercase tracking-[0.4em] text-foreground/80">
-            College of Engineering Munnar
-          </p>
+          <h2 className={`${compact ? 'text-lg md:text-xl' : 'text-xl md:text-2xl'} font-headline font-black text-primary tracking-widest uppercase`}>
+            Dhruva 2026
+          </h2>
           
-          <div className="py-2" />
+          <p className="text-[10px] md:text-xs font-body font-medium text-foreground opacity-90 lowercase italic py-1">
+            And
+          </p>
 
-          <div className="flex flex-col items-center gap-2">
-            <h2 className={`${compact ? 'text-lg md:text-xl' : 'text-2xl md:text-3xl'} font-headline font-black text-primary tracking-widest uppercase`}>
-              Dhruva 2026
-            </h2>
-            
-            <span className="text-[10px] md:text-xs font-body font-medium text-foreground opacity-90 lowercase italic">
-              And
-            </span>
-
-            <div className={`${compact ? 'text-[9px] md:text-xs' : 'text-[11px] md:text-sm'} font-headline font-black text-primary tracking-[0.1em] uppercase flex flex-col items-center text-center leading-tight`}>
-              <span>Department of</span>
-              <span>Computer Science and Engineering</span>
-            </div>
+          <div className={`${compact ? 'text-[9px] md:text-xs' : 'text-[11px] md:text-sm'} font-headline font-black text-primary tracking-[0.1em] uppercase flex flex-col items-center text-center leading-tight`}>
+            <span>Department of</span>
+            <span>Computer Science and Engineering</span>
           </div>
           
           <p className="text-[10px] font-headline font-black italic text-primary/70 uppercase tracking-[0.3em] mt-4">
@@ -103,8 +95,8 @@ export function BrandingHeader({ compact = false }: { compact?: boolean }) {
               <Image 
                 src={kickwiseLogo?.imageUrl || ''} 
                 alt="Kickwise Logo" 
-                width={400} 
-                height={400} 
+                width={250} 
+                height={250} 
                 className="object-contain animate-pop"
                 priority
               />
