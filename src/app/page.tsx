@@ -111,19 +111,19 @@ export default function Home() {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-8 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-background/60 border border-primary/5 group transition-all hover:border-primary/40 hover:translate-x-1">
+              <div className="flex flex-col items-center justify-center p-6 bg-background/60 border border-primary/5 group transition-all hover:border-primary/40 text-center gap-4">
                 <div className="space-y-1">
                   <span className="font-black text-sm uppercase block">Exact Score</span>
                   <span className="text-[10px] text-muted-foreground uppercase">Perfect score prediction</span>
                 </div>
-                <span className="bg-primary text-white px-4 py-2 text-sm font-black rounded-none shadow-lg transition-transform group-hover:scale-110">+10 XP</span>
+                <span className="bg-primary text-white px-8 py-2 text-sm font-black rounded-none shadow-lg transition-transform group-hover:scale-110 tracking-widest">+10 XP</span>
               </div>
-              <div className="flex items-center justify-between p-4 bg-background/60 border border-primary/5 group transition-all hover:border-primary/40 hover:translate-x-1">
+              <div className="flex flex-col items-center justify-center p-6 bg-background/60 border border-primary/5 group transition-all hover:border-primary/40 text-center gap-4">
                 <div className="space-y-1">
                   <span className="font-black text-sm uppercase block">Correct Outcome</span>
                   <span className="text-[10px] text-muted-foreground uppercase">Win/Draw/Loss correctly predicted</span>
                 </div>
-                <span className="bg-primary/10 text-primary px-4 py-2 text-sm font-black rounded-none border border-primary/20 transition-transform group-hover:scale-110">+5 XP</span>
+                <span className="bg-primary/10 text-primary px-8 py-2 text-sm font-black rounded-none border border-primary/20 transition-transform group-hover:scale-110 tracking-widest">+5 XP</span>
               </div>
             </CardContent>
           </Card>
