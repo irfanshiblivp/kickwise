@@ -7,17 +7,17 @@ import {
   addDoc, 
   deleteDoc, 
   query, 
-  orderBy, 
   where, 
   getDocs,
   writeBatch,
-  Firestore
+  Firestore,
+  getDoc
 } from 'firebase/firestore';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 
 export type AcademicYear = '2nd' | '3rd' | '4th';
-export type Department = 'CSE' | 'ECE' | 'EEE' | 'ME';
+export type Department = 'CSE' | 'ECE' | 'EEE' | 'ME' | 'CE';
 
 export interface User {
   id: string;
@@ -74,10 +74,17 @@ export interface AppSettings {
 
 export const db = {
   users: {
+    getByUsername: async (firestore: Firestore, username: string) => {
+      const q = query(collection(firestore, 'users'), where('username', '==', username.toLowerCase()));
+      const snap = await getDocs(q);
+      if (snap.empty) return null;
+      return { id: snap.docs[0].id, ...snap.docs[0].data() } as User;
+    },
     create: async (firestore: Firestore, data: Omit<User, 'id' | 'points' | 'isAdmin'>) => {
       const userRef = doc(collection(firestore, 'users'));
       const newUser = {
         ...data,
+        username: data.username.toLowerCase(),
         id: userRef.id,
         points: 0,
         isAdmin: false
@@ -86,7 +93,7 @@ export const db = {
         errorEmitter.emit('permission-error', new FirestorePermissionError({
           path: userRef.path,
           operation: 'create',
-          requestResourceData: data
+          requestResourceData: newUser
         }));
       });
       return newUser;

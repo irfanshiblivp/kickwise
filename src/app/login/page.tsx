@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -8,32 +7,44 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { LogIn, ArrowLeft, ShieldCheck, Lock } from 'lucide-react';
+import { LogIn, ArrowLeft, ShieldCheck, Lock, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { useFirestore } from '@/firebase';
 
 export default function LoginPage() {
   const router = useRouter();
+  const firestore = useFirestore();
   const [formData, setFormData] = useState({
     username: '',
     password: ''
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const stadiumBg = PlaceHolderImages.find(img => img.id === 'stadium-bg');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const user = db.users.find(formData.username);
-    
-    if (user && user.password === formData.password) {
-      localStorage.setItem('kw_current_user', JSON.stringify(user));
-      if (user.isAdmin) {
-        router.push('/admin');
+    setError('');
+    setLoading(true);
+
+    try {
+      const user = await db.users.getByUsername(firestore, formData.username);
+      
+      if (user && user.password === formData.password) {
+        localStorage.setItem('kw_current_user', JSON.stringify(user));
+        if (user.isAdmin) {
+          router.push('/admin');
+        } else {
+          router.push('/dashboard');
+        }
       } else {
-        router.push('/dashboard');
+        setError('AUTHENTICATION FAILED: INVALID CREDENTIALS');
       }
-    } else {
-      setError('AUTHENTICATION FAILED: INVALID CREDENTIALS');
+    } catch (err) {
+      setError('SYSTEM ERROR: UNABLE TO CONTACT ARENA DATABASE');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -76,6 +87,7 @@ export default function LoginPage() {
                 className="bg-background/50 rounded-none h-12 border-border focus:ring-primary/30 font-bold"
                 value={formData.username}
                 onChange={(e) => setFormData({...formData, username: e.target.value})}
+                disabled={loading}
               />
             </div>
             
@@ -89,6 +101,7 @@ export default function LoginPage() {
                   className="bg-background/50 rounded-none h-12 border-border focus:ring-primary/30 font-bold pl-10"
                   value={formData.password}
                   onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  disabled={loading}
                 />
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               </div>
@@ -100,8 +113,8 @@ export default function LoginPage() {
               </p>
             )}
 
-            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-[0.3em] h-14 rounded-none shadow-xl transition-all hover:scale-[1.02]">
-              AUTHORIZE ACCESS
+            <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-[0.3em] h-14 rounded-none shadow-xl transition-all hover:scale-[1.02]">
+              {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : 'AUTHORIZE ACCESS'}
             </Button>
           </form>
         </CardContent>

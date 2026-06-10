@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -9,12 +8,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { UserPlus, ArrowLeft, AlertCircle } from 'lucide-react';
+import { UserPlus, ArrowLeft, AlertCircle, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useFirestore } from '@/firebase';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const firestore = useFirestore();
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
     year: '2nd' as AcademicYear,
@@ -22,31 +24,42 @@ export default function RegisterPage() {
     password: ''
   });
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
-    if (!formData.username || !formData.password) return;
-    
-    // Check if username already exists
-    const existing = db.users.find(formData.username);
-    if (existing) {
-      setError('Username already taken. Please choose another.');
+    if (!formData.username || !formData.password) {
+      setLoading(false);
       return;
     }
+    
+    try {
+      // Check if username already exists
+      const existing = await db.users.getByUsername(firestore, formData.username);
+      if (existing) {
+        setError('Username already taken. Please choose another.');
+        setLoading(false);
+        return;
+      }
 
-    const user = db.users.create({
-      username: formData.username,
-      year: formData.year,
-      department: formData.department,
-      password: formData.password
-    });
+      const user = await db.users.create(firestore, {
+        username: formData.username,
+        year: formData.year,
+        department: formData.department,
+        password: formData.password
+      });
 
-    localStorage.setItem('kw_current_user', JSON.stringify(user));
-    if (user.isAdmin) {
-      router.push('/admin');
-    } else {
-      router.push('/dashboard');
+      localStorage.setItem('kw_current_user', JSON.stringify(user));
+      if (user.isAdmin) {
+        router.push('/admin');
+      } else {
+        router.push('/dashboard');
+      }
+    } catch (err) {
+      setError('NETWORK ERROR: FAILED TO SYNC WITH ARENA CLOUD');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -77,6 +90,7 @@ export default function RegisterPage() {
               <Input 
                 id="username" 
                 required 
+                disabled={loading}
                 className="bg-white/50 border-primary/10 rounded-none h-11 focus-visible:ring-primary/30"
                 value={formData.username}
                 onChange={(e) => setFormData({...formData, username: e.target.value.toLowerCase().replace(/\s/g, '')})}
@@ -86,7 +100,7 @@ export default function RegisterPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase tracking-widest text-foreground/60">Batch</Label>
-                <Select value={formData.year} onValueChange={(v: AcademicYear) => setFormData({...formData, year: v})}>
+                <Select disabled={loading} value={formData.year} onValueChange={(v: AcademicYear) => setFormData({...formData, year: v})}>
                   <SelectTrigger className="bg-white/50 border-primary/10 rounded-none h-11">
                     <SelectValue placeholder="Year" />
                   </SelectTrigger>
@@ -99,7 +113,7 @@ export default function RegisterPage() {
               </div>
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase tracking-widest text-foreground/60">Dept</Label>
-                <Select value={formData.department} onValueChange={(v: Department) => setFormData({...formData, department: v})}>
+                <Select disabled={loading} value={formData.department} onValueChange={(v: Department) => setFormData({...formData, department: v})}>
                   <SelectTrigger className="bg-white/50 border-primary/10 rounded-none h-11">
                     <SelectValue placeholder="Dept" />
                   </SelectTrigger>
@@ -120,14 +134,15 @@ export default function RegisterPage() {
                 id="password" 
                 type="password" 
                 required 
+                disabled={loading}
                 className="bg-white/50 border-primary/10 rounded-none h-11 focus-visible:ring-primary/30"
                 value={formData.password}
                 onChange={(e) => setFormData({...formData, password: e.target.value})}
               />
             </div>
 
-            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white font-headline font-bold h-12 rounded-none mt-2 shadow-lg">
-              <UserPlus className="mr-2 h-4 w-4" /> REGISTER PROFILE
+            <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-primary/90 text-white font-headline font-bold h-12 rounded-none mt-2 shadow-lg">
+              {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <><UserPlus className="mr-2 h-4 w-4" /> REGISTER PROFILE</>}
             </Button>
           </form>
         </CardContent>
