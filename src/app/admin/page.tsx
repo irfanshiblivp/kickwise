@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState, useMemo } from 'react';
@@ -611,7 +610,7 @@ export default function AdminPage() {
                     <div className="space-y-3">
                       <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Active Project Identity</p>
                       <div className="flex items-center justify-between bg-background p-3 border border-border">
-                        <code className="text-xs font-bold text-primary">kickwise-2026</code>
+                        <code className="text-xs font-bold text-primary">studio-1840118234-897d1</code>
                         <Badge className="bg-green-600 text-white font-black text-[8px] rounded-none">CONNECTED</Badge>
                       </div>
                     </div>
@@ -624,7 +623,7 @@ export default function AdminPage() {
                         asChild
                         className="w-full bg-primary hover:bg-primary/90 h-14 rounded-none font-black uppercase tracking-[0.2em] text-[10px] shadow-xl"
                       >
-                        <a href="https://console.firebase.google.com/u/0/project/kickwise-2026/firestore/data" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
+                        <a href="https://console.firebase.google.com/u/0/project/studio-1840118234-897d1/firestore/data" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
                           View Live Database <ExternalLink className="h-4 w-4" />
                         </a>
                       </Button>
