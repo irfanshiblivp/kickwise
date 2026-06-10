@@ -69,12 +69,31 @@ const STADIUMS = {
   ]
 };
 
-const FRIENDLY_FIXTURES = [
-  { teamA: "Argentina", teamB: "Portugal", flagA: "🇦🇷", flagB: "🇵🇹", group: "Friendly", round: 0, date: "2026-06-15", time: "20:00", venue: "SoFi Stadium (Los Angeles)" },
-  { teamA: "France", teamB: "England", flagA: "🇫🇷", flagB: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", group: "Friendly", round: 0, date: "2026-06-16", time: "21:00", venue: "MetLife Stadium (NY/NJ)" },
-  { teamA: "Brazil", teamB: "Spain", flagA: "🇧🇷", flagB: "🇪🇸", group: "Friendly", round: 0, date: "2026-06-17", time: "19:00", venue: "AT&T Stadium (Dallas)" },
-  { teamA: "Germany", teamB: "Italy", flagA: "🇩🇪", flagB: "🇮🇹", group: "Friendly", round: 0, date: "2026-06-18", time: "20:30", venue: "Hard Rock Stadium (Miami)" },
-  { teamA: "Japan", teamB: "South Korea", flagA: "🇯🇵", flagB: "🇰🇷", group: "Friendly", round: 0, date: "2026-06-19", time: "18:00", venue: "BC Place (Vancouver)" }
+const WORLD_CUP_FIXTURES = [
+  // Opening Matches
+  { teamA: "Mexico", teamB: "Group A2", flagA: "🇲🇽", flagB: "🏳️", group: "Group A", round: 1, date: "2026-06-11", time: "18:00", venue: "Estadio Azteca (Mexico City)" },
+  { teamA: "Canada", teamB: "Group B2", flagA: "🇨🇦", flagB: "🏳️", group: "Group B", round: 1, date: "2026-06-12", time: "17:00", venue: "BMO Field (Toronto)" },
+  { teamA: "USA", teamB: "Group D2", flagA: "🇺🇸", flagB: "🏳️", group: "Group D", round: 1, date: "2026-06-12", time: "19:00", venue: "SoFi Stadium (Los Angeles)" },
+  
+  // Group Stage Marquee Matchups (Plausible/Sample)
+  { teamA: "Argentina", teamB: "Portugal", flagA: "🇦🇷", flagB: "🇵🇹", group: "Group C", round: 1, date: "2026-06-13", time: "20:00", venue: "AT&T Stadium (Dallas)" },
+  { teamA: "France", teamB: "Senegal", flagA: "🇫🇷", flagB: "🇸🇳", group: "Group E", round: 1, date: "2026-06-14", time: "15:00", venue: "Hard Rock Stadium (Miami)" },
+  { teamA: "Brazil", teamB: "Belgium", flagA: "🇧🇷", flagB: "🇧🇪", group: "Group F", round: 1, date: "2026-06-15", time: "19:00", venue: "MetLife Stadium (NY/NJ)" },
+  { teamA: "England", teamB: "Nigeria", flagA: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", flagB: "🇳🇬", group: "Group G", round: 1, date: "2026-06-16", time: "18:00", venue: "Arrowhead Stadium (Kansas City)" },
+  { teamA: "Spain", teamB: "Japan", flagA: "🇪🇸", flagB: "🇯🇵", group: "Group H", round: 1, date: "2026-06-17", time: "20:00", venue: "Levi's Stadium (SF Bay Area)" },
+  { teamA: "Germany", teamB: "Morocco", flagA: "🇩🇪", flagB: "🇲🇦", group: "Group I", round: 1, date: "2026-06-18", time: "16:00", venue: "NRG Stadium (Houston)" },
+  { teamA: "Netherlands", teamB: "South Korea", flagA: "🇳🇱", flagB: "🇰🇷", group: "Group J", round: 1, date: "2026-06-19", time: "17:00", venue: "BC Place (Vancouver)" },
+  { teamA: "Italy", teamB: "Uruguay", flagA: "🇮🇹", flagB: "🇺🇾", group: "Group K", round: 1, date: "2026-06-20", time: "19:00", venue: "Lincoln Financial Field (Philadelphia)" },
+  { teamA: "Croatia", teamB: "Colombia", flagA: "🇭🇷", flagB: "🇨🇴", group: "Group L", round: 1, date: "2026-06-21", time: "18:00", venue: "Lumen Field (Seattle)" },
+
+  // Round 2 Samples
+  { teamA: "Mexico", teamB: "Group A3", flagA: "🇲🇽", flagB: "🏳️", group: "Group A", round: 2, date: "2026-06-22", time: "19:00", venue: "Estadio BBVA (Monterrey)" },
+  { teamA: "USA", teamB: "Group D3", flagA: "🇺🇸", flagB: "🏳️", group: "Group D", round: 2, date: "2026-06-23", time: "20:00", venue: "Lumen Field (Seattle)" },
+  { teamA: "Argentina", teamB: "Group C3", flagA: "🇦🇷", flagB: "🏳️", group: "Group C", round: 2, date: "2026-06-24", time: "18:00", venue: "NRG Stadium (Houston)" },
+  
+  // Friendlies
+  { teamA: "India", teamB: "Australia", flagA: "🇮🇳", flagB: "🇦🇺", group: "Friendly", round: 0, date: "2026-06-05", time: "20:00", venue: "MetLife Stadium (NY/NJ)" },
+  { teamA: "Switzerland", teamB: "Sweden", flagA: "🇨🇭", flagB: "🇸🇪", group: "Friendly", round: 0, date: "2026-06-06", time: "19:00", venue: "BMO Field (Toronto)" }
 ];
 
 export default function AdminPage() {
@@ -130,11 +149,11 @@ export default function AdminPage() {
     setNewMatch({ teamA: '', teamB: '', flagA: '', flagB: '', group: 'Group A', round: 1, date: '', time: '', venue: '' });
   };
 
-  const seedFriendlies = async () => {
-    for (const fixture of FRIENDLY_FIXTURES) {
+  const seedTournamentData = async () => {
+    for (const fixture of WORLD_CUP_FIXTURES) {
       db.matches.add(firestore, { ...fixture, isLocked: false });
     }
-    toast({ title: "Friendlies Seeded", description: "5 international friendly matches added to the schedule." });
+    toast({ title: "Tournament Initialized", description: "All marquee 2026 fixtures have been added to the cloud database." });
   };
 
   const toggleLeaderboardVisibility = (checked: boolean) => {
@@ -589,12 +608,12 @@ export default function AdminPage() {
                   <CardContent className="pt-10 space-y-6 px-10 pb-12">
                      <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-50 text-center mb-6">Data Management</p>
                      <Button 
-                      onClick={seedFriendlies}
+                      onClick={seedTournamentData}
                       variant="outline"
                       className="w-full h-14 border-primary/20 rounded-none font-black uppercase tracking-[0.2em] text-[10px] hover:bg-primary/5 group"
                     >
                       <Flame className="h-4 w-4 mr-3 text-primary group-hover:animate-bounce" />
-                      Seed International Friendlies
+                      Initialize 2026 World Cup Fixtures
                     </Button>
                   </CardContent>
                 </Card>
