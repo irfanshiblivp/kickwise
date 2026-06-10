@@ -36,7 +36,9 @@ import {
   Settings2,
   Eye,
   EyeOff,
-  Flame
+  Flame,
+  ExternalLink,
+  Database
 } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -595,6 +597,34 @@ export default function AdminPage() {
                       <Flame className="h-4 w-4 mr-3 text-primary group-hover:animate-bounce" />
                       Seed International Friendlies
                     </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="glass-morphism rounded-none classic-border shadow-2xl">
+                  <CardHeader className="bg-primary/5 border-b border-border py-6">
+                    <CardTitle className="font-headline font-black uppercase tracking-widest text-sm flex items-center gap-3">
+                      <Database className="h-5 w-5 text-primary" />
+                      Database Overview
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-6 px-8 pb-8 space-y-4">
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase leading-relaxed">
+                      Your application is powered by **Firebase Firestore**. To view, edit, or delete data manually:
+                    </p>
+                    <div className="space-y-2">
+                      <div className="flex items-start gap-3">
+                        <span className="bg-primary/10 text-primary w-5 h-5 flex items-center justify-center text-[10px] font-black shrink-0">1</span>
+                        <p className="text-[10px] font-bold uppercase">Log in to the <a href="https://console.firebase.google.com" target="_blank" className="text-primary hover:underline inline-flex items-center gap-1">Firebase Console <ExternalLink className="h-2 w-2" /></a></p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="bg-primary/10 text-primary w-5 h-5 flex items-center justify-center text-[10px] font-black shrink-0">2</span>
+                        <p className="text-[10px] font-bold uppercase">Select Project: <span className="text-foreground">kickwise-2026</span></p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="bg-primary/10 text-primary w-5 h-5 flex items-center justify-center text-[10px] font-black shrink-0">3</span>
+                        <p className="text-[10px] font-bold uppercase">Navigate to **Firestore Database** in the sidebar.</p>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
