@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { db, Match, UserMessage, AppSettings, User } from '@/lib/db';
 import { BrandingHeader } from '@/components/branding-header';
@@ -39,6 +39,8 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { useFirestore, useCollection, useDoc } from '@/firebase';
+import { collection, query, orderBy, doc } from 'firebase/firestore';
 
 const STADIUMS = {
   USA: [
@@ -68,23 +70,29 @@ const STADIUMS = {
 export default function AdminPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const [matches, setMatches] = useState<Match[]>([]);
-  const [messages, setMessages] = useState<UserMessage[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
-  const [settings, setSettings] = useState<AppSettings>({ leaderboardVisible: true });
+  const firestore = useFirestore();
+
+  // Firestore Data Hooks
+  const matchesQuery = useMemo(() => query(collection(firestore, 'matches'), orderBy('date', 'asc')), [firestore]);
+  const messagesQuery = useMemo(() => query(collection(firestore, 'inbox'), orderBy('timestamp', 'desc')), [firestore]);
+  const usersQuery = useMemo(() => query(collection(firestore, 'users'), orderBy('points', 'desc')), [firestore]);
+  const broadcastsQuery = useMemo(() => query(collection(firestore, 'broadcasts'), orderBy('timestamp', 'desc')), [firestore]);
+  const settingsDocRef = useMemo(() => doc(firestore, 'settings', 'app'), [firestore]);
+
+  const { data: matches } = useCollection<Match>(matchesQuery);
+  const { data: messages } = useCollection<UserMessage>(messagesQuery);
+  const { data: users } = useCollection<User>(usersQuery);
+  const { data: broadcasts } = useCollection<any>(broadcastsQuery);
+  const { data: settingsData } = useDoc<AppSettings>(settingsDocRef);
+
+  const settings = settingsData || { leaderboardVisible: true };
+
   const [broadcast, setBroadcast] = useState('');
   const [editingMatch, setEditingMatch] = useState<string | null>(null);
   const [newMatch, setNewMatch] = useState({
     teamA: '', teamB: '', flagA: '', flagB: '', group: 'Group A', round: 1, date: '', time: '', venue: ''
   });
   const stadiumBg = PlaceHolderImages.find(img => img.id === 'stadium-bg');
-
-  const refresh = useCallback(() => {
-    setMatches([...db.matches.all()]);
-    setMessages([...db.inbox.all()]);
-    setUsers([...db.users.all()]);
-    setSettings(db.settings.get());
-  }, []);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('kw_current_user');
@@ -97,8 +105,7 @@ export default function AdminPage() {
       router.push('/dashboard');
       return;
     }
-    refresh();
-  }, [router, refresh]);
+  }, [router]);
 
   const handleCreateMatch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,87 +113,53 @@ export default function AdminPage() {
       toast({ title: "Validation Error", description: "Teams and Venue are required.", variant: "destructive" });
       return;
     }
-    db.matches.add({
+    db.matches.add(firestore, {
       ...newMatch,
       isLocked: false
     });
     toast({ title: "Match Added", description: `${newMatch.teamA} vs ${newMatch.teamB} scheduled.` });
-    refresh();
     setNewMatch({ teamA: '', teamB: '', flagA: '', flagB: '', group: 'Group A', round: 1, date: '', time: '', venue: '' });
   };
 
   const toggleLeaderboardVisibility = (checked: boolean) => {
-    db.settings.update({ leaderboardVisible: checked });
-    refresh();
+    db.settings.update(firestore, { leaderboardVisible: checked });
     toast({ 
       title: checked ? "Leaderboard Live" : "Leaderboard Hidden", 
       description: checked ? "Standings are now visible to all players." : "Standings access has been restricted."
     });
   };
 
-  const handleResetSystem = () => {
-    if (confirm("CRITICAL: This will permanently delete all data. Continue?")) {
-      db.system.resetAll();
-    }
-  };
-
   const toggleLock = (matchId: string, currentStatus: boolean) => {
-    db.matches.update(matchId, { isLocked: !currentStatus });
-    refresh();
+    db.matches.update(firestore, matchId, { isLocked: !currentStatus });
     toast({ title: `Match ${!currentStatus ? 'Locked' : 'Unlocked'}` });
   };
 
   const handleLockRound = (round: number, lock: boolean) => {
-    db.matches.lockRound(round, lock);
-    refresh();
+    db.matches.lockRound(firestore, round, lock);
     toast({ title: `Round ${round} ${lock ? 'Locked' : 'Unlocked'}` });
   };
 
   const deleteMatch = (matchId: string) => {
     if (confirm("Are you sure you want to delete this match? This action cannot be undone.")) {
-      db.matches.delete(matchId);
-      refresh();
+      db.matches.delete(firestore, matchId);
       toast({ title: "Match Deleted", description: "The fixture has been removed from the tournament." });
     }
   };
 
-  const recalculatePoints = () => {
-    db.users.resetPoints();
-    const allMatches = db.matches.all().filter(m => m.isFinished);
-    allMatches.forEach(m => {
-      const predictions = db.predictions.forMatch(m.id);
-      predictions.forEach(pred => {
-        let pointsAwarded = 0;
-        if (pred.scoreA === m.scoreA && pred.scoreB === m.scoreB) {
-          pointsAwarded = 10;
-        } else {
-          const actualWinner = (m.scoreA ?? 0) > (m.scoreB ?? 0) ? 'A' : (m.scoreA ?? 0) < (m.scoreB ?? 0) ? 'B' : 'Draw';
-          const predictedWinner = pred.scoreA > pred.scoreB ? 'A' : pred.scoreA < pred.scoreB ? 'B' : 'Draw';
-          if (actualWinner === predictedWinner) pointsAwarded = 5;
-        }
-        if (pointsAwarded > 0) db.users.addPoints(pred.userId, pointsAwarded);
-      });
-    });
-    refresh();
-    toast({ title: "Standings Recalculated", description: "All points have been updated based on final scores." });
-  };
-
   const handleUpdateScore = (matchId: string, scoreA: number, scoreB: number) => {
-    db.matches.update(matchId, { scoreA, scoreB, isFinished: true, isLocked: true });
-    recalculatePoints();
-    toast({ title: "Score Updated", description: "The match result has been logged." });
+    db.matches.update(firestore, matchId, { scoreA, scoreB, isFinished: true, isLocked: true });
+    toast({ title: "Score Updated", description: "The match result has been logged. Points will update shortly." });
   };
 
   const saveEdit = (matchId: string, updates: any) => {
-    db.matches.update(matchId, updates);
+    db.matches.update(firestore, matchId, updates);
     setEditingMatch(null);
     toast({ title: "Updated" });
-    refresh();
   };
 
   const sendBroadcast = () => {
     if (!broadcast) return;
-    db.broadcasts.add(broadcast, 'ADMIN');
+    db.broadcasts.add(firestore, broadcast, 'ADMIN');
     setBroadcast('');
     toast({ title: "Broadcast Transmitted" });
   };
@@ -322,7 +295,7 @@ export default function AdminPage() {
                     <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Official Venue</Label>
                     <Select value={newMatch.venue} onValueChange={v => setNewMatch({...newMatch, venue: v})}>
                       <SelectTrigger className="rounded-none bg-background/50 border-border h-12 font-bold">
-                        <SelectValue placeholder="Select Tournament Stadium" />
+                        <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         {Object.entries(STADIUMS).map(([country, venues]) => (
@@ -350,7 +323,7 @@ export default function AdminPage() {
                 <Badge variant="outline" className="text-primary border-primary/30 rounded-none text-[9px] font-black tracking-widest px-4 py-1">{matches.length} REGISTERED</Badge>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
-                {matches.length > 0 ? [...matches].sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()).map(m => (
+                {matches.length > 0 ? matches.map(m => (
                   <div key={m.id} className="p-6 rounded-none border border-border bg-background/40 hover:bg-primary/5 transition-all">
                     {editingMatch === m.id ? (
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -457,9 +430,6 @@ export default function AdminPage() {
                       </span>
                       <Switch checked={settings.leaderboardVisible} onCheckedChange={toggleLeaderboardVisibility} />
                     </div>
-                    <Button variant="outline" size="sm" onClick={recalculatePoints} className="rounded-none border-primary/30 text-[9px] font-black uppercase h-10 px-6 bg-primary/5 hover:bg-primary hover:text-white transition-all shadow-md">
-                      <RefreshCcw className="h-3 w-3 mr-2" /> Recalculate Points
-                    </Button>
                   </div>
                 </CardTitle>
               </CardHeader>
@@ -544,7 +514,7 @@ export default function AdminPage() {
                   <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border pb-2">Recent Transmissions</h3>
                   <ScrollArea className="h-[300px] border border-border bg-background/20 p-4">
                     <div className="space-y-4">
-                      {db.broadcasts.all().map(b => (
+                      {broadcasts.map((b: any) => (
                         <div key={b.id} className="p-4 bg-muted/30 border-l-2 border-primary">
                           <p className="text-[11px] font-bold mb-2">{b.message}</p>
                           <p className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">{new Date(b.timestamp).toLocaleString()}</p>
@@ -573,7 +543,7 @@ export default function AdminPage() {
                         <div key={msg.id} className="p-6 border border-border bg-background/30 relative group hover:border-primary/30 transition-all">
                           <div className="flex justify-between items-start mb-4">
                             <span className="text-[10px] font-black uppercase text-primary tracking-widest">{msg.username}</span>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => { db.inbox.delete(msg.id); refresh(); }}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => { db.inbox.delete(firestore, msg.id); }}>
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
@@ -594,29 +564,14 @@ export default function AdminPage() {
                 <Card className="glass-morphism rounded-none classic-border border-destructive/30 overflow-hidden shadow-2xl">
                   <CardHeader className="bg-destructive/10 border-b border-border py-6 text-center">
                     <CardTitle className="font-headline font-black uppercase tracking-widest text-sm text-destructive flex items-center justify-center gap-3">
-                      <RefreshCcw className="h-5 w-5 animate-spin-slow" />
-                      Critical System Maintenance
+                      <RefreshCcw className="h-5 w-5" />
+                      Dhruva 2026 Prediction League Core
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-10 space-y-6 px-10 pb-12">
-                    <div className="bg-destructive/5 p-6 border border-destructive/10">
-                      <p className="text-[10px] font-black text-destructive uppercase leading-relaxed text-center tracking-widest">
-                        WARNING: EXECUTION OF THE NUCLEAR OPTION WILL PERMANENTLY ERASE ALL TOURNAMENT DATA, PLAYER PROFILES, AND RECORDS.
-                      </p>
-                    </div>
-                    <Button 
-                      variant="destructive" 
-                      className="w-full rounded-none font-black text-[11px] uppercase h-16 tracking-[0.4em] shadow-2xl transition-all active:scale-95"
-                      onClick={handleResetSystem}
-                    >
-                      EXECUTE NUCLEAR RESET
-                    </Button>
+                     <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-50 text-center">System Managed via Firestore Real-time DB</p>
                   </CardContent>
                 </Card>
-
-                <div className="p-10 text-center glass-morphism classic-border">
-                   <p className="text-[10px] font-black uppercase tracking-[0.5em] text-muted-foreground opacity-50">Dhruva 2026 Prediction League Core</p>
-                </div>
               </div>
             </div>
           </TabsContent>

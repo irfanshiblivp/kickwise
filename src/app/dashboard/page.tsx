@@ -3,7 +3,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { db, User, Match, Broadcast, AppSettings } from '@/lib/db';
+import { db, User, Match, Broadcast, AppSettings, Prediction } from '@/lib/db';
 import { BrandingHeader } from '@/components/branding-header';
 import { MatchCard } from '@/components/match-card';
 import { Button } from '@/components/ui/button';
@@ -20,23 +20,35 @@ import {
   History,
   TrendingUp,
   EyeOff,
-  ShieldCheck,
-  ChevronRight
+  ShieldCheck
 } from 'lucide-react';
 import { Toaster } from '@/components/ui/toaster';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { useFirestore, useCollection, useDoc } from '@/firebase';
+import { collection, query, orderBy, doc, where } from 'firebase/firestore';
 
 export default function DashboardPage() {
   const router = useRouter();
+  const firestore = useFirestore();
   const [user, setUser] = useState<User | null>(null);
-  const [matches, setMatches] = useState<Match[]>([]);
-  const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
-  const [leaderboard, setLeaderboard] = useState<User[]>([]);
-  const [settings, setSettings] = useState<AppSettings>({ leaderboardVisible: true });
+  
+  // Firestore Data Hooks
+  const matchesQuery = useMemo(() => query(collection(firestore, 'matches'), orderBy('date', 'asc')), [firestore]);
+  const broadcastsQuery = useMemo(() => query(collection(firestore, 'broadcasts'), orderBy('timestamp', 'desc')), [firestore]);
+  const leaderboardQuery = useMemo(() => query(collection(firestore, 'users'), orderBy('points', 'desc')), [firestore]);
+  const settingsDocRef = useMemo(() => doc(firestore, 'settings', 'app'), [firestore]);
+
+  const { data: matches } = useCollection<Match>(matchesQuery);
+  const { data: broadcasts } = useCollection<Broadcast>(broadcastsQuery);
+  const { data: leaderboard } = useCollection<User>(leaderboardQuery);
+  const { data: settingsData } = useDoc<AppSettings>(settingsDocRef);
+
   const [activeTab, setActiveTab] = useState('upcoming');
   const [selectedRound, setSelectedRound] = useState<string>('all');
   const stadiumBg = PlaceHolderImages.find(img => img.id === 'stadium-bg');
+
+  const settings = settingsData || { leaderboardVisible: true };
 
   useEffect(() => {
     const savedUser = localStorage.getItem('kw_current_user');
@@ -44,24 +56,18 @@ export default function DashboardPage() {
       router.push('/login');
       return;
     }
-    const parsedUser = JSON.parse(savedUser);
-    const freshUser = db.users.find(parsedUser.username);
-    setUser(freshUser || parsedUser);
-    refreshData();
+    setUser(JSON.parse(savedUser));
   }, [router]);
 
-  const refreshData = () => {
-    setMatches(db.matches.all());
-    setBroadcasts(db.broadcasts.all());
-    setLeaderboard(db.users.all());
-    setSettings(db.settings.get());
-    const savedUser = localStorage.getItem('kw_current_user');
-    if (savedUser) {
-      const parsed = JSON.parse(savedUser);
-      const fresh = db.users.find(parsed.username);
-      if (fresh) setUser(fresh);
-    }
-  };
+  // Track the current user's profile in real-time for point updates
+  const currentUserRef = useMemo(() => user ? doc(firestore, 'users', user.id) : null, [firestore, user]);
+  const { data: freshUser } = useDoc<User>(currentUserRef);
+  
+  // Track user's predictions in real-time
+  const userPredictionsQuery = useMemo(() => user ? query(collection(firestore, 'predictions'), where('userId', '==', user.id)) : null, [firestore, user]);
+  const { data: predictions } = useCollection<Prediction>(userPredictionsQuery);
+
+  const activeUser = freshUser || user;
 
   const logout = () => {
     localStorage.removeItem('kw_current_user');
@@ -86,7 +92,7 @@ export default function DashboardPage() {
     });
   }, [matches, activeTab, selectedRound]);
 
-  if (!user) return null;
+  if (!activeUser) return null;
 
   return (
     <div className="min-h-screen relative flex flex-col bg-background">
@@ -108,9 +114,9 @@ export default function DashboardPage() {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
               <TrendingUp className="h-3 w-3 text-primary" />
-              <span className="text-xs font-black text-primary uppercase">{user.points} XP</span>
+              <span className="text-xs font-black text-primary uppercase">{activeUser.points} XP</span>
             </div>
-            {user.isAdmin && (
+            {activeUser.isAdmin && (
               <Button size="sm" variant="outline" onClick={() => router.push('/admin')} className="text-[9px] font-black uppercase h-7 border-primary/20 rounded-none bg-primary/5 hover:bg-primary hover:text-white transition-all">
                 <ShieldCheck className="h-3 w-3 mr-1" /> Command Center
               </Button>
@@ -118,8 +124,8 @@ export default function DashboardPage() {
           </div>
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex flex-col items-end mr-2">
-              <span className="text-[10px] font-black uppercase text-primary tracking-widest">{user.username}</span>
-              <span className="text-[9px] text-muted-foreground font-bold uppercase">{user.year} {user.department}</span>
+              <span className="text-[10px] font-black uppercase text-primary tracking-widest">{activeUser.username}</span>
+              <span className="text-[9px] text-muted-foreground font-bold uppercase">{activeUser.year} {activeUser.department}</span>
             </div>
             <Button 
               variant="outline" 
@@ -193,9 +199,8 @@ export default function DashboardPage() {
                         <MatchCard 
                           key={match.id} 
                           match={match} 
-                          user={user} 
-                          existingPrediction={db.predictions.forUser(user.id).find(p => p.matchId === match.id)}
-                          onPredictionSubmit={refreshData}
+                          user={activeUser} 
+                          existingPrediction={predictions.find(p => p.matchId === match.id)}
                         />
                       ))
                     ) : (
@@ -213,9 +218,8 @@ export default function DashboardPage() {
                         <MatchCard 
                           key={match.id} 
                           match={match} 
-                          user={user} 
-                          existingPrediction={db.predictions.forUser(user.id).find(p => p.matchId === match.id)}
-                          onPredictionSubmit={refreshData}
+                          user={activeUser} 
+                          existingPrediction={predictions.find(p => p.matchId === match.id)}
                         />
                       ))
                     ) : (
@@ -237,7 +241,7 @@ export default function DashboardPage() {
                     <CardContent className="p-0">
                       <div className="divide-y divide-border">
                         {leaderboard.filter(u => !u.isAdmin).map((u, idx) => (
-                          <div key={u.id} className={`flex items-center justify-between px-6 py-5 transition-colors ${u.id === user.id ? 'bg-primary/5 border-l-2 border-primary' : ''}`}>
+                          <div key={u.id} className={`flex items-center justify-between px-6 py-5 transition-colors ${u.id === activeUser.id ? 'bg-primary/5 border-l-2 border-primary' : ''}`}>
                             <div className="flex items-center gap-4">
                               <span className={`w-8 text-[10px] font-black ${idx < 3 ? 'text-primary' : 'text-muted-foreground'}`}>#{idx + 1}</span>
                               <div>
@@ -270,13 +274,13 @@ export default function DashboardPage() {
                 <CardContent className="pt-4 p-0 max-h-[500px] overflow-y-auto scrollbar-hide">
                   <div className="divide-y divide-border">
                     {leaderboard.filter(u => !u.isAdmin).map((u, idx) => (
-                      <div key={u.id} className={`flex items-center justify-between px-5 py-4 transition-all duration-300 ${u.id === user.id ? 'bg-primary/10 border-l-2 border-primary' : 'hover:bg-primary/5'}`}>
+                      <div key={u.id} className={`flex items-center justify-between px-5 py-4 transition-all duration-300 ${u.id === activeUser.id ? 'bg-primary/10 border-l-2 border-primary' : 'hover:bg-primary/5'}`}>
                         <div className="flex items-center gap-4">
                           <span className={`w-6 text-[10px] font-black ${idx === 0 ? 'text-yellow-500' : idx === 1 ? 'text-slate-400' : idx === 2 ? 'text-amber-600' : 'text-muted-foreground'}`}>
                             #{idx + 1}
                           </span>
                           <div>
-                            <p className={`text-[11px] font-black uppercase tracking-tight ${u.id === user.id ? 'text-primary' : ''}`}>{u.username}</p>
+                            <p className={`text-[11px] font-black uppercase tracking-tight ${u.id === activeUser.id ? 'text-primary' : ''}`}>{u.username}</p>
                             <p className="text-[8px] text-muted-foreground uppercase font-black tracking-widest">{u.year} | {u.department}</p>
                           </div>
                         </div>
@@ -285,9 +289,6 @@ export default function DashboardPage() {
                     ))}
                   </div>
                 </CardContent>
-                <div className="bg-primary/5 border-t border-border p-3 text-center">
-                  <p className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">TOP 50 PLAYERS SHOWN</p>
-                </div>
               </Card>
             ) : (
               <Card className="glass-morphism border-dashed border-primary/20 rounded-none overflow-hidden shadow-xl">

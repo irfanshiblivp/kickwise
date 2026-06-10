@@ -10,20 +10,21 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, MapPin, Lock, Trophy, Timer, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
+import { useFirestore } from '@/firebase';
 
 interface MatchCardProps {
   match: Match;
   user: User;
   existingPrediction?: Prediction;
-  onPredictionSubmit: () => void;
 }
 
-export function MatchCard({ match, user, existingPrediction, onPredictionSubmit }: MatchCardProps) {
+export function MatchCard({ match, user, existingPrediction }: MatchCardProps) {
   const [scoreA, setScoreA] = useState(existingPrediction?.scoreA.toString() || '');
   const [scoreB, setScoreB] = useState(existingPrediction?.scoreB.toString() || '');
   const [isAutoLocked, setIsAutoLocked] = useState(false);
   const [isClosingSoon, setIsClosingSoon] = useState(false);
   const { toast } = useToast();
+  const firestore = useFirestore();
 
   useEffect(() => {
     const checkLock = () => {
@@ -57,7 +58,7 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
       return;
     }
 
-    db.predictions.submit({
+    db.predictions.submit(firestore, {
       userId: user.id,
       matchId: match.id,
       scoreA: parseInt(scoreA),
@@ -68,7 +69,6 @@ export function MatchCard({ match, user, existingPrediction, onPredictionSubmit 
       title: "Prediction Recorded",
       description: `Your ${scoreA}-${scoreB} result has been locked in.`
     });
-    onPredictionSubmit();
   };
 
   const isUrl = (str: string) => str.startsWith('http') || str.startsWith('https') || str.startsWith('/');

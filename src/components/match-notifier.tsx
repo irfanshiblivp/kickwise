@@ -1,20 +1,27 @@
+
 "use client";
 
-import { useEffect, useRef } from 'react';
-import { db, Match } from '@/lib/db';
+import { useEffect, useRef, useMemo } from 'react';
+import { Match } from '@/lib/db';
 import { useToast } from '@/hooks/use-toast';
-import { Bell } from 'lucide-react';
+import { useFirestore, useCollection } from '@/firebase';
+import { collection, query } from 'firebase/firestore';
 
 export function MatchNotifier() {
   const { toast } = useToast();
+  const firestore = useFirestore();
   const notifiedMatches = useRef<Set<string>>(new Set());
 
+  const matchesQuery = useMemo(() => query(collection(firestore, 'matches')), [firestore]);
+  const { data: matches } = useCollection<Match>(matchesQuery);
+
   useEffect(() => {
+    if (!matches || matches.length === 0) return;
+
     const checkUpcomingMatches = () => {
-      const allMatches = db.matches.all();
       const now = new Date();
 
-      allMatches.forEach((match: Match) => {
+      matches.forEach((match: Match) => {
         if (match.isFinished || match.isLocked) return;
         if (notifiedMatches.current.has(match.id)) return;
 
@@ -34,12 +41,11 @@ export function MatchNotifier() {
       });
     };
 
-    // Check every minute
     const interval = setInterval(checkUpcomingMatches, 60000);
-    checkUpcomingMatches(); // Initial check
+    checkUpcomingMatches();
 
     return () => clearInterval(interval);
-  }, [toast]);
+  }, [toast, matches]);
 
   return null;
 }
