@@ -75,7 +75,7 @@ const WORLD_CUP_FIXTURES = [
   { teamA: "Canada", teamB: "Group B2", flagA: "🇨🇦", flagB: "🏳️", group: "Group B", round: 1, date: "2026-06-12", time: "17:00", venue: "BMO Field (Toronto)" },
   { teamA: "USA", teamB: "Group D2", flagA: "🇺🇸", flagB: "🏳️", group: "Group D", round: 1, date: "2026-06-12", time: "19:00", venue: "SoFi Stadium (Los Angeles)" },
   
-  // Group Stage Marquee Matchups (Plausible/Sample)
+  // Group Stage Marquee Matchups
   { teamA: "Argentina", teamB: "Portugal", flagA: "🇦🇷", flagB: "🇵🇹", group: "Group C", round: 1, date: "2026-06-13", time: "20:00", venue: "AT&T Stadium (Dallas)" },
   { teamA: "France", teamB: "Senegal", flagA: "🇫🇷", flagB: "🇸🇳", group: "Group E", round: 1, date: "2026-06-14", time: "15:00", venue: "Hard Rock Stadium (Miami)" },
   { teamA: "Brazil", teamB: "Belgium", flagA: "🇧🇷", flagB: "🇧🇪", group: "Group F", round: 1, date: "2026-06-15", time: "19:00", venue: "MetLife Stadium (NY/NJ)" },
@@ -86,14 +86,19 @@ const WORLD_CUP_FIXTURES = [
   { teamA: "Italy", teamB: "Uruguay", flagA: "🇮🇹", flagB: "🇺🇾", group: "Group K", round: 1, date: "2026-06-20", time: "19:00", venue: "Lincoln Financial Field (Philadelphia)" },
   { teamA: "Croatia", teamB: "Colombia", flagA: "🇭🇷", flagB: "🇨🇴", group: "Group L", round: 1, date: "2026-06-21", time: "18:00", venue: "Lumen Field (Seattle)" },
 
-  // Round 2 Samples
-  { teamA: "Mexico", teamB: "Group A3", flagA: "🇲🇽", flagB: "🏳️", group: "Group A", round: 2, date: "2026-06-22", time: "19:00", venue: "Estadio BBVA (Monterrey)" },
-  { teamA: "USA", teamB: "Group D3", flagA: "🇺🇸", flagB: "🏳️", group: "Group D", round: 2, date: "2026-06-23", time: "20:00", venue: "Lumen Field (Seattle)" },
-  { teamA: "Argentina", teamB: "Group C3", flagA: "🇦🇷", flagB: "🏳️", group: "Group C", round: 2, date: "2026-06-24", time: "18:00", venue: "NRG Stadium (Houston)" },
+  // Additional Group Stage Matches
+  { teamA: "Switzerland", teamB: "Ghana", flagA: "🇨🇭", flagB: "🇬🇭", group: "Group E", round: 1, date: "2026-06-22", time: "15:00", venue: "Gillette Stadium (Boston)" },
+  { teamA: "Denmark", teamB: "Tunisia", flagA: "🇩🇰", flagB: "🇹🇳", group: "Group F", round: 1, date: "2026-06-22", time: "18:00", venue: "BMO Field (Toronto)" },
+  { teamA: "Poland", teamB: "Australia", flagA: "🇵🇱", flagB: "🇦🇺", group: "Group G", round: 1, date: "2026-06-23", time: "14:00", venue: "Lincoln Financial Field (Philadelphia)" },
+  { teamA: "Ecuador", teamB: "Wales", flagA: "🇪🇨", flagB: "🏴󠁧󠁢󠁷󠁬󠁳󠁿", group: "Group H", round: 1, date: "2026-06-23", time: "17:00", venue: "NRG Stadium (Houston)" },
+  { teamA: "Serbia", teamB: "Cameroon", flagA: "🇷🇸", flagB: "🇨🇲", group: "Group I", round: 1, date: "2026-06-24", time: "16:00", venue: "Hard Rock Stadium (Miami)" },
+  { teamA: "Costa Rica", teamB: "Iran", flagA: "🇨🇷", flagB: "🇮🇷", group: "Group J", round: 1, date: "2026-06-24", time: "19:00", venue: "SoFi Stadium (Los Angeles)" },
   
   // Friendlies
   { teamA: "India", teamB: "Australia", flagA: "🇮🇳", flagB: "🇦🇺", group: "Friendly", round: 0, date: "2026-06-05", time: "20:00", venue: "MetLife Stadium (NY/NJ)" },
-  { teamA: "Switzerland", teamB: "Sweden", flagA: "🇨🇭", flagB: "🇸🇪", group: "Friendly", round: 0, date: "2026-06-06", time: "19:00", venue: "BMO Field (Toronto)" }
+  { teamA: "Switzerland", teamB: "Sweden", flagA: "🇨🇭", flagB: "🇸🇪", group: "Friendly", round: 0, date: "2026-06-06", time: "19:00", venue: "BMO Field (Toronto)" },
+  { teamA: "Argentina", teamB: "Portugal", flagA: "🇦🇷", flagB: "🇵🇹", group: "Friendly", round: 0, date: "2026-06-07", time: "21:00", venue: "AT&T Stadium (Dallas)" },
+  { teamA: "France", teamB: "England", flagA: "🇫🇷", flagB: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", group: "Friendly", round: 0, date: "2026-06-08", time: "20:30", venue: "Hard Rock Stadium (Miami)" }
 ];
 
 export default function AdminPage() {
