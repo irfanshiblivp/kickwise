@@ -35,7 +35,8 @@ import {
   Radio,
   Settings2,
   Eye,
-  EyeOff
+  EyeOff,
+  Flame
 } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -46,7 +47,7 @@ const STADIUMS = {
   USA: [
     "Mercedes-Benz Stadium (Atlanta)",
     "Gillette Stadium (Boston)",
-    "AT&T Stadium (Dallas - 9 matches)",
+    "AT&T Stadium (Dallas)",
     "NRG Stadium (Houston)",
     "Arrowhead Stadium (Kansas City)",
     "SoFi Stadium (Los Angeles)",
@@ -67,12 +68,19 @@ const STADIUMS = {
   ]
 };
 
+const FRIENDLY_FIXTURES = [
+  { teamA: "Argentina", teamB: "Portugal", flagA: "🇦🇷", flagB: "🇵🇹", group: "Friendly", round: 0, date: "2026-06-15", time: "20:00", venue: "SoFi Stadium (Los Angeles)" },
+  { teamA: "France", teamB: "England", flagA: "🇫🇷", flagB: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", group: "Friendly", round: 0, date: "2026-06-16", time: "21:00", venue: "MetLife Stadium (NY/NJ)" },
+  { teamA: "Brazil", teamB: "Spain", flagA: "🇧🇷", flagB: "🇪🇸", group: "Friendly", round: 0, date: "2026-06-17", time: "19:00", venue: "AT&T Stadium (Dallas)" },
+  { teamA: "Germany", teamB: "Italy", flagA: "🇩🇪", flagB: "🇮🇹", group: "Friendly", round: 0, date: "2026-06-18", time: "20:30", venue: "Hard Rock Stadium (Miami)" },
+  { teamA: "Japan", teamB: "South Korea", flagA: "🇯🇵", flagB: "🇰🇷", group: "Friendly", round: 0, date: "2026-06-19", time: "18:00", venue: "BC Place (Vancouver)" }
+];
+
 export default function AdminPage() {
   const router = useRouter();
   const { toast } = useToast();
   const firestore = useFirestore();
 
-  // Firestore Data Hooks
   const matchesQuery = useMemo(() => query(collection(firestore, 'matches'), orderBy('date', 'asc')), [firestore]);
   const messagesQuery = useMemo(() => query(collection(firestore, 'inbox'), orderBy('timestamp', 'desc')), [firestore]);
   const usersQuery = useMemo(() => query(collection(firestore, 'users'), orderBy('points', 'desc')), [firestore]);
@@ -119,6 +127,13 @@ export default function AdminPage() {
     });
     toast({ title: "Match Added", description: `${newMatch.teamA} vs ${newMatch.teamB} scheduled.` });
     setNewMatch({ teamA: '', teamB: '', flagA: '', flagB: '', group: 'Group A', round: 1, date: '', time: '', venue: '' });
+  };
+
+  const seedFriendlies = async () => {
+    for (const fixture of FRIENDLY_FIXTURES) {
+      db.matches.add(firestore, { ...fixture, isLocked: false });
+    }
+    toast({ title: "Friendlies Seeded", description: "5 international friendly matches added to the schedule." });
   };
 
   const toggleLeaderboardVisibility = (checked: boolean) => {
@@ -267,6 +282,7 @@ export default function AdminPage() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="0">Friendly</SelectItem>
                           <SelectItem value="1">Round 1</SelectItem>
                           <SelectItem value="2">Round 2</SelectItem>
                           <SelectItem value="3">Round 3</SelectItem>
@@ -357,7 +373,7 @@ export default function AdminPage() {
                       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                         <div className="flex items-center gap-6">
                           <div className="text-center w-20 border-r border-border/50 pr-6">
-                            <Badge className="bg-primary text-white mb-2 uppercase font-black text-[9px] rounded-none px-2 tracking-tighter">RD {m.round}</Badge>
+                            <Badge className="bg-primary text-white mb-2 uppercase font-black text-[9px] rounded-none px-2 tracking-tighter">{m.round === 0 ? 'FRND' : `RD ${m.round}`}</Badge>
                             <p className="text-[9px] font-black text-muted-foreground uppercase">{m.group}</p>
                           </div>
                           <div>
@@ -465,6 +481,7 @@ export default function AdminPage() {
               </CardHeader>
               <CardContent className="pt-10 px-6 md:px-12 pb-12 space-y-6">
                 {[
+                  { label: "INTERNATIONAL FRIENDLIES", val: 0, desc: "Exhibition match-ups" },
                   { label: "GROUP STAGE ROUND 1", val: 1, desc: "Opening set of 24 fixtures" },
                   { label: "GROUP STAGE ROUND 2", val: 2, desc: "Mid-group tournament matches" },
                   { label: "GROUP STAGE ROUND 3", val: 3, desc: "Final group stage qualifiers" },
@@ -561,15 +578,23 @@ export default function AdminPage() {
               </Card>
 
               <div className="space-y-10">
-                <Card className="glass-morphism rounded-none classic-border border-destructive/30 overflow-hidden shadow-2xl">
-                  <CardHeader className="bg-destructive/10 border-b border-border py-6 text-center">
-                    <CardTitle className="font-headline font-black uppercase tracking-widest text-sm text-destructive flex items-center justify-center gap-3">
+                <Card className="glass-morphism rounded-none classic-border border-primary/20 overflow-hidden shadow-2xl">
+                  <CardHeader className="bg-primary/10 border-b border-border py-6 text-center">
+                    <CardTitle className="font-headline font-black uppercase tracking-widest text-sm text-primary flex items-center justify-center gap-3">
                       <RefreshCcw className="h-5 w-5" />
                       Dhruva 2026 Prediction League Core
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-10 space-y-6 px-10 pb-12">
-                     <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-50 text-center">System Managed via Firestore Real-time DB</p>
+                     <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-50 text-center mb-6">System Management Utilities</p>
+                     <Button 
+                      onClick={seedFriendlies}
+                      variant="outline"
+                      className="w-full h-14 border-primary/20 rounded-none font-black uppercase tracking-[0.2em] text-[10px] hover:bg-primary/5 group"
+                    >
+                      <Flame className="h-4 w-4 mr-3 text-primary group-hover:animate-bounce" />
+                      Seed International Friendlies
+                    </Button>
                   </CardContent>
                 </Card>
               </div>

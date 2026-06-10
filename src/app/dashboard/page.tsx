@@ -33,7 +33,6 @@ export default function DashboardPage() {
   const firestore = useFirestore();
   const [user, setUser] = useState<User | null>(null);
   
-  // Firestore Data Hooks
   const matchesQuery = useMemo(() => query(collection(firestore, 'matches'), orderBy('date', 'asc')), [firestore]);
   const broadcastsQuery = useMemo(() => query(collection(firestore, 'broadcasts'), orderBy('timestamp', 'desc')), [firestore]);
   const leaderboardQuery = useMemo(() => query(collection(firestore, 'users'), orderBy('points', 'desc')), [firestore]);
@@ -59,11 +58,9 @@ export default function DashboardPage() {
     setUser(JSON.parse(savedUser));
   }, [router]);
 
-  // Track the current user's profile in real-time for point updates
   const currentUserRef = useMemo(() => user ? doc(firestore, 'users', user.id) : null, [firestore, user]);
   const { data: freshUser } = useDoc<User>(currentUserRef);
   
-  // Track user's predictions in real-time
   const userPredictionsQuery = useMemo(() => user ? query(collection(firestore, 'predictions'), where('userId', '==', user.id)) : null, [firestore, user]);
   const { data: predictions } = useCollection<Prediction>(userPredictionsQuery);
 
@@ -175,6 +172,7 @@ export default function DashboardPage() {
                     <div className="flex bg-muted/50 border border-border p-1 rounded-none overflow-x-auto scrollbar-hide">
                       {[
                         { id: 'all', label: 'ALL ROUNDS' },
+                        { id: '0', label: 'FRIENDLIES' },
                         { id: '1', label: 'ROUND 1' },
                         { id: '2', label: 'ROUND 2' },
                         { id: '3', label: 'ROUND 3' },
