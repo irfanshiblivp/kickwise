@@ -72,16 +72,12 @@ export interface AppSettings {
   leaderboardVisible: boolean;
 }
 
-/**
- * Firestore Mutation Helpers
- * We keep the "db" naming for compatibility but refactor methods to accept Firestore instance.
- */
 export const db = {
   users: {
-    add: async (firestore: Firestore, user: Omit<User, 'id' | 'points' | 'isAdmin'>) => {
+    create: async (firestore: Firestore, data: Omit<User, 'id' | 'points' | 'isAdmin'>) => {
       const userRef = doc(collection(firestore, 'users'));
       const newUser = {
-        ...user,
+        ...data,
         id: userRef.id,
         points: 0,
         isAdmin: false
@@ -90,7 +86,7 @@ export const db = {
         errorEmitter.emit('permission-error', new FirestorePermissionError({
           path: userRef.path,
           operation: 'create',
-          requestResourceData: user
+          requestResourceData: data
         }));
       });
       return newUser;
@@ -103,12 +99,6 @@ export const db = {
           operation: 'update'
         }));
       });
-    },
-    resetPoints: async (firestore: Firestore) => {
-      const snap = await getDocs(collection(firestore, 'users'));
-      const batch = writeBatch(firestore);
-      snap.docs.forEach(d => batch.update(d.ref, { points: 0 }));
-      await batch.commit();
     }
   },
   matches: {

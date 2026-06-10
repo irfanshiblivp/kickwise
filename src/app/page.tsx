@@ -139,6 +139,7 @@ export default function Home() {
               <form onSubmit={handleSendMessage} className="space-y-4">
                 <div className="space-y-2">
                   <Input 
+                    placeholder="Your Name"
                     className="rounded-none bg-white/50 border-primary/10 focus-visible:ring-primary/30"
                     value={msgName}
                     onChange={e => setMsgName(e.target.value)}
@@ -147,6 +148,7 @@ export default function Home() {
                 </div>
                 <div className="space-y-2">
                   <Textarea 
+                    placeholder="Message Content"
                     className="rounded-none bg-white/50 border-primary/10 min-h-[100px] focus-visible:ring-primary/30"
                     value={msgBody}
                     onChange={e => setMsgBody(e.target.value)}
