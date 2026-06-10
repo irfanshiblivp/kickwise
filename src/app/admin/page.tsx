@@ -89,10 +89,10 @@ export default function AdminPage() {
   const broadcastsQuery = useMemo(() => query(collection(firestore, 'broadcasts'), orderBy('timestamp', 'desc')), [firestore]);
   const settingsDocRef = useMemo(() => doc(firestore, 'settings', 'app'), [firestore]);
 
-  const { data: matches } = useCollection<Match>(matchesQuery);
-  const { data: messages } = useCollection<UserMessage>(messagesQuery);
-  const { data: users } = useCollection<User>(usersQuery);
-  const { data: broadcasts } = useCollection<any>(broadcastsQuery);
+  const { data: matches = [] } = useCollection<Match>(matchesQuery);
+  const { data: messages = [] } = useCollection<UserMessage>(messagesQuery);
+  const { data: users = [] } = useCollection<User>(usersQuery);
+  const { data: broadcasts = [] } = useCollection<any>(broadcastsQuery);
   const { data: settingsData } = useDoc<AppSettings>(settingsDocRef);
 
   const settings = settingsData || { leaderboardVisible: true };
@@ -584,11 +584,11 @@ export default function AdminPage() {
                   <CardHeader className="bg-primary/10 border-b border-border py-6 text-center">
                     <CardTitle className="font-headline font-black uppercase tracking-widest text-sm text-primary flex items-center justify-center gap-3">
                       <RefreshCcw className="h-5 w-5" />
-                      Dhruva 2026 Prediction League Core
+                      Tournament Utilities
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-10 space-y-6 px-10 pb-12">
-                     <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-50 text-center mb-6">System Management Utilities</p>
+                     <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-50 text-center mb-6">Data Management</p>
                      <Button 
                       onClick={seedFriendlies}
                       variant="outline"
@@ -600,38 +600,40 @@ export default function AdminPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="glass-morphism rounded-none classic-border shadow-2xl">
-                  <CardHeader className="bg-primary/5 border-b border-border py-6">
-                    <CardTitle className="font-headline font-black uppercase tracking-widest text-sm flex items-center gap-3">
-                      <Database className="h-5 w-5 text-primary" />
-                      Database & Console Link
+                <Card className="glass-morphism rounded-none classic-border shadow-2xl border-primary/20 bg-primary/5">
+                  <CardHeader className="border-b border-border py-6">
+                    <CardTitle className="font-headline font-black uppercase tracking-widest text-sm flex items-center gap-3 text-primary">
+                      <Database className="h-5 w-5" />
+                      Firestore Database Console
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-6 px-8 pb-8 space-y-6">
-                    <div className="p-4 bg-primary/5 border border-primary/10 space-y-2">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-primary">Your Firebase Project Identity</p>
-                      <div className="flex items-center justify-between">
-                        <code className="bg-background px-3 py-1 text-xs font-bold border border-border">kickwise-2026</code>
-                        <Badge className="bg-green-600 text-white font-black text-[8px] rounded-none">ACTIVE</Badge>
+                  <CardContent className="pt-8 px-10 pb-10 space-y-8">
+                    <div className="space-y-3">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Active Project Identity</p>
+                      <div className="flex items-center justify-between bg-background p-3 border border-border">
+                        <code className="text-xs font-bold text-primary">kickwise-2026</code>
+                        <Badge className="bg-green-600 text-white font-black text-[8px] rounded-none">CONNECTED</Badge>
                       </div>
                     </div>
 
-                    <p className="text-[10px] font-bold text-muted-foreground uppercase leading-relaxed">
-                      To view or modify raw data, use the Firebase Console:
-                    </p>
-                    <div className="space-y-3">
-                      <div className="flex items-start gap-3">
-                        <span className="bg-primary/10 text-primary w-5 h-5 flex items-center justify-center text-[10px] font-black shrink-0">1</span>
-                        <p className="text-[10px] font-bold uppercase">Log in to the <a href="https://console.firebase.google.com" target="_blank" className="text-primary hover:underline inline-flex items-center gap-1">Firebase Console <ExternalLink className="h-2 w-2" /></a> using your current Google account.</p>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <span className="bg-primary/10 text-primary w-5 h-5 flex items-center justify-center text-[10px] font-black shrink-0">2</span>
-                        <p className="text-[10px] font-bold uppercase">Select project: <span className="text-foreground">kickwise-2026</span></p>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <span className="bg-primary/10 text-primary w-5 h-5 flex items-center justify-center text-[10px] font-black shrink-0">3</span>
-                        <p className="text-[10px] font-bold uppercase">Click **Firestore Database** in the left sidebar to manage collections.</p>
-                      </div>
+                    <div className="space-y-4">
+                      <p className="text-[11px] font-bold text-foreground leading-relaxed">
+                        Access the Firebase Console to manage real-time data, view player records, and monitor tournament logs.
+                      </p>
+                      <Button 
+                        asChild
+                        className="w-full bg-primary hover:bg-primary/90 h-14 rounded-none font-black uppercase tracking-[0.2em] text-[10px] shadow-xl"
+                      >
+                        <a href="https://console.firebase.google.com/u/0/project/kickwise-2026/firestore/data" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
+                          View Live Database <ExternalLink className="h-4 w-4" />
+                        </a>
+                      </Button>
+                    </div>
+
+                    <div className="pt-4 border-t border-border/50">
+                      <p className="text-[9px] font-bold text-muted-foreground uppercase text-center">
+                        Secure Access via: <span className="text-foreground">Google Cloud Identity</span>
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
