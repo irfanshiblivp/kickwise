@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -15,10 +14,12 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { db } from '@/lib/db';
 import { useToast } from '@/hooks/use-toast';
 import { Toaster } from '@/components/ui/toaster';
+import { useFirestore } from '@/firebase';
 
 export default function Home() {
   const router = useRouter();
   const { toast } = useToast();
+  const firestore = useFirestore();
   const [isAuth, setIsAuth] = useState(false);
   const [msgName, setMsgName] = useState('');
   const [msgBody, setMsgBody] = useState('');
@@ -32,7 +33,7 @@ export default function Home() {
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!msgName || !msgBody) return;
-    db.inbox.add(msgName, msgBody);
+    db.inbox.add(firestore, msgName, msgBody);
     toast({ title: "Message Sent", description: "Admin will review your feedback soon." });
     setMsgName('');
     setMsgBody('');
@@ -40,7 +41,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen relative flex flex-col items-center bg-background selection:bg-primary selection:text-white overflow-x-hidden">
-      {/* Stadium Background */}
       <div className="fixed inset-0 z-0 overflow-hidden">
         <Image 
           src={stadiumBg?.imageUrl || ''} 

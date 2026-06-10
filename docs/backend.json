@@ -1,0 +1,106 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A player in the prediction league",
+      "type": "object",
+      "properties": {
+        "username": { "type": "string" },
+        "year": { "type": "string" },
+        "department": { "type": "string" },
+        "points": { "type": "number" },
+        "isAdmin": { "type": "boolean" },
+        "password": { "type": "string" }
+      },
+      "required": ["username", "password", "year", "department"]
+    },
+    "Match": {
+      "title": "Match",
+      "description": "A tournament fixture",
+      "type": "object",
+      "properties": {
+        "round": { "type": "number" },
+        "group": { "type": "string" },
+        "teamA": { "type": "string" },
+        "teamB": { "type": "string" },
+        "flagA": { "type": "string" },
+        "flagB": { "type": "string" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "venue": { "type": "string" },
+        "isLocked": { "type": "boolean" },
+        "scoreA": { "type": "number" },
+        "scoreB": { "type": "number" },
+        "isFinished": { "type": "boolean" }
+      }
+    },
+    "Prediction": {
+      "title": "Prediction",
+      "description": "A user's score prediction for a match",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "matchId": { "type": "string" },
+        "scoreA": { "type": "number" },
+        "scoreB": { "type": "number" }
+      }
+    },
+    "Broadcast": {
+      "title": "Broadcast",
+      "description": "An admin announcement",
+      "type": "object",
+      "properties": {
+        "message": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "author": { "type": "string" }
+      }
+    },
+    "UserMessage": {
+      "title": "UserMessage",
+      "description": "A message from a user to the admin",
+      "type": "object",
+      "properties": {
+        "username": { "type": "string" },
+        "message": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Global application settings",
+      "type": "object",
+      "properties": {
+        "leaderboardVisible": { "type": "boolean" }
+      }
+    }
+  },
+  "auth": {
+    "providers": ["password"]
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles and scores"
+    },
+    "/matches/{matchId}": {
+      "schema": "Match",
+      "description": "Tournament fixtures"
+    },
+    "/predictions/{predictionId}": {
+      "schema": "Prediction",
+      "description": "All match predictions"
+    },
+    "/broadcasts/{broadcastId}": {
+      "schema": "Broadcast",
+      "description": "Admin broadcasts"
+    },
+    "/inbox/{messageId}": {
+      "schema": "UserMessage",
+      "description": "User feedback messages"
+    },
+    "/settings/app": {
+      "schema": "Settings",
+      "description": "Global app state"
+    }
+  }
+}
