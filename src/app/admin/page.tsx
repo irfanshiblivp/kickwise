@@ -604,25 +604,33 @@ export default function AdminPage() {
                   <CardHeader className="bg-primary/5 border-b border-border py-6">
                     <CardTitle className="font-headline font-black uppercase tracking-widest text-sm flex items-center gap-3">
                       <Database className="h-5 w-5 text-primary" />
-                      Database Overview
+                      Database & Console Link
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-6 px-8 pb-8 space-y-4">
+                  <CardContent className="pt-6 px-8 pb-8 space-y-6">
+                    <div className="p-4 bg-primary/5 border border-primary/10 space-y-2">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-primary">Your Firebase Project Identity</p>
+                      <div className="flex items-center justify-between">
+                        <code className="bg-background px-3 py-1 text-xs font-bold border border-border">kickwise-2026</code>
+                        <Badge className="bg-green-600 text-white font-black text-[8px] rounded-none">ACTIVE</Badge>
+                      </div>
+                    </div>
+
                     <p className="text-[10px] font-bold text-muted-foreground uppercase leading-relaxed">
-                      Your application is powered by **Firebase Firestore**. To view, edit, or delete data manually:
+                      To view or modify raw data, use the Firebase Console:
                     </p>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <div className="flex items-start gap-3">
                         <span className="bg-primary/10 text-primary w-5 h-5 flex items-center justify-center text-[10px] font-black shrink-0">1</span>
-                        <p className="text-[10px] font-bold uppercase">Log in to the <a href="https://console.firebase.google.com" target="_blank" className="text-primary hover:underline inline-flex items-center gap-1">Firebase Console <ExternalLink className="h-2 w-2" /></a></p>
+                        <p className="text-[10px] font-bold uppercase">Log in to the <a href="https://console.firebase.google.com" target="_blank" className="text-primary hover:underline inline-flex items-center gap-1">Firebase Console <ExternalLink className="h-2 w-2" /></a> using your current Google account.</p>
                       </div>
                       <div className="flex items-start gap-3">
                         <span className="bg-primary/10 text-primary w-5 h-5 flex items-center justify-center text-[10px] font-black shrink-0">2</span>
-                        <p className="text-[10px] font-bold uppercase">Select Project: <span className="text-foreground">kickwise-2026</span></p>
+                        <p className="text-[10px] font-bold uppercase">Select project: <span className="text-foreground">kickwise-2026</span></p>
                       </div>
                       <div className="flex items-start gap-3">
                         <span className="bg-primary/10 text-primary w-5 h-5 flex items-center justify-center text-[10px] font-black shrink-0">3</span>
-                        <p className="text-[10px] font-bold uppercase">Navigate to **Firestore Database** in the sidebar.</p>
+                        <p className="text-[10px] font-bold uppercase">Click **Firestore Database** in the left sidebar to manage collections.</p>
                       </div>
                     </div>
                   </CardContent>
